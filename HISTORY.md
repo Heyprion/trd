@@ -13,3 +13,7 @@
 
 - 按用户要求建立 `Agent.md`，明确工作目的、Agent 自主管理 Git，以及持续维护文字历史。
 - 本次文档工作分支为 `docs/agent-workflow`。
+
+## 2026-11-14：补充 SwanLab 记录约定
+
+- 用户确认本地环境已登录 SwanLab；所有本地和远程实验均须上传 SwanLab，并在 `HISTORY.md` 中记录实验链接。
