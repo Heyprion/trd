@@ -887,6 +887,10 @@ class KLTrainer:
 
                 del teacher_output
                 del train_output
+                # Full-vocabulary teacher logits can be many GiB. Release the
+                # outer batch before the next teacher forward (micro-batches
+                # may pop their own copy of the logits key).
+                del student_batch, teacher_batch, batch
 
         return {
             "kl_loss": running_kl / max(num_batches, 1),

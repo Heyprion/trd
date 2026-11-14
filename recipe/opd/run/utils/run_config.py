@@ -281,6 +281,11 @@ def print_config(values: dict[str, str]) -> None:
     print(f"Output dir:      {values['EPOCH_OUTPUT_DIR']}")
     print(f"Model save dir:  {values['EPOCH_MODEL_SAVE_DIR']}")
     print(f"Gen results dir: {values['GEN_RESULTS_DIR']}")
+    print(f"FSDP / SP:       {values['FSDP_STRATEGY']} size={values['FSDP_SIZE']} sp={values['SP_SIZE']}")
+    print(f"Batch / accum:   {values['TRAIN_BATCH_SIZE']} / {values['GRADIENT_ACCUMULATION_STEPS']} per DP rank")
+    print(f"Token budget:    {values['MAX_TOKEN_LEN_PER_GPU']} per GPU; max sequence={values['MAX_LENGTH']}")
+    print(f"Storage / KL:    {values['MODEL_STORAGE_DTYPE']} / {values['KL_LOSS_BACKEND']}; Liger={values['USE_LIGER']}")
+    print(f"Memory policy:   teacher_cpu={values['TEACHER_CPU_OFFLOAD']} allocator_fraction={values['CUDA_MEMORY_FRACTION']}")
     print(f"Eval:            {values['RUN_EVAL_AFTER_TRAINING']} ({values['EVAL_DATASETS']})")
     print("==========================================")
 
@@ -309,6 +314,13 @@ def write_training_config(values: dict[str, str]) -> None:
         "Y_R_PROMPT_LENGTH",
         "MAX_RESPONSE_LENGTH",
         "MAX_LENGTH",
+        "NNODES", "NGPUS_PER_NODE", "TRAIN_BATCH_SIZE", "GRADIENT_ACCUMULATION_STEPS",
+        "FSDP_STRATEGY", "FSDP_SIZE", "SP_SIZE", "MAX_TOKEN_LEN_PER_GPU",
+        "MODEL_STORAGE_DTYPE", "KL_LOSS_BACKEND", "USE_LIGER", "USE_TORCH_COMPILE",
+        "TEACHER_CPU_OFFLOAD", "RESHARD_AFTER_FORWARD", "GRADIENT_CHECKPOINTING", "CUDA_MEMORY_FRACTION",
+        "PARAM_OFFLOAD", "OPTIMIZER_OFFLOAD", "OFFLOAD_POLICY",
+        "LEARNING_RATE", "USE_LORA", "LORA_RANK", "LORA_ALPHA", "WARMUP_RATIO", "WEIGHT_DECAY",
+        "ROLLOUT_GPU_MEMORY_UTILIZATION", "ROLLOUT_MAX_NUM_SEQS", "ROLLOUT_MAX_NUM_BATCHED_TOKENS",
     ]
     names = {
         "MODEL_PATH": "student_model_path",
