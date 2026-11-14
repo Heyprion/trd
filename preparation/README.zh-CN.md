@@ -2,6 +2,12 @@
 
 本目录只准备本仓库数学 OPD 的环境、模型、数据和运行入口。
 
+2026-11-15 已完成双卡首轮性能试跑。下一次 TRD 运行建议显式加载
+`preparation/pilot/profiles/balanced.env.sh`：FSDP2/2 卡、SP=1、每卡 batch=2、累积=32，
+32K 动态 token 预算、单条上限 18,432，开启 Liger 与全词表 KL 重计算。
+满预算压力测试整卡峰值约 88 GiB；详见 [性能报告](pilot/REPORT.zh-CN.md) 和
+[试跑工具说明](pilot/README.zh-CN.md)。下文的 batch=1/累积=64 是最初准备配置，仍保留为未加载 profile 时的默认值。
+
 本机准备已完成：两个模型共约 23 GiB 的权重已下载并通过 SHA256 校验；完整 DeepScaleR 共 40,315 条，五个评测集分别为 30 / 30 / 30 / 100 / 39 条。依赖检查、两卡 FlashAttention 前向/反向、NCCL、数学判分、实际 Ray/vLLM 学生生成，以及 4B 学生 + 8B 教师的两卡单步 TRD KL 更新均已通过。记录见 `readiness.json`、`validation.json` 和 `logs/`。正式完整训练尚未运行。
 
 - 学生：`Qwen/Qwen3-4B-Instruct-2507`

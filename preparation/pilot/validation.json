@@ -1,0 +1,139 @@
+{
+  "status": "passed",
+  "training_probes": 21,
+  "passed_probes": 17,
+  "exploratory_oom_cases": [
+    "bf16-18k-b2-noreshard",
+    "bf16-18k-no-gc",
+    "resident-18k-b2",
+    "resident-18k-b3"
+  ],
+  "validated_profiles": {
+    "capped-resident-16k-b2": {
+      "name": "capped-resident-16k-b2",
+      "passed": true,
+      "length": 16384,
+      "batch": 2,
+      "budget": 32768,
+      "gpu_peak_gib": 87.93475341796875,
+      "url": "https://swanlab.cn/@WangZIyu/trd-pro6000-pilot/runs/7dqnisz5",
+      "seconds": 9.313180919736624,
+      "response_tokens_per_second": 6985.798910314985,
+      "model_tokens_per_second": 14103.1737701657,
+      "max_allocated_gib": 83.08707475662231
+    },
+    "dynamic32k-resident-18k-b2": {
+      "name": "dynamic32k-resident-18k-b2",
+      "passed": true,
+      "length": 18432,
+      "batch": 2,
+      "budget": 32768,
+      "gpu_peak_gib": 76.71600341796875,
+      "url": "https://swanlab.cn/@WangZIyu/trd-pro6000-pilot/runs/vbcosoyz",
+      "seconds": 10.32730346918106,
+      "response_tokens_per_second": 7080.052368341922,
+      "model_tokens_per_second": 14278.306796723684,
+      "max_allocated_gib": 67.97554588317871
+    },
+    "capped-offload-18k-b2-acc4": {
+      "name": "capped-offload-18k-b2-acc4",
+      "passed": true,
+      "length": 18432,
+      "batch": 2,
+      "budget": 36864,
+      "gpu_peak_gib": 88.44256591796875,
+      "url": "https://swanlab.cn/@WangZIyu/trd-pro6000-pilot/runs/hdw9dx5x",
+      "seconds": 11.655710028750557,
+      "response_tokens_per_second": 6279.333769232753,
+      "model_tokens_per_second": 12666.839294179912,
+      "max_allocated_gib": 84.29787492752075
+    },
+    "capped-resident-2k-b16": {
+      "name": "capped-resident-2k-b16",
+      "passed": true,
+      "length": 2048,
+      "batch": 16,
+      "budget": 32768,
+      "gpu_peak_gib": 88.06365966796875,
+      "url": "https://swanlab.cn/@WangZIyu/trd-pro6000-pilot/runs/tqvk3qz1",
+      "seconds": 7.000558387488127,
+      "response_tokens_per_second": 8968.515041997645,
+      "model_tokens_per_second": 18724.75299085225,
+      "max_allocated_gib": 82.84098100662231
+    },
+    "real-opd-trd-update": {
+      "name": "real-opd-trd-update",
+      "passed": true,
+      "length": 18432,
+      "batch": 2,
+      "budget": 32768,
+      "gpu_peak_gib": 26.21014404296875,
+      "url": "https://swanlab.cn/@WangZIyu/trd-pro6000-pilot/runs/ddcwfrbe",
+      "seconds": 1.1381816864013672,
+      "response_tokens_per_second": 3598.722461394086,
+      "model_tokens_per_second": 11534.186638960342,
+      "max_allocated_gib": 19.187937259674072
+    }
+  },
+  "real_rollout": {
+    "returncode": 0,
+    "wall_seconds": 296.87385266274214,
+    "gpu_peak_gib": [
+      79.700439453125,
+      79.74139404296875
+    ],
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-pro6000-pilot/runs/2enpetf3",
+    "training_data": "/root/autodl-tmp/trd/preparation/logs/pilot/real-rollout/generation/OPD/math/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_pilot-real/math_y_r_opd_Qwen3-8B_responses.parquet",
+    "rows": 8,
+    "rewritten_response_tokens": [
+      1003,
+      1024,
+      1024,
+      1024,
+      1024,
+      1024,
+      1024,
+      1024
+    ]
+  },
+  "real_update_optimizer_steps_per_rank": [
+    4,
+    4
+  ],
+  "cuda_numerical_checks": [
+    {
+      "near_identical": false,
+      "reverse": false,
+      "fast_value_max_error": 1.1654705888153316e-06,
+      "legacy_value_max_error": 0.0020028990976226346,
+      "fast_gradient_relative_error": 2.3467782739317045e-05,
+      "legacy_gradient_relative_error": 0.0023178167175501585
+    },
+    {
+      "near_identical": false,
+      "reverse": true,
+      "fast_value_max_error": 7.529204761880237e-07,
+      "legacy_value_max_error": 7.529204761880237e-07,
+      "fast_gradient_relative_error": 1.9759776478167623e-05,
+      "legacy_gradient_relative_error": 2.579838655947242e-05
+    },
+    {
+      "near_identical": true,
+      "reverse": false,
+      "fast_value_max_error": 5.659615373905676e-07,
+      "legacy_value_max_error": 0.0036115976314518993,
+      "fast_gradient_relative_error": 0.00011995399108855054,
+      "legacy_gradient_relative_error": 0.08026920258998871
+    },
+    {
+      "near_identical": true,
+      "reverse": true,
+      "fast_value_max_error": 5.658935678189191e-07,
+      "legacy_value_max_error": 5.658935678189191e-07,
+      "fast_gradient_relative_error": 6.76952049616375e-06,
+      "legacy_gradient_relative_error": 0.0002338832273380831
+    }
+  ],
+  "core_commit": "d977a7d",
+  "cleanup_commit": "b833978"
+}
