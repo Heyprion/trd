@@ -145,3 +145,6 @@ agentica-org
 /checkpoints_merged/
 /preparation/wheels/
 /preparation/logs/
+
+# Local Git history archives (never upload)
+/preparation/git-backups/
