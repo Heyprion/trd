@@ -1,6 +1,6 @@
 # 数学 OPD：2×RTX PRO 6000 首轮试跑
 
-推荐下一次数学 OPD/TRD 运行从 `profiles/balanced.env.sh` 起步：FSDP2 分片大小 2、SP=1，每 DP rank batch=2、梯度累积=32（全局有效 batch=128），动态微批预算 32,768 tokens，单条序列上限仍为 18,432。冻结模型权重以 BF16 保存，学生 LoRA 参数保持 FP32；开启 Liger 与梯度检查点，使用分块重计算全词表 KL、chunk=512，教师常驻 GPU，forward 后重分片，CUDA 分配器份额 0.92。LoRA r64/alpha128、学习率 5e-6、温度 1、KL clip=0 保持原方法设置。
+推荐下一次数学 OPD/TRD 运行从 `profiles/balanced.env.sh` 起步：FSDP2 分片大小 2、SP=1，每 DP rank batch=2、梯度累积=32（全局有效 batch=128），动态微批预算 32,768 tokens，单条序列上限采用本轮试跑的 18,432。冻结模型权重以 BF16 保存，学生 LoRA 参数保持 FP32；开启 Liger 与梯度检查点，使用分块重计算全词表 KL、chunk=512，教师常驻 GPU，forward 后重分片，CUDA 分配器份额 0.92。LoRA r64/alpha128、学习率 5e-6、温度 1、KL clip=0 保持原方法设置。
 
 运行方式（本轮仅执行了少量样本试跑，没有启动完整数据训练）：
 
@@ -18,6 +18,8 @@ bash preparation/run_math_opd.sh forward_kl_y_r --dry-run
 所有显存数字为 NVML 整卡峰值（包括 PyTorch 保留缓存及 NCCL/驱动等），以 MiB/1024 换算 GiB；不把仅看 allocated 的 84 GiB 等同于整卡 84 GiB。0.92 是 PyTorch 分配器预算，不是整卡绝对硬限制，选择依据是实测 NVML 峰值；最终推荐均需以实际数据继续观察。
 
 ## 测量与比较边界
+
+长度范围更正：原 `forward_kl_y_r.sh` 的 MAX_LENGTH 默认是 34,816；本轮 balanced profile 显式改为 18,432，会更早裁剪教师的 initial-response 提示块。因此本轮并非原始最大上下文长度的完整复现；原 34,816 长度的显存和吞吐尚未覆盖。
 
 - 固定长度压力输入来自真实数学文本，必要时重复到指定长度，不能用于准确率/收敛结论。每次实际长度、梯度范数、KL、耗时和两类 PyTorch 峰值均有记录。压力输入只有 32 个独立来源，后期短样本用 128 行重复索引支持 batch=16 的多步测试。
 - 吞吐按较慢 rank 的时间、两卡不重复的 DP token 数计算；丢弃第一轮预热。大多数候选测 3 个微批，推荐高容量配置测 8 个；这是首轮候选筛选，不能视为完整长跑稳定性或收敛保证。
