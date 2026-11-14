@@ -1,0 +1,122 @@
+{
+  "model:Qwen/Qwen3-4B-Instruct-2507": {
+    "repo_id": "Qwen/Qwen3-4B-Instruct-2507",
+    "repo_type": "model",
+    "revision": "cdbee75f17c01a7cc42f958dc650907174af0554",
+    "path": "/root/autodl-tmp/trd/models/Qwen3-4B-Instruct-2507",
+    "complete": true,
+    "files": {
+      "README.md": 8168,
+      "config.json": 727,
+      "generation_config.json": 238,
+      "merges.txt": 1671839,
+      "model.safetensors.index.json": 32819,
+      "tokenizer.json": 11422654,
+      "tokenizer_config.json": 9377,
+      "model-00003-of-00003.safetensors": 99630640,
+      "vocab.json": 2776833,
+      "model-00001-of-00003.safetensors": 3957900840,
+      "model-00002-of-00003.safetensors": 3987450520
+    },
+    "weight_sha256": {
+      "model-00001-of-00003.safetensors": "75311d91bb08cf0b882913da464a1e722a31fb44db35208663487efb7a3d8ed6",
+      "model-00002-of-00003.safetensors": "0b48adbb1f60e901153d91907ba11ce63bd4b8b584482e730f48808d055dfba1",
+      "model-00003-of-00003.safetensors": "7dd39ccca5e4de123c74c14af44c9bf2eb75df33b4614382af0134528e060d5d"
+    }
+  },
+  "model:Qwen/Qwen3-8B": {
+    "repo_id": "Qwen/Qwen3-8B",
+    "repo_type": "model",
+    "revision": "b968826d9c46dd6066d109eabc6255188de91218",
+    "path": "/root/autodl-tmp/trd/models/Qwen3-8B",
+    "complete": true,
+    "files": {
+      "config.json": 728,
+      "README.md": 16660,
+      "generation_config.json": 239,
+      "merges.txt": 1671853,
+      "tokenizer_config.json": 9732,
+      "model.safetensors.index.json": 32878,
+      "vocab.json": 2776833,
+      "tokenizer.json": 11422654,
+      "model-00001-of-00005.safetensors": 3996250744,
+      "model-00002-of-00005.safetensors": 3993160032,
+      "model-00003-of-00005.safetensors": 3959604768,
+      "model-00004-of-00005.safetensors": 3187841392,
+      "model-00005-of-00005.safetensors": 1244659840
+    },
+    "weight_sha256": {
+      "model-00001-of-00005.safetensors": "31d6a825ae35f11fb85b195b4c42c146c051e446433125a215336abdf95cbf5f",
+      "model-00002-of-00005.safetensors": "5991236cea6fe21f3d43cab0f0e84448734fbbe0789816202989f2ddc9d18282",
+      "model-00003-of-00005.safetensors": "c5185c4794be2d8a9784d5753c9922db38df478ce11f9ed0b415b7304d896836",
+      "model-00004-of-00005.safetensors": "b5ee7de71fbf17db3d5704e0c8f2bc7d005ca9e1d7ca2aeb19827b0cfcaa917a",
+      "model-00005-of-00005.safetensors": "20c2d6366ab85c90786ccdd829cd2b9e7d30ef3b2ebbb998280e7e4014b542ff"
+    }
+  },
+  "dataset:agentica-org/DeepScaleR-Preview-Dataset": {
+    "repo_id": "agentica-org/DeepScaleR-Preview-Dataset",
+    "repo_type": "dataset",
+    "revision": "b6ae8c60f5c1f2b594e2140b91c49c9ad0949e29",
+    "path": "/root/autodl-tmp/trd/data/raw/agentica-org/DeepScaleR-Preview-Dataset",
+    "complete": true,
+    "files": {
+      "README.md": 1782,
+      "deepscaler.json": 21479374
+    }
+  },
+  "dataset:math-ai/aime24": {
+    "repo_id": "math-ai/aime24",
+    "repo_type": "dataset",
+    "revision": "83a7f387baaa524a8bda0022eac0541582297103",
+    "path": "/root/autodl-tmp/trd/data/raw/math-ai/aime24",
+    "complete": true,
+    "files": {
+      "README.md": 974,
+      "test-00000-of-00001.parquet": 11183
+    }
+  },
+  "dataset:math-ai/aime25": {
+    "repo_id": "math-ai/aime25",
+    "repo_type": "dataset",
+    "revision": "563bb8404243c5f09de6ec262f2db674fe5bce9b",
+    "path": "/root/autodl-tmp/trd/data/raw/math-ai/aime25",
+    "complete": true,
+    "files": {
+      "README.md": 878,
+      "test.jsonl": 15813
+    }
+  },
+  "dataset:PraMamba/HMMT-202502": {
+    "repo_id": "PraMamba/HMMT-202502",
+    "repo_type": "dataset",
+    "revision": "9de5288c84abeb090b162f75e43a96ad971c7b26",
+    "path": "/root/autodl-tmp/trd/data/raw/PraMamba/HMMT-202502",
+    "complete": true,
+    "files": {
+      "hmmt_feb_2025.jsonl": 12659,
+      "README.md": 202
+    }
+  },
+  "dataset:ByteDance-Seed/BeyondAIME": {
+    "repo_id": "ByteDance-Seed/BeyondAIME",
+    "repo_type": "dataset",
+    "revision": "c705198ae1043810b1e1693bd879250b51a7a523",
+    "path": "/root/autodl-tmp/trd/data/raw/ByteDance-Seed/BeyondAIME",
+    "complete": true,
+    "files": {
+      "README.md": 4188,
+      "data/test.parquet": 24021
+    }
+  },
+  "dataset:meituan-longcat/AMO-Bench": {
+    "repo_id": "meituan-longcat/AMO-Bench",
+    "repo_type": "dataset",
+    "revision": "2f422616c25d862984408fbbfaed63a961e8e025",
+    "path": "/root/autodl-tmp/trd/data/raw/meituan-longcat/AMO-Bench",
+    "complete": true,
+    "files": {
+      "README.md": 13045,
+      "data/test-00000-of-00001.parquet": 100150
+    }
+  }
+}

@@ -138,3 +138,10 @@ outputs
 LMOps
 gen_results
 agentica-org
+
+# Local math OPD reproduction assets
+/models/
+/data/
+/checkpoints_merged/
+/preparation/wheels/
+/preparation/logs/

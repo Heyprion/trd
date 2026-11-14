@@ -1,0 +1,68 @@
+{
+  "dataset:agentica-org/DeepScaleR-Preview-Dataset": {
+    "repo_id": "agentica-org/DeepScaleR-Preview-Dataset",
+    "repo_type": "dataset",
+    "revision": "b6ae8c60f5c1f2b594e2140b91c49c9ad0949e29",
+    "path": "/root/autodl-tmp/trd/data/raw/agentica-org/DeepScaleR-Preview-Dataset",
+    "complete": true,
+    "files": {
+      "README.md": 1782,
+      "deepscaler.json": 21479374
+    }
+  },
+  "dataset:math-ai/aime24": {
+    "repo_id": "math-ai/aime24",
+    "repo_type": "dataset",
+    "revision": "83a7f387baaa524a8bda0022eac0541582297103",
+    "path": "/root/autodl-tmp/trd/data/raw/math-ai/aime24",
+    "complete": true,
+    "files": {
+      "README.md": 974,
+      "test-00000-of-00001.parquet": 11183
+    }
+  },
+  "dataset:math-ai/aime25": {
+    "repo_id": "math-ai/aime25",
+    "repo_type": "dataset",
+    "revision": "563bb8404243c5f09de6ec262f2db674fe5bce9b",
+    "path": "/root/autodl-tmp/trd/data/raw/math-ai/aime25",
+    "complete": true,
+    "files": {
+      "README.md": 878,
+      "test.jsonl": 15813
+    }
+  },
+  "dataset:PraMamba/HMMT-202502": {
+    "repo_id": "PraMamba/HMMT-202502",
+    "repo_type": "dataset",
+    "revision": "9de5288c84abeb090b162f75e43a96ad971c7b26",
+    "path": "/root/autodl-tmp/trd/data/raw/PraMamba/HMMT-202502",
+    "complete": true,
+    "files": {
+      "hmmt_feb_2025.jsonl": 12659,
+      "README.md": 202
+    }
+  },
+  "dataset:ByteDance-Seed/BeyondAIME": {
+    "repo_id": "ByteDance-Seed/BeyondAIME",
+    "repo_type": "dataset",
+    "revision": "c705198ae1043810b1e1693bd879250b51a7a523",
+    "path": "/root/autodl-tmp/trd/data/raw/ByteDance-Seed/BeyondAIME",
+    "complete": true,
+    "files": {
+      "README.md": 4188,
+      "data/test.parquet": 24021
+    }
+  },
+  "dataset:meituan-longcat/AMO-Bench": {
+    "repo_id": "meituan-longcat/AMO-Bench",
+    "repo_type": "dataset",
+    "revision": "2f422616c25d862984408fbbfaed63a961e8e025",
+    "path": "/root/autodl-tmp/trd/data/raw/meituan-longcat/AMO-Bench",
+    "complete": true,
+    "files": {
+      "README.md": 13045,
+      "data/test-00000-of-00001.parquet": 100150
+    }
+  }
+}

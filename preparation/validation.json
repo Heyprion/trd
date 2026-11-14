@@ -1,0 +1,37 @@
+{
+  "scope": "math OPD Qwen3-4B-Instruct-2507 + Qwen3-8B",
+  "pip_check": "passed",
+  "nccl_two_gpus": "passed",
+  "flash_attention_forward_backward_both_gpus": "passed",
+  "student_teacher_token_ids": "identical",
+  "actual_ray_vllm_student_rollout_rows": 1,
+  "wrapper_dry_runs": [
+    "forward_kl",
+    "forward_kl_y_r",
+    "forward_kl_clip",
+    "reverse_kl",
+    "reverse_kl_topk"
+  ],
+  "full_training_started": false,
+  "teacher_weights": "complete; canonical SHA256 verified",
+  "two_gpu_synthetic_trd_kl_update": [
+    {
+      "status": "passed",
+      "optimizer_steps": 1,
+      "kl_loss": 1.4157005037580217,
+      "student_perplexity": 10.10716606250133,
+      "teacher_perplexity": 14.896342968257692
+    },
+    {
+      "status": "passed",
+      "optimizer_steps": 1,
+      "kl_loss": 1.4157005037580217,
+      "student_perplexity": 10.10716606250133,
+      "teacher_perplexity": 14.896342968257692
+    }
+  ],
+  "math_scoring": "passed",
+  "checkpoint_export_storage": "split filesystems; free-space checks and export symlink verified",
+  "full_length_training": "not run",
+  "status": "preparation_complete"
+}

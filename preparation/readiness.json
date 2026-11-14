@@ -1,0 +1,59 @@
+{
+  "dependencies": {
+    "torch": "2.8.0+cu128",
+    "vllm": "0.11.0",
+    "transformers": "4.57.1",
+    "peft": "0.17.1",
+    "datasets": "4.3.0",
+    "ray": "2.49.2",
+    "flash-attn": "2.8.3",
+    "tensordict": "0.10.0",
+    "torchdata": "0.11.0",
+    "math-verify": "0.8.0",
+    "numpy": "1.26.4",
+    "pyarrow": "21.0.0",
+    "verl": "0.8.0.dev0"
+  },
+  "models": {
+    "Qwen3-4B-Instruct-2507": {
+      "path": "/root/autodl-tmp/trd/models/Qwen3-4B-Instruct-2507",
+      "vocab_size": 151936,
+      "shards": 3,
+      "bytes": 8044982000
+    },
+    "Qwen3-8B": {
+      "path": "/root/autodl-tmp/trd/models/Qwen3-8B",
+      "vocab_size": 151936,
+      "shards": 5,
+      "bytes": 16381516776
+    }
+  },
+  "datasets": {
+    "DeepScaleR": 40315,
+    "aime24": 30,
+    "aime25": 30,
+    "hmmt25": 30,
+    "beyondaime": 100,
+    "amobench": 39
+  },
+  "gpus": [
+    {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "capability": [
+        12,
+        0
+      ],
+      "memory_gib": 94.97
+    },
+    {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "capability": [
+        12,
+        0
+      ],
+      "memory_gib": 94.97
+    }
+  ],
+  "cuda_matmul_and_flash_attention_backward": "passed",
+  "status": "ready"
+}
