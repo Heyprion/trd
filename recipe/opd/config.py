@@ -81,6 +81,12 @@ class KLTrainingConfig:
     param_offload: bool = False
     optimizer_offload: bool = False
     offload_policy: bool = False
+    teacher_cpu_offload: bool = True
+    reshard_after_forward: bool = True
+    kl_loss_backend: Literal["autograd", "recompute"] = "autograd"
+    use_liger: bool = False
+    model_storage_dtype: Literal["fp32", "bf16"] = "fp32"
+    cuda_memory_fraction: float = 1.0
 
     # Distributed Training
     local_rank: int = -1
@@ -132,6 +138,16 @@ class KLTrainingConfig:
 
     def __post_init__(self):
         """Validate configuration."""
+        if not 0 < self.cuda_memory_fraction <= 1:
+            raise ValueError("cuda_memory_fraction must be in (0, 1]")
+        if self.kl_loss_backend not in {"autograd", "recompute"}:
+            raise ValueError(f"Unknown kl_loss_backend: {self.kl_loss_backend}")
+        if self.kl_loss_backend == "recompute" and (
+            self.kl_method != "full_vocab" or self.kl_type not in {"forward", "reverse"} or self.top_k
+        ):
+            raise ValueError("recompute requires full-vocabulary forward/reverse KL without top-k")
+        if self.model_storage_dtype == "bf16" and not self.use_lora:
+            raise ValueError("BF16 model storage is validated for LoRA only; full tuning should keep FP32 master weights")
         if not self.base_model_name:
             self.base_model_name = self.student_model_path.rstrip("/").split("/")[-1]
 

@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 import time
+from dataclasses import asdict
 from typing import Any
 
 import torch
@@ -64,6 +65,8 @@ class KLTrainer:
         self.local_rank, self.rank, self.world_size = initialize_global_process_group()
         self.config.local_rank = self.local_rank
         self.config.world_size = self.world_size
+        if self.config.cuda_memory_fraction < 1:
+            torch.cuda.set_per_process_memory_fraction(self.config.cuda_memory_fraction, self.local_rank)
 
         if self.sync_only:
             self.tokenizer = None
@@ -93,6 +96,23 @@ class KLTrainer:
         if not self.sync_only and self.is_logging and HAS_WANDB:
             self._init_wandb()
 
+        self.swanlab_run = None
+        if not self.sync_only and self.is_logging and os.environ.get("SWANLAB_MODE", "online") != "disabled":
+            import swanlab
+
+            self.swanlab_run = swanlab.init(
+                project=os.environ.get("SWANLAB_PROJECT", "trd-math-opd"),
+                name=self.config.wandb_run_name or None,
+                mode="online", on_online_error="raise", config=asdict(self.config),
+                log_dir=os.path.join(self.config.output_dir, "swanlab"),
+            )
+            os.makedirs(self.config.output_dir, exist_ok=True)
+            with open(os.path.join(self.config.output_dir, "swanlab.json"), "w") as f:
+                json.dump({"url": self.swanlab_run.url}, f)
+            history = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "HISTORY.md")
+            with open(history, "a") as f:
+                f.write(f"\n- OPD training：{self.swanlab_run.url}；日志：`{self.config.output_dir}`。\n")
+
 
         logger.info("KL Trainer initialized with verl FSDP backend%s", " (sync-only)" if self.sync_only else "")
         logger.info("  KL Type: %s", self.config.kl_type)
@@ -107,6 +127,8 @@ class KLTrainer:
         logger.info("  Grad Accum Steps: %s", self.config.gradient_accumulation_steps)
 
     def close(self):
+        if self.swanlab_run is not None:
+            self.swanlab_run.finish()
         if not self.sync_only and HAS_WANDB and self.is_logging:
             wandb.finish()
         destroy_global_process_group()
@@ -181,6 +203,7 @@ class KLTrainer:
             tokenizer_path=model_path,
             trust_remote_code=True,
             load_tokenizer=False,
+            use_liger=self.config.use_liger,
             enable_gradient_checkpointing=trainable and self.config.gradient_checkpointing,
             use_remove_padding=self.config.use_remove_padding,
             lora_rank=self.config.lora_rank if trainable and self.config.use_lora else 0,
@@ -216,7 +239,10 @@ class KLTrainer:
             param_offload=self.config.param_offload,
             optimizer_offload=self.config.optimizer_offload,
             offload_policy=self.config.offload_policy,
+            forward_only_cpu_offload=self.config.teacher_cpu_offload,
+            reshard_after_forward=self.config.reshard_after_forward,
             dtype="bfloat16" if self.config.bf16 else "float16",
+            model_dtype=self.config.model_storage_dtype,
         )
 
     def _build_optimizer_config(self) -> FSDPOptimizerConfig:
@@ -381,81 +407,100 @@ class KLTrainer:
                     "top_k > 0 is only supported with kl_type in {forward, reverse}; "
                     "JSD requires the full vocabulary for the mixture distribution."
                 )
-            # Process logits one sample at a time, freeing each row's logits
-            # immediately after use to keep peak memory low on A100-40GB.
-            student_logits_nested = model_output["logits"]
-            teacher_logits_nested = data["teacher_logits"]
-            student_rows = list(student_logits_nested.unbind())
-            teacher_rows = list(teacher_logits_nested.unbind())
-            student_mask_rows = list(data["loss_mask"].unbind())
-            teacher_mask_rows = list(data["teacher_loss_mask"].unbind())
-            # Release the original nested tensors so their backing storage
-            # can be freed as we consume individual rows below.
-            del student_logits_nested, teacher_logits_nested
-            if "logits" in model_output:
-                del model_output["logits"]
-            if "teacher_logits" in data.keys():
-                data.pop("teacher_logits")
+            if self.config.kl_loss_backend == "recompute":
+                if top_k or self.config.kl_type not in {"forward", "reverse"}:
+                    raise ValueError("recompute KL supports full-vocabulary forward/reverse KL without top-k")
+                from .recompute_kl import recompute_kl
 
-            kl_chunks = []
-            chunk_size = int(os.environ.get("KL_FULL_VOCAB_CHUNK_SIZE") or "512")
-            if chunk_size < 1:
-                raise ValueError(f"KL_FULL_VOCAB_CHUNK_SIZE must be positive, got {chunk_size}")
-            T = self.config.temperature
+                s_logits = model_output.pop("logits").values()
+                t_logits = data.pop("teacher_logits").values()
+                s_idx = data["loss_mask"].values().bool().nonzero(as_tuple=True)[0]
+                t_idx = data["teacher_loss_mask"].values().bool().nonzero(as_tuple=True)[0]
+                flat_kl = recompute_kl(
+                    s_logits, t_logits, s_idx, t_idx,
+                    chunk_size=int(os.environ.get("KL_FULL_VOCAB_CHUNK_SIZE") or "512"),
+                    temperature=self.config.temperature, reverse=self.config.kl_type == "reverse",
+                )
+                counts = [int(n) for n in student_counts.tolist()]
+                kl_per_position = torch.nn.utils.rnn.pad_sequence(
+                    flat_kl.split(counts), batch_first=True, padding_value=0.,
+                )
+                max_len = kl_per_position.shape[1]
+            else:
+                # Process logits one sample at a time, freeing each row's logits
+                # immediately after use to keep peak memory low on A100-40GB.
+                student_logits_nested = model_output["logits"]
+                teacher_logits_nested = data["teacher_logits"]
+                student_rows = list(student_logits_nested.unbind())
+                teacher_rows = list(teacher_logits_nested.unbind())
+                student_mask_rows = list(data["loss_mask"].unbind())
+                teacher_mask_rows = list(data["teacher_loss_mask"].unbind())
+                # Release the original nested tensors so their backing storage
+                # can be freed as we consume individual rows below.
+                del student_logits_nested, teacher_logits_nested
+                if "logits" in model_output:
+                    del model_output["logits"]
+                if "teacher_logits" in data.keys():
+                    data.pop("teacher_logits")
 
-            for i, (s_logits, t_logits, s_mask, t_mask) in enumerate(zip(
-                student_rows, teacher_rows, student_mask_rows, teacher_mask_rows, strict=True
-            )):
-                s_idx = s_mask.to(torch.bool).nonzero(as_tuple=False).flatten()
-                t_idx = t_mask.to(torch.bool).nonzero(as_tuple=False).flatten()
-                common = min(s_idx.shape[0], t_idx.shape[0])
-                if common == 0:
-                    kl_chunks.append(s_logits.new_zeros(1))
+                kl_chunks = []
+                chunk_size = int(os.environ.get("KL_FULL_VOCAB_CHUNK_SIZE") or "512")
+                if chunk_size < 1:
+                    raise ValueError(f"KL_FULL_VOCAB_CHUNK_SIZE must be positive, got {chunk_size}")
+                T = self.config.temperature
+
+                for i, (s_logits, t_logits, s_mask, t_mask) in enumerate(zip(
+                    student_rows, teacher_rows, student_mask_rows, teacher_mask_rows, strict=True
+                )):
+                    s_idx = s_mask.to(torch.bool).nonzero(as_tuple=False).flatten()
+                    t_idx = t_mask.to(torch.bool).nonzero(as_tuple=False).flatten()
+                    common = min(s_idx.shape[0], t_idx.shape[0])
+                    if common == 0:
+                        kl_chunks.append(s_logits.new_zeros(1))
+                        student_rows[i] = None
+                        teacher_rows[i] = None
+                        del s_logits, t_logits, s_idx, t_idx
+                        continue
+                    s_idx = s_idx[:common]
+                    t_idx = t_idx[:common]
+
+                    sample_kl = []
+                    for start in range(0, common, chunk_size):
+                        end = min(start + chunk_size, common)
+                        s_slice = s_logits.index_select(0, s_idx[start:end])
+                        t_slice = t_logits.index_select(0, t_idx[start:end])
+                        if T != 1.0:
+                            s_slice = s_slice / T
+                            t_slice = t_slice / T
+                        if top_k > 0:
+                            # Top-K teacher local support matching (paper Eq. 7-8).
+                            if self.config.kl_type == "reverse":
+                                sample_kl.append(_reverse_kl_topk_chunk(s_slice, t_slice, top_k))
+                            else:  # forward
+                                sample_kl.append(_forward_kl_topk_chunk(t_slice, s_slice, top_k))
+                        elif self.config.kl_type == "reverse":
+                            sample_kl.append(_reverse_kl_chunk(s_slice, t_slice))
+                        elif self.config.kl_type == "forward":
+                            sample_kl.append(_forward_kl_chunk(t_slice, s_slice))
+                        else:  # jsd
+                            sample_kl.append(
+                                _generalized_jsd_chunk(s_slice, t_slice, beta=self.config.beta)
+                            )
+                        del s_slice, t_slice
+                    kl_chunks.append(torch.cat(sample_kl))
+                    # Free this row's full logits immediately after all chunks finish.
                     student_rows[i] = None
                     teacher_rows[i] = None
-                    del s_logits, t_logits, s_idx, t_idx
-                    continue
-                s_idx = s_idx[:common]
-                t_idx = t_idx[:common]
+                    del s_logits, t_logits, s_idx, t_idx, sample_kl
 
+                del student_rows, teacher_rows
 
-                sample_kl = []
-                for start in range(0, common, chunk_size):
-                    end = min(start + chunk_size, common)
-                    s_slice = s_logits.index_select(0, s_idx[start:end])
-                    t_slice = t_logits.index_select(0, t_idx[start:end])
-                    if T != 1.0:
-                        s_slice = s_slice / T
-                        t_slice = t_slice / T
-                    if top_k > 0:
-                        # Top-K teacher local support matching (paper Eq. 7-8).
-                        if self.config.kl_type == "reverse":
-                            sample_kl.append(_reverse_kl_topk_chunk(s_slice, t_slice, top_k))
-                        else:  # forward
-                            sample_kl.append(_forward_kl_topk_chunk(t_slice, s_slice, top_k))
-                    elif self.config.kl_type == "reverse":
-                        sample_kl.append(_reverse_kl_chunk(s_slice, t_slice))
-                    elif self.config.kl_type == "forward":
-                        sample_kl.append(_forward_kl_chunk(t_slice, s_slice))
-                    else:  # jsd
-                        sample_kl.append(
-                            _generalized_jsd_chunk(s_slice, t_slice, beta=self.config.beta)
-                        )
-                    del s_slice, t_slice
-                kl_chunks.append(torch.cat(sample_kl))
-                # Free this row's full logits immediately after all chunks finish.
-                student_rows[i] = None
-                teacher_rows[i] = None
-                del s_logits, t_logits, s_idx, t_idx, sample_kl
-
-            del student_rows, teacher_rows
-
-            max_len = max(c.shape[0] for c in kl_chunks)
-            if max_len == 0:
-                max_len = 1
-            kl_per_position = mask.new_zeros(len(kl_chunks), max_len)
-            for idx, c in enumerate(kl_chunks):
-                kl_per_position[idx, :c.shape[0]] = c
+                max_len = max(c.shape[0] for c in kl_chunks)
+                if max_len == 0:
+                    max_len = 1
+                kl_per_position = mask.new_zeros(len(kl_chunks), max_len)
+                for idx, c in enumerate(kl_chunks):
+                    kl_per_position[idx, :c.shape[0]] = c
             mask = mask[:, :max_len]
             student_log_probs = student_log_probs[:, :max_len]
             teacher_log_probs = teacher_log_probs[:, :max_len]
@@ -758,6 +803,7 @@ class KLTrainer:
             for batch_idx, batch in enumerate(progress_bar):
                 if batch_idx < skip_batches:
                     continue
+                start_time = time.time()
                 teacher_batch = self._make_teacher_batch(batch)
                 with self.teacher_engine.eval_mode():
                     teacher_output = self.teacher_engine.forward_backward_batch(
@@ -768,7 +814,6 @@ class KLTrainer:
 
                 student_batch = self._make_student_batch(batch, teacher_output["model_output"])
 
-                start_time = time.time()
                 train_output = self.student_engine.forward_backward_batch(
                     student_batch,
                     loss_function=self._compute_kl_loss,
@@ -792,8 +837,9 @@ class KLTrainer:
                     self.student_engine.optimizer_zero_grad()
                     lr = self.student_engine.lr_scheduler_step()
                     self.global_step += 1
+                    step_time = time.time() - start_time
 
-                    if self.is_logging and HAS_WANDB:
+                    if self.is_logging:
                         log_payload = {
                             "train/kl_loss": step_metrics["kl_loss"],
                             "train/kl_loss_per_traj": step_metrics["kl_loss_per_traj"],
@@ -812,7 +858,10 @@ class KLTrainer:
                             "train/clip_frac": step_metrics["clip_frac"],
                             "train/kl_token_clip": self.config.kl_token_clip,
                         }
-                        wandb.log(log_payload)
+                        if HAS_WANDB:
+                            wandb.log(log_payload)
+                        if self.swanlab_run is not None:
+                            self.swanlab_run.log(log_payload)
 
                     if self.global_step % self.config.logging_steps == 0 and self.is_logging:
                         logger.info(
@@ -880,6 +929,8 @@ class KLTrainer:
                             "epoch/index": epoch + 1,
                         }
                     )
+                if self.swanlab_run is not None:
+                    self.swanlab_run.log({f"epoch/{key}": value for key, value in epoch_metrics.items()})
 
         if self.global_step == 0:
             raise RuntimeError("Training finished without any optimizer step.")

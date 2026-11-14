@@ -212,6 +212,7 @@ class FSDPEngineConfig(EngineConfig):
         param_offload (bool): Whether to offload parameters to CPU, default False
         optimizer_offload (bool): Whether to offload optimizer states to CPU, default False
         offload_policy (bool): Whether to offload policy model parameters, default False
+        forward_only_cpu_offload (bool): Keep the historical FSDP2 CPU offload for inference, default True
         reshard_after_forward (bool): Whether to reshard parameters after forward pass, default True
         fsdp_size (int): FSDP group size. -1 means use all available GPUs.
         forward_prefetch (bool): Whether to prefetch parameters for next forward pass, default False
@@ -233,6 +234,8 @@ class FSDPEngineConfig(EngineConfig):
     wrap_policy: dict[str, Any] = field(default_factory=dict)
     offload_policy: bool = False
     reshard_after_forward: bool = True
+    # Preserve the historical inference default; large-memory hosts may opt out.
+    forward_only_cpu_offload: bool = True
     fsdp_size: int = -1
     forward_prefetch: bool = False
     model_dtype: str = "fp32"

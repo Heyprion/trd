@@ -87,6 +87,13 @@ def parse_args():
     parser.add_argument("--param_offload", type=lambda x: x.lower() == "true", default=False)
     parser.add_argument("--optimizer_offload", type=lambda x: x.lower() == "true", default=False)
     parser.add_argument("--offload_policy", type=lambda x: x.lower() == "true", default=False)
+    parser.add_argument("--teacher_cpu_offload", type=lambda x: x.lower() == "true", default=True)
+    parser.add_argument("--reshard_after_forward", type=lambda x: x.lower() == "true", default=True)
+    parser.add_argument("--kl_loss_backend", choices=["autograd", "recompute"], default="autograd")
+    parser.add_argument("--use_liger", type=lambda x: x.lower() == "true", default=False)
+    parser.add_argument("--model_storage_dtype", choices=["fp32", "bf16"], default="fp32")
+    parser.add_argument("--gradient_checkpointing", type=lambda x: x.lower() == "true", default=True)
+    parser.add_argument("--cuda_memory_fraction", type=float, default=1.0)
 
     # Distributed Training
     parser.add_argument(
@@ -188,6 +195,13 @@ def main():
         param_offload=args.param_offload,
         optimizer_offload=args.optimizer_offload,
         offload_policy=args.offload_policy,
+        teacher_cpu_offload=args.teacher_cpu_offload,
+        reshard_after_forward=args.reshard_after_forward,
+        kl_loss_backend=args.kl_loss_backend,
+        use_liger=args.use_liger,
+        model_storage_dtype=args.model_storage_dtype,
+        gradient_checkpointing=args.gradient_checkpointing,
+        cuda_memory_fraction=args.cuda_memory_fraction,
         # Distributed Training
         local_rank=args.local_rank,
         nnodes=args.nnodes,
@@ -223,6 +237,8 @@ def main():
         # then hard-exit so torchrun reaps every worker.
         import traceback
         traceback.print_exc()
+        if trainer.swanlab_run is not None:
+            trainer.swanlab_run.finish(state="crashed", error=traceback.format_exc())
         sys.stdout.flush()
         sys.stderr.flush()
         os._exit(1)
