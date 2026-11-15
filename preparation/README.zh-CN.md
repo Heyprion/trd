@@ -2,6 +2,8 @@
 
 本目录只准备本仓库数学 OPD 的环境、模型、数据和运行入口。
 
+当前数据工程已完成：可用33,236题，固定验证512题，训练池32,724题，首轮训练9,984题。完整过程、分层规则和文件索引见[数据工程完整记录](data_engineering/REPORT.zh-CN.md)；当前数据配置加载`preparation/data_engineering/splits.env.sh`。
+
 2026-11-15 已完成双卡首轮性能试跑。下一次 TRD 运行建议显式加载
 `preparation/pilot/profiles/balanced.env.sh`：FSDP2/2 卡、SP=1、每卡 batch=2、累积=32，
 32K 动态 token 预算、单条上限 18,432，开启 Liger 与全词表 KL 重计算。
@@ -12,7 +14,7 @@
 
 - 学生：`Qwen/Qwen3-4B-Instruct-2507`
 - 教师：`Qwen/Qwen3-8B`
-- 训练集：`agentica-org/DeepScaleR-Preview-Dataset`，保留完整数据。
+- 训练来源：`agentica-org/DeepScaleR-Preview-Dataset`，完整原始版本保留；当前训练范围按上述数据工程记录选择9,984题子集。
 - 评测：AIME24、AIME25、HMMT25、BeyondAIME、AMO-Bench。AMO-Bench 沿用原脚本，过滤 `answer_type=description`。
 - 支持原仓库全部五种数学 OPD 变体。`forward_kl_y_r` 是论文 TRD 方法；`forward_kl` 是普通 OPD 前向 KL 基线。
 
@@ -30,6 +32,8 @@ Python 3.12；独立 `.venv` 继承宿主已有的 PyTorch 2.8.0+cu128 / torchvi
 
 ```bash
 source preparation/env.sh
+source preparation/pilot/profiles/balanced.env.sh
+source preparation/data_engineering/splits.env.sh
 python preparation/check_ready.py --gpu
 torchrun --standalone --nproc-per-node=2 preparation/check_nccl.py
 

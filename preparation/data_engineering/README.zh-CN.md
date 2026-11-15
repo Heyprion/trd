@@ -2,6 +2,8 @@
 
 两个阶段：`clean.py`全自动清洗，`stratify.py`给清洗通过的题标数学领域和易/中/难。`run.sh`默认连续执行两阶段，两个8B GPU副本全程复用。原始数据只读，不修改训练默认配置，不进行完整解题或训练。
 
+当前清洗、标签和实际划分均已完成，完整过程与当前数据使用范围以[数据工程完整记录](REPORT.zh-CN.md)为准：验证512题、训练池32,724题、首轮训练9,984题。已冻结的同一输出目录不要重复清洗或重新抽验证集。
+
 在本仓库根目录直接运行：
 
 ```bash
@@ -102,13 +104,12 @@ OUTPUT_DIR/
 
 可用数据包含原始题目、答案、参考解答、稳定ID、重复组、数据版本、领域、易中难、标签来源。运行日志及汇总上传SwanLab，原始题目/逐题数据不作为SwanLab文本附件上传。
 
-在本仓库使用最终数据训练：
+在本仓库使用当前首轮9,984题训练子集：
 
 ```bash
 source preparation/env.sh
 source preparation/pilot/profiles/balanced.env.sh
-export TRAIN_DATA_PATH="$PWD/data/processed/math-v1/final/dataset"
-export GEN_RESULTS_ROOT="$PWD/gen_results/math-v1"
+source preparation/data_engineering/splits.env.sh
 bash preparation/run_math_opd.sh forward_kl_y_r --dry-run
 ```
 
@@ -120,4 +121,6 @@ CPU回归检查：
 python -m unittest discover -s preparation/data_engineering -p 'test_*.py' -v
 ```
 
-已有只读数据画像及依据见`PLAN.zh-CN.md`和`audit-summary.json`；最新脚本验证和SwanLab链接记录在仓库`HISTORY.md`。
+数据划分脚本为`split.py`，已执行一次并冻结`data/processed/math-v1/splits-v1/`。验证集从终答一致的非空参考解答候选中按领域×难度选取；训练池固定顺序的前9,984题用于首轮，更长前缀用于后续扩充。当前训练配置及各集合路径由`splits.env.sh`导出。
+
+已有只读数据画像及早期方案见`PLAN.zh-CN.md`和`audit-summary.json`；正式运行、实际划分及使用说明以`REPORT.zh-CN.md`为准；SwanLab链接继续记录在仓库`HISTORY.md`。

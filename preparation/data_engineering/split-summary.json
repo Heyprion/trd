@@ -1,0 +1,310 @@
+{
+  "completed": true,
+  "config": {
+    "input": "/root/autodl-tmp/trd/data/processed/math-v1/final/usable.parquet",
+    "input_sha256": "ea8936b477f7a3a4c02f3df458fcdda56bf36654c43c9f703f7c2b6ee2f0d2d7",
+    "output": "/root/autodl-tmp/trd/data/processed/math-v1/splits-v1",
+    "validation_size": 512,
+    "train_target": 10000,
+    "train_selected": 9984,
+    "effective_batch": 128,
+    "seed": 20261115,
+    "split_version": "math-v1-splits-v1",
+    "pilot_excluded_from_validation": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      123,
+      137,
+      158,
+      242,
+      254,
+      360,
+      374,
+      488
+    ],
+    "validation_reference_policy": "last box or bounded Math-Verify terminal equivalence",
+    "training_order": "deterministic per-stratum hash order, weighted deficit interleave; nested prefixes",
+    "code_sha256": "96d22ee03ef0d98e81e4ad2137a5e11d615aaba9c32eb4f2b80354a354a9d220"
+  },
+  "source_stats": {
+    "rows": 33236,
+    "difficulty_counts": {
+      "medium": 21496,
+      "hard": 7244,
+      "easy": 4496
+    },
+    "domain_counts": {
+      "algebra": 13327,
+      "geometry": 8495,
+      "number_theory": 4489,
+      "combinatorics_probability": 6424,
+      "calculus": 308,
+      "other": 193
+    },
+    "stratum_counts": {
+      "easy/algebra": 2906,
+      "easy/calculus": 5,
+      "easy/combinatorics_probability": 108,
+      "easy/geometry": 722,
+      "easy/number_theory": 656,
+      "easy/other": 99,
+      "hard/algebra": 2263,
+      "hard/calculus": 93,
+      "hard/combinatorics_probability": 1179,
+      "hard/geometry": 2629,
+      "hard/number_theory": 1071,
+      "hard/other": 9,
+      "medium/algebra": 8158,
+      "medium/calculus": 210,
+      "medium/combinatorics_probability": 5137,
+      "medium/geometry": 5144,
+      "medium/number_theory": 2762,
+      "medium/other": 85
+    },
+    "nonempty_references": 6305
+  },
+  "reference_selection": {
+    "nonempty_references_excluding_pilot": 6267,
+    "eligible_checked_references": 2661,
+    "eligible_check_methods": {
+      "last_box_equivalent": 2657,
+      "math_verify_terminal": 4
+    },
+    "symbolic_fallback_attempts": 4,
+    "selected_check_methods": {
+      "last_box_equivalent": 508,
+      "math_verify_terminal": 4
+    },
+    "validation_stratum_quotas": {
+      "easy/algebra": 44,
+      "easy/calculus": 1,
+      "easy/combinatorics_probability": 2,
+      "easy/geometry": 11,
+      "easy/number_theory": 10,
+      "easy/other": 1,
+      "hard/algebra": 35,
+      "hard/calculus": 1,
+      "hard/combinatorics_probability": 18,
+      "hard/geometry": 41,
+      "hard/number_theory": 16,
+      "hard/other": 1,
+      "medium/algebra": 126,
+      "medium/calculus": 3,
+      "medium/combinatorics_probability": 79,
+      "medium/geometry": 79,
+      "medium/number_theory": 43,
+      "medium/other": 1
+    }
+  },
+  "splits": {
+    "validation": {
+      "parquet_sha256": "e3bca204b91dd7012d45334335553c78b915d3edca33ecd1190bc96cb0ed05d0",
+      "ids_sha256": "1d8296f750e4693e5432197cb60c2b97832d24e1492d4311c00b18da1f0d269f",
+      "sample_ids_sha256": "c7c906e804a5001f31875912adc04957a483a9ef534af759368e35e3b2782121",
+      "rows": 512,
+      "difficulty_counts": {
+        "hard": 112,
+        "medium": 331,
+        "easy": 69
+      },
+      "domain_counts": {
+        "combinatorics_probability": 99,
+        "geometry": 131,
+        "number_theory": 69,
+        "other": 3,
+        "algebra": 205,
+        "calculus": 5
+      },
+      "stratum_counts": {
+        "easy/algebra": 44,
+        "easy/calculus": 1,
+        "easy/combinatorics_probability": 2,
+        "easy/geometry": 11,
+        "easy/number_theory": 10,
+        "easy/other": 1,
+        "hard/algebra": 35,
+        "hard/calculus": 1,
+        "hard/combinatorics_probability": 18,
+        "hard/geometry": 41,
+        "hard/number_theory": 16,
+        "hard/other": 1,
+        "medium/algebra": 126,
+        "medium/calculus": 3,
+        "medium/combinatorics_probability": 79,
+        "medium/geometry": 79,
+        "medium/number_theory": 43,
+        "medium/other": 1
+      },
+      "nonempty_references": 512
+    },
+    "train_pool": {
+      "parquet_sha256": "6a3457ed428a39506eb10f8adff77f5a2daf044a831cc1844d0f13b7767ec50f",
+      "ids_sha256": "a96245d203d2822c81a9849808d87f4d70fcc58885d7cc446c08bf9631460a7b",
+      "sample_ids_sha256": "dc55822a9be0b14d8462ecebaa19e3e4c79f6b59e86e393e28b4223102bcf710",
+      "rows": 32724,
+      "difficulty_counts": {
+        "medium": 21165,
+        "easy": 4427,
+        "hard": 7132
+      },
+      "domain_counts": {
+        "algebra": 13122,
+        "geometry": 8364,
+        "combinatorics_probability": 6325,
+        "number_theory": 4420,
+        "calculus": 303,
+        "other": 190
+      },
+      "stratum_counts": {
+        "easy/algebra": 2862,
+        "easy/calculus": 4,
+        "easy/combinatorics_probability": 106,
+        "easy/geometry": 711,
+        "easy/number_theory": 646,
+        "easy/other": 98,
+        "hard/algebra": 2228,
+        "hard/calculus": 92,
+        "hard/combinatorics_probability": 1161,
+        "hard/geometry": 2588,
+        "hard/number_theory": 1055,
+        "hard/other": 8,
+        "medium/algebra": 8032,
+        "medium/calculus": 207,
+        "medium/combinatorics_probability": 5058,
+        "medium/geometry": 5065,
+        "medium/number_theory": 2719,
+        "medium/other": 84
+      },
+      "nonempty_references": 5793
+    },
+    "train_9984": {
+      "parquet_sha256": "cb27a12b862623e03eb7c92e220a18bc3cec27a2fa578b2fbab8d927fe80788d",
+      "ids_sha256": "2f54d6121960e86d1b0403b18550169f1553dc94362644b349eb52787f5fb2d0",
+      "sample_ids_sha256": "4ea10a5df9c8058cc2b6239d12e0cd9b8af60cd6aef6f08466980c5a2310ee13",
+      "rows": 9984,
+      "difficulty_counts": {
+        "medium": 6457,
+        "easy": 1350,
+        "hard": 2177
+      },
+      "domain_counts": {
+        "algebra": 4003,
+        "geometry": 2552,
+        "combinatorics_probability": 1929,
+        "number_theory": 1349,
+        "calculus": 92,
+        "other": 59
+      },
+      "stratum_counts": {
+        "easy/algebra": 873,
+        "easy/calculus": 1,
+        "easy/combinatorics_probability": 32,
+        "easy/geometry": 217,
+        "easy/number_theory": 197,
+        "easy/other": 30,
+        "hard/algebra": 680,
+        "hard/calculus": 28,
+        "hard/combinatorics_probability": 354,
+        "hard/geometry": 790,
+        "hard/number_theory": 322,
+        "hard/other": 3,
+        "medium/algebra": 2450,
+        "medium/calculus": 63,
+        "medium/combinatorics_probability": 1543,
+        "medium/geometry": 1545,
+        "medium/number_theory": 830,
+        "medium/other": 26
+      },
+      "nonempty_references": 1755
+    },
+    "train_reserve": {
+      "parquet_sha256": "b3bb78fee38e7a1af99c656df5421d4afbd4ae73bbf762cb1e282c5b12b46f7a",
+      "ids_sha256": "14d2aafbd38eb3b2adabb5cafdb9e8f6e8317fc6b35455d3f4cdb0af258f7e9e",
+      "sample_ids_sha256": "6857d4db26936ed391c55254ac70f9035143225a7ff2da5646ba81fc172b9b51",
+      "rows": 22740,
+      "difficulty_counts": {
+        "medium": 14708,
+        "easy": 3077,
+        "hard": 4955
+      },
+      "domain_counts": {
+        "algebra": 9119,
+        "geometry": 5812,
+        "combinatorics_probability": 4396,
+        "number_theory": 3071,
+        "calculus": 211,
+        "other": 131
+      },
+      "stratum_counts": {
+        "easy/algebra": 1989,
+        "easy/calculus": 3,
+        "easy/combinatorics_probability": 74,
+        "easy/geometry": 494,
+        "easy/number_theory": 449,
+        "easy/other": 68,
+        "hard/algebra": 1548,
+        "hard/calculus": 64,
+        "hard/combinatorics_probability": 807,
+        "hard/geometry": 1798,
+        "hard/number_theory": 733,
+        "hard/other": 5,
+        "medium/algebra": 5582,
+        "medium/calculus": 144,
+        "medium/combinatorics_probability": 3515,
+        "medium/geometry": 3520,
+        "medium/number_theory": 1889,
+        "medium/other": 58
+      },
+      "nonempty_references": 4038
+    }
+  },
+  "validation_token_stats": {
+    "tokenizer": "/root/autodl-tmp/trd/models/Qwen3-4B-Instruct-2507",
+    "response_tokens": 234375,
+    "mean": 457.763671875,
+    "median": 445.5,
+    "p95": 840.9,
+    "max": 1674
+  },
+  "nominal_optimizer_steps_one_epoch": 78,
+  "checks": {
+    "unique_ids": true,
+    "validation_train_overlap": 0,
+    "validation_pool_group_overlap": 0,
+    "selected_is_pool_prefix": true,
+    "selected_reserve_overlap": 0,
+    "all_source_rows_accounted": true
+  },
+  "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qc1pyqma",
+  "wall_seconds": 4.044950757175684
+}

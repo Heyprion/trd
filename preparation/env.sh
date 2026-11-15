@@ -7,7 +7,12 @@ export PYTHONPATH="$VERL_ROOT:${PYTHONPATH:-}"
 export HF_HOME="${HF_HOME:-$VERL_ROOT/.cache/huggingface}"
 export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"
 export DATA_ROOT="$VERL_ROOT/data"
-export TRAIN_DATA_PATH="$DATA_ROOT/train/DeepScaleR"
+# Activate the frozen provisional subset once it has been generated. Preserve
+# explicit overrides when this file is sourced again by run_math_opd.sh.
+if [[ -z "${TRAIN_DATA_PATH:-}" && -f "$DATA_ROOT/processed/math-v1/splits-v1/manifest.json" ]]; then
+    source "$VERL_ROOT/preparation/data_engineering/splits.env.sh"
+fi
+export TRAIN_DATA_PATH="${TRAIN_DATA_PATH:-$DATA_ROOT/train/DeepScaleR}"
 export EVAL_DATASETS_DIR="$DATA_ROOT/eval"
 export EVAL_DATASETS="aime24,aime25,hmmt25,beyondaime,amobench"
 export MODEL_PATH="$VERL_ROOT/models/Qwen3-4B-Instruct-2507"

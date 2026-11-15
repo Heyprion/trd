@@ -236,3 +236,17 @@
 - 用户询问从当前可用数据分层留出的验证集应有多大，强调数量不宜过多。本轮只读统计final/usable.parquet，未真正划分或冻结验证集，无新生成/评分实验。
 - 核实33,236题对应33,236个唯一duplicate_group_id；非空参考solution共6,305题（易987/中3,626/难1,692），领域×难度18个组合均有非空参考样本。全体易4,496/中21,496/难7,244。
 - 建议固定512题，占全体1.54%，留出后训练32,724题；按难度×领域联合分层，难度比例约易69/中331/难112，稀有领域适当保证覆盖。若用于前述PPL/KL主比较，建议从非空且自动核验通过的参考解答题中选取，并尽量对齐全量的联合分布；应说明其参考解答子分布边界。验证ID及随机种子固定、整个题组与训练隔离；五套最终测试集继续独立。256题可节省成本但统计更粗，1,024题会使每次验证成本约翻倍，因此首选512。当前验证集仍未实际落地。
+
+- 数据分层划分：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qc1pyqma；配置及日志：`/root/autodl-tmp/trd/preparation/logs/data-engineering/split-20261115-094138`；目标输出：`/root/autodl-tmp/trd/data/processed/math-v1/splits-v1`。
+- 划分完成：验证512、训练池32724、首轮训练9984、后备22740，按有效batch128为78步/epoch；零交集检查通过；SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qc1pyqma。
+
+
+## 2026-11-15：冻结512题验证集、训练池和首轮9,984题子集
+
+- 用户确认512题暂定验证集，其余作为可扩充训练池；首轮只训练约1万条，并要求数据工程完整文档与a.md简短索引。选择9,984=78×128，最接近1万；不要求2的幂。已实际执行split.py，SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qc1pyqma，没有运行正式生成、训练或验证模型评分。
+- 输入为清洗后33,236题。验证512（易69/中331/难112），训练池32,724（易4,427/中21,165/难7,132），首轮9,984（易1,350/中6,457/难2,177），后备22,740。领域×难度联合分层；固定seed20261115；训练池按层内ID哈希顺序和加权缺额交织，首轮取前缀，扩充取更长前缀，因此保留首轮样本。
+- 验证参考：6,305非空solution中排除已知pilot来源后6,267候选；快速末boxed/安全等价检查得到2,657条，4次有界Math-Verify终答检查补充稀有层，共2,661条候选。最终512题中508快路径/4符号路径，18层均覆盖。仅核查终答与gold一致，不证明全部推理。原始参考文本不修改；验证参考共234,375 tokens，均值457.76、中位445.5、P95 840.9、最大1,674。未选中的参考检查候选仍留在训练池，不据此重复清洗整题。
+- 本地产物：data/processed/math-v1/splits-v1/{validation,train_pool,train_9984,train_reserve}，每份含data.parquet、HF dataset及ID清单；根manifest含来源/代码/产物SHA256、分层计数和SwanLab链接。逐题数据及ID清单按Git规则只留本地；preparation/data_engineering/split-summary.json为小型可提交摘要。
+- 自动检查：四个实际HF目录和parquet条数、各文件SHA256均通过；raw_id/sample_id/duplicate_group_id在验证与训练池间交集0，训练子集与后备交集0，全部输入恰好分配；原可用parquet哈希未变；执行脚本SHA256与冻结manifest一致。新增6项划分检查，合计18项CPU回归通过；抽样可重现、跨原始输入顺序稳定、扩充保持子集嵌套。
+- 默认入口：新增splits.env.sh；env.sh仅在未显式指定TRAIN_DATA_PATH且冻结manifest存在时启用子集，并保留显式路径，修复run_math_opd.sh再次source环境把用户选定输入重置成原始全集的问题。生成缓存隔离为gen_results/math-v1-splits-v1/train_9984。fresh环境自动激活、显式输入覆盖、shell语法及训练dry-run通过（batch2/acc32、有效128）；训练准备器继续传递split_version/sampling_rank。
+- 文档：新增preparation/data_engineering/REPORT.zh-CN.md，详细记录原始数据、64题观察、清洗规则、589对候选判断、训练/测试去污染范围、正式排除数、标签来源和分布、双卡实测、冻结划分/扩充、实际路径及哈希。仓库已有工作约定是Agent.md（AGENTS.md链接至它），已更新其中索引和默认数据范围，并按用户字面文件名新增根a.md短索引；旧PPL/KLD方案与准备README同步到当前划分。验证评分仅准备了输入，尚未接入训练中的自动定期评估。

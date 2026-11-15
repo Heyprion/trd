@@ -84,7 +84,7 @@ def make_map_fn_y_o(question_key="problem", data_source="deepscaleR", index_offs
         # Preserve data-engineering identity and labels after filtering/reordering.
         for key in ("raw_id", "sample_id", "duplicate_group_id", "data_version",
                     "raw_index", "domain", "difficulty", "label_source",
-                    "native_difficulty", "native_source"):
+                    "native_difficulty", "native_source", "split_version", "sampling_rank"):
             if example.get(key) is not None:
                 extra_info[key] = example[key]
 
