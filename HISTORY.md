@@ -141,3 +141,17 @@
 
 - 用户追问当前项目是否已有验证集及其规模。读取实际数据文件元数据、DeepScaleR准备脚本及OPD训练/评测配置；当前没有单独划分并接入训练流程的PPL/KLD验证集，已落地规模为0，前文512题仍是待执行方案。
 - 当前DeepScaleR训练文件为40,315条，准备脚本默认只读取train split。`data/eval/`现有的是最终数学benchmark测试数据：AIME24 30、AIME25 30、HMMT25 30、BeyondAIME 100、AMO-Bench 39，合计229题；AMO-Bench原始50题与实际过滤后39题应区分。没有启动任何评测或修改数据划分，无新增SwanLab实验。
+
+
+## 2026-11-15：数据工程只读审计与清洗/难度分层方案
+
+- 用户要求：基于真实数据抽样和相似论文/工程，提出清洗筛选、难度分层方案，重点限制本机双卡成本。本次只读审计和写方案，未覆盖原始/训练数据，未运行 GPU 标注、生成或训练。
+- 数据核查：读取 DeepScaleR 完整40,315行（revision b6ae8c60f5c1f2b594e2140b91c49c9ad0949e29），确认本地训练parquet逐行等于raw JSON；固定seed=20261115浏览64题并查看风险候选。空answer=6、空solution=32,924，后者为数据集原约定，当前OPD不使用参考解答，不能据此剔除。题干中位65 tokens、P95约179，实际学生chat prompt仅1条超过2048。
+- 去重：原文完全相同冗余928条；NFC/去空白后950组、冗余1,282条；177组答案文本不同，包含等价格式和真实错标。已核实原始行786/1401同一道合作做纸杯蛋糕题答案分别25/20，正确为25且两条solution均算到25。样本还发现缺图和解答片段混入problem，关键词仅作风险标记。
+- 测试排重：读取五套实际评测共229题，规范化全等0对；trigram Jaccard>=0.5召回1对，已阅读核实训练行5696与BeyondAIME索引30为同一二十面体染色题，测试仅追加答案mod1000（61917364224 ->224）。方案要求从clean训练版本移除整个题组；本轮尚未删除，不把零全等称为无污染。
+- 标签恢复：只读下载官方Omni-MATH，固定revision 40ba231d8f16e29ecd40e6407e2c8640145a8f62；4,428行与本地3,528训练行匹配，共3,587匹配对。3,469训练行单一匹配，3,468同时通过现有答案判等；59行多匹配、31行难度冲突，需保留不确定状态。来源文件仅保存在data/raw/KbsdJames/Omni-MATH/，未加入Git。
+- 审计与记录：v1 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/1hc7vi14；v2补充一对多及冲突统计 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/ksp7x0ba。v2分析段约19.4秒（不含导入/网络连接），核心统计与v1一致。原始日志、64题样本、候选、逐题tokens和join保存在preparation/logs/data-engineering/audit-v2/，stdout为preparation/logs/data-engineering-audit-v2.log。现有grader未判等不能当成错标，审计未证明完整语义去污染。
+- 方案：CPU规则清洗/哈希及近重复召回/测试排重 -> 原标签回填 -> 8B非思考短结构标注补齐先验难度/领域/风险 -> 复用正常y_o/y_r做显式数学判分与行为分组。生成入口当前不主动评分，默认reward=0不可当作正确率；需补保留finish_reason等元信息。先验难度、模型表现和长度成本独立保存，不照搬DAPO的全对/全错删除规则。首轮保持清洗后自然分布，不预设课程比例；允许unknown并分流quarantine。
+- 成本：未来短标注拟双卡各1个8B vLLM副本、TP1，沿用balanced rollout显存份额0.85/并发16为起点；先256题测速后再全量。首版GPU预留1–3小时，可选256题×2次4B解题校准另加0.5–1.5小时；均为未实测工程估计，开发联调另计半天到一天。全量4次长解题仅按平均2K输出就约3.23亿tokens，故不作首版。与已有PPL/KLD方案对齐的512参考验证题仍为待执行建议，当前没有新划分。
+- 产物与参考：preparation/data_engineering/PLAN.zh-CN.md、audit.py及小型audit-summary.json；参考DeepScaleR原卡、Big-Math、Omni-MATH、Open R1 Update #3、DAPO与Qwen3-8B官方卡，具体适用边界和链接在方案中。工作分支analysis/data-cleaning-stratification；提交前检查只含代码/文档/小摘要，不含数据与原始日志。
+- 检验：审计脚本导入/语法检查通过，汇总行数、答案类型、非空解答、评测规模及来源匹配计数恒等式通过，规范化保留数值及不等号的检查通过；git diff --check通过。数据、原始日志与__pycache__均由Git忽略。后续生成目录按数据版本隔离并校验输入哈希的要求已加入方案，避免旧parquet缓存误复用。

@@ -1,0 +1,159 @@
+{
+  "config": {
+    "dataset": "agentica-org/DeepScaleR-Preview-Dataset",
+    "revision": "b6ae8c60f5c1f2b594e2140b91c49c9ad0949e29",
+    "raw_sha256": "4e9e7b18248d982b4498a54a6bdb37b1bb653cf5f77bc309fa67a6c2533c8ba4",
+    "seed": 20261115,
+    "device": "cpu",
+    "mutates_training_data": false,
+    "tokenizer": "Qwen3-4B-Instruct-2507",
+    "sample_count": 64,
+    "canonicalization": "NFC; remove whitespace; preserve case/operators/numbers/LaTeX",
+    "near_eval": "token-trigram Jaccard candidate retrieval; threshold 0.5; no auto decisions",
+    "omni_revision": "40ba231d8f16e29ecd40e6407e2c8640145a8f62"
+  },
+  "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/ksp7x0ba",
+  "rows": 40315,
+  "schema_keys": [
+    "answer",
+    "problem",
+    "solution"
+  ],
+  "missing_or_empty": {
+    "answer_empty": 6,
+    "solution_empty": 32924
+  },
+  "nonempty_solutions": 7391,
+  "raw_exact_duplicate_excess": 928,
+  "normalized_duplicate_groups": 950,
+  "normalized_duplicate_excess": 1282,
+  "normalized_answer_conflict_groups_string_only": 177,
+  "answer_types_heuristic": {
+    "expression_or_other": 15558,
+    "integer": 23205,
+    "decimal": 1504,
+    "choice_letter_candidate": 48
+  },
+  "problem_flags_heuristic": {
+    "asymptote_marker": 958,
+    "diagram_word": 782,
+    "multiple_choice_marker": 415,
+    "proof_word": 8,
+    "external_image_marker": 19
+  },
+  "reference_box_check_existing_grader": {
+    "last_box_not_proven_equivalent": 2376,
+    "last_box_equivalent_by_existing_grader": 2084,
+    "nonempty_solution_without_extractable_last_box": 2930,
+    "last_box_extraction_error": 1
+  },
+  "tokens": {
+    "problem": {
+      "count": 40315,
+      "total": 3217465,
+      "mean": 79.80813592955475,
+      "p50": 65.0,
+      "p90": 140.0,
+      "p95": 179.29999999999563,
+      "p99": 313.8600000000006,
+      "max": 3297
+    },
+    "answer": {
+      "count": 40315,
+      "total": 203572,
+      "mean": 5.049534912563562,
+      "p50": 3.0,
+      "p90": 10.0,
+      "p95": 13.0,
+      "p99": 20.0,
+      "max": 1222
+    },
+    "solution": {
+      "count": 40315,
+      "total": 3153770,
+      "mean": 78.2282029021456,
+      "p50": 0.0,
+      "p90": 355.0,
+      "p95": 571.2999999999956,
+      "p99": 860.0,
+      "max": 4270
+    }
+  },
+  "nonempty_solution_tokens": {
+    "count": 7391,
+    "total": 3153770,
+    "mean": 426.704099580571,
+    "p50": 388.0,
+    "p90": 765.0,
+    "p95": 874.0,
+    "p99": 1245.300000000001,
+    "max": 4270
+  },
+  "student_chat_prompt_tokens": {
+    "count": 40315,
+    "total": 4144399,
+    "mean": 102.8004216792757,
+    "p50": 88.0,
+    "p90": 163.0,
+    "p95": 202.29999999999563,
+    "p99": 336.8600000000006,
+    "max": 3320
+  },
+  "student_chat_prompt_over_2048": 1,
+  "eval_counts": {
+    "aime24": 30,
+    "aime25": 30,
+    "amobench": 39,
+    "beyondaime": 100,
+    "hmmt25": 30
+  },
+  "exact_eval_match_pairs": 0,
+  "near_eval_candidate_pairs_ge_0_5": 1,
+  "omni_metadata_recovery": {
+    "rows": 4428,
+    "sha256": "7c87be8ee41ac7c7a597ef5a5500e84bd2b639a85a06db3da7f69bf9a32ef168",
+    "revision": "40ba231d8f16e29ecd40e6407e2c8640145a8f62",
+    "matched_train_rows": 3528,
+    "matched_omni_rows": 3523,
+    "matched_pairs": 3587,
+    "answer_equivalent_pairs_existing_grader": 3582,
+    "unique_match_train_rows": 3469,
+    "unique_match_answer_equivalent_train_rows": 3468,
+    "multiple_match_train_rows": 59,
+    "conflicting_difficulty_train_rows": 31,
+    "difficulty_counts_unambiguous_labels": {
+      "8.0": 141,
+      "7.0": 201,
+      "6.0": 166,
+      "6.5": 48,
+      "8.5": 6,
+      "9.0": 59,
+      "7.5": 36,
+      "5.0": 794,
+      "4.5": 362,
+      "5.5": 110,
+      "4.0": 509,
+      "5.25": 202,
+      "3.5": 191,
+      "3.0": 19,
+      "4.75": 12,
+      "3.75": 3,
+      "2.0": 153,
+      "2.5": 163,
+      "4.375": 1,
+      "4.25": 2,
+      "6.25": 3,
+      "1.5": 192,
+      "1.0": 114,
+      "2.25": 4,
+      "9.5": 6
+    }
+  },
+  "wall_seconds": 19.447198271751404,
+  "limitations": [
+    "lexical candidates are not confirmed duplicates",
+    "no full semantic decontamination",
+    "existing answer grader is incomplete; disagreement is not a proven wrong label",
+    "no model generation or difficulty annotation performed"
+  ]
+}
