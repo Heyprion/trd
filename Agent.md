@@ -46,3 +46,7 @@ bash preparation/run_math_opd.sh forward_kl_y_r
 ## 7. 固定验证集 PPL/KLD 入口（2026-11-15）
 
 在根目录执行`bash preparation/run_ppl_kld.sh`计算蒸馏前基线，默认固定512题、原始4B学生与冻结8B教师、双卡分片评分；`--dry-run`只核对输入。训练后用`--label distilled --student-model <HF模型或LoRA目录> --compare-to preparation/logs/ppl-kld/latest-baseline.json`进行同口径比较。指标为相同题目/参考前缀上的response PPL与全词表forward/reverse KL，区别于教师额外看初始解答的TRD训练KL；详见[评分说明](preparation/ppl_kld/README.zh-CN.md)。实际运行自动上传SwanLab并追加HISTORY；准备脚本不代表已经完成基线评分。
+
+## 8. 正式训练与独立评测入口（2026-11-15）
+
+当前推荐一键入口为 `bash preparation/run_train_eval.sh`，自动加载 balanced 与冻结9,984题子集，训练成功并完成LoRA合并后再执行五个benchmark的pass@16评测。加 `--dry-run` 仅核对数据与配置。单独训练用 `bash preparation/run_train.sh`；单独评测用 `bash preparation/run_eval.sh --train-run <train/summary.json>` 或 `--model <已合并HF目录>`。训练和评测分别创建SwanLab实验，并追加HISTORY；详细命令、日志及检查说明见[训练评测入口说明](preparation/training/README.zh-CN.md)。固定512题PPL/KLD继续使用第7节的独立入口。

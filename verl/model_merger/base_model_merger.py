@@ -77,6 +77,9 @@ def parse_args():
     merge_parser.add_argument(
         "--private", action="store_true", help="Whether to upload the model to a private Hugging Face repository"
     )
+    merge_parser.add_argument(
+        "--merge-lora", action="store_true", help="Fold exported LoRA weights into the HF model for plain inference"
+    )
 
     test_parser = subparsers.add_parser(
         "test", parents=[base_op_parser], help="Test merged model against a reference Hugging Face model"
@@ -109,6 +112,7 @@ class ModelMergerConfig:
         hf_model_config_path (Optional[str]): Path to HuggingFace model configuration files. Defaults to None.
         hf_upload (bool): Whether to upload to HuggingFace (computed automatically). Not for initialization.
         use_cpu_initialization (bool): Whether to use CPU initialization for large models. Defaults to False.
+        merge_lora (bool): Fold LoRA into HF weights for plain inference. Defaults to False.
     """
 
     operation: str  # 'merge' or 'test'
@@ -124,6 +128,7 @@ class ModelMergerConfig:
     hf_model_config_path: Optional[str] = None
     hf_upload: bool = field(init=False)
     use_cpu_initialization: bool = False
+    merge_lora: bool = False
 
     def __post_init__(self):
         self.hf_upload = self.operation == "merge" and bool(self.hf_upload_path)
@@ -152,6 +157,7 @@ def generate_config_from_args(args: argparse.Namespace) -> ModelMergerConfig:
             hf_upload_path=args.hf_upload_path,
             private=args.private,
             test_hf_dir=None,
+            merge_lora=args.merge_lora,
         )
         os.makedirs(config.target_dir, exist_ok=True)
     elif args.operation == "test":
@@ -361,6 +367,8 @@ class BaseModelMerger(ABC):
             if meta_task_type is not None:
                 task_type = meta_task_type
 
+        if lora_alpha == 0 and self.config.merge_lora:
+            raise ValueError("--merge-lora requires nonzero lora_alpha in lora_train_meta.json")
         if lora_alpha == 0:
             warnings.warn(
                 "LoRA alpha metadata is missing or equals 0; falling back to lora_alpha=0. "
@@ -411,11 +419,26 @@ class BaseModelMerger(ABC):
             print(f"Saving lora adapter to {lora_path}")
 
         print(f"Saving model to {self.config.target_dir}")
-        model.save_pretrained(self.config.target_dir, state_dict=state_dict)
+        if lora_path and self.config.merge_lora:
+            from peft import PeftModel
+
+            # Keep the checkpoint's base dtype and apply the trained adapter before
+            # saving; a plain HF/vLLM load otherwise silently evaluates the base.
+            model.load_state_dict(state_dict, strict=True, assign=True)
+            model = PeftModel.from_pretrained(model, lora_path, device_map={"": "cpu"})
+            model = model.merge_and_unload(safe_merge=True)
+            model.save_pretrained(self.config.target_dir)
+        else:
+            model.save_pretrained(self.config.target_dir, state_dict=state_dict)
         del state_dict
         del model
 
         self.save_hf_processing_assets()
+        if lora_path and self.config.merge_lora:
+            import json
+
+            with open(os.path.join(self.config.target_dir, "lora_merge.json"), "w") as stream:
+                json.dump({"merged": True, "adapter_path": "lora_adapter", "safe_merge": True}, stream)
 
     def upload_to_huggingface(self):
         import requests

@@ -97,7 +97,11 @@ class KLTrainer:
             self._init_wandb()
 
         self.swanlab_run = None
-        if not self.sync_only and self.is_logging and os.environ.get("SWANLAB_MODE", "online") != "disabled":
+        if not self.sync_only and self.is_logging and os.environ.get("SWANLAB_RELAY") == "1":
+            from .swanlab_relay import SwanLabRelay
+
+            self.swanlab_run = SwanLabRelay()
+        elif not self.sync_only and self.is_logging and os.environ.get("SWANLAB_MODE", "online") != "disabled":
             import swanlab
 
             self.swanlab_run = swanlab.init(
@@ -726,6 +730,8 @@ class KLTrainer:
                 if hf_assets_source:
                     logger.info("Using HF assets from %s for merged export", hf_assets_source)
                 cmd.append("--trust-remote-code")
+                if os.environ.get("MERGE_LORA_ON_EXPORT") == "true":
+                    cmd.append("--merge-lora")
                 logger.info("Merging FSDP checkpoint %s -> %s", latest_ckpt, merged_dir)
                 subprocess.run(cmd, check=True)
             except Exception as e:

@@ -2,6 +2,15 @@
 
 本目录只准备本仓库数学 OPD 的环境、模型、数据和运行入口。
 
+当前正式启动入口（自动加载 balanced 和冻结9,984题子集）：
+
+```bash
+bash preparation/run_train_eval.sh --dry-run
+bash preparation/run_train_eval.sh --run-id math-trd-9984-v1
+```
+
+训练与评测分别记录到两个SwanLab实验。独立运行用 `run_train.sh` 和 `run_eval.sh --train-run <train/summary.json>`；模型导出会将LoRA合入HF权重后再评测。完整说明见[训练与评测脚本](training/README.zh-CN.md)。后文 `run_math_opd.sh` 是保留的上游通用入口。
+
 当前数据工程已完成：可用33,236题，固定验证512题，训练池32,724题，首轮训练9,984题。完整过程、分层规则和文件索引见[数据工程完整记录](data_engineering/REPORT.zh-CN.md)；当前数据配置加载`preparation/data_engineering/splits.env.sh`。
 
 2026-11-15 已完成双卡首轮性能试跑。下一次 TRD 运行建议显式加载

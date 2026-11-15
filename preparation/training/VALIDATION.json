@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-15",
+  "production_generation_started": false,
+  "production_training_started": false,
+  "production_benchmark_evaluation_started": false,
+  "software_checks": {
+    "device": "cpu",
+    "tests": 20,
+    "passed": 20,
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/so9e5dn2",
+    "log_dir": "preparation/logs/training-development/20261115-183526-final-cpu-tests",
+    "lora_export": "Random tiny Qwen3, FP32/BF16 base, nonzero FP32 LoRA; plain exported HF logits agree with base+adapter within dtype tolerance"
+  },
+  "frozen_data": {
+    "split_version": "math-v1-splits-v1",
+    "training_rows": 9984,
+    "validation_rows": 512,
+    "effective_batch": 128,
+    "nominal_updates_per_epoch": 78,
+    "manifest_sha256": "c75c4026968050b9a1b87983a16eed8bed4de294658a4467db05c0a8920873a0",
+    "training_parquet_sha256": "cb27a12b862623e03eb7c92e220a18bc3cec27a2fa578b2fbab8d927fe80788d",
+    "hf_matches_frozen_parquet": true,
+    "training_validation_identity_overlap": 0,
+    "student_prompts_over_2048": 0,
+    "longest_student_prompt_tokens": 1669
+  },
+  "entrypoint_checks": {
+    "train_dry_run": true,
+    "eval_dry_run_on_original_student": true,
+    "all_dry_run": true,
+    "all_dry_run_from_tmp": true,
+    "original_full_dataset_rejected": true,
+    "pilot_max_samples_rejected": true,
+    "shell_syntax": true,
+    "python_compilation": true,
+    "git_diff_check": true,
+    "gpu_memory_after_checks_mib": [0, 0]
+  },
+  "evaluation_protocol": {
+    "datasets": ["aime24", "aime25", "hmmt25", "beyondaime", "amobench"],
+    "rows": [30, 30, 30, 100, 39],
+    "pass_k": 16,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "tensor_parallel_size": 2,
+    "response_length": 38912,
+    "response_length_origin": "Existing upstream benchmark default; independent from training rollout limit 16384"
+  }
+}

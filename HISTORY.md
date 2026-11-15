@@ -266,3 +266,26 @@
 - 校验：真实512题HF目录逐行等于冻结parquet；validation/train_pool的parquet及ID文件SHA256通过，raw_id/sample_id/duplicate_group_id零交集；完整response tokens=234,375，含提示input tokens=281,011，最长input=1,808，默认65个batch。仓库外绝对路径启动、加载env+balanced+splits后32题dry-run、shell语法、Python导入及Git diff检查通过；dry-run不调用评分/CUDA/SwanLab。
 - 首轮12项合成回归有1项LoRA加载失败：PEFT自动device_map把微型测试模型从CPU调到CUDA；未使用生产权重或给真实题打分。已显式指定adapter的device_map和torch_device；v2 13项通过，最终16项通过。覆盖首末token/causal shift、HF原生loss与FP64 KL、BF16、chunk/padding一致性、LoRA实际加载、token加权、配对bootstrap、污染/文件篡改拒绝、合成主流程成功/失败及baseline指针、多GPU任务分配模拟。所有软件实验链接见上文，最终SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/c8slwskd；失败运行也已保留。收尾两卡显存均0MiB。
 - 用户运行`bash preparation/run_ppl_kld.sh`后自动在线记录SwanLab项目trd-math-opd并追加HISTORY，输出`preparation/logs/ppl-kld/<label>-<时间戳>-<pid>/`的逐题统计、summary、REPORT及GPU日志。仅完整成功baseline更新latest-baseline.json；后续`--label distilled --student-model <HF或LoRA目录> --compare-to preparation/logs/ppl-kld/latest-baseline.json`核对固定参考/口径/教师文件SHA256后输出前后配对差值和95%区间。没有上传权重、题目数据或token任务，Git仅包含代码、文档、配置和小型检验摘要。
+
+## 2026-11-15 10:18:27 UTC：验证集PPL/KLD baseline
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/348lb6qg；输出/日志：`/root/autodl-tmp/trd/preparation/logs/ppl-kld/baseline-20261115-101823-758028-27412`；学生：`/root/autodl-tmp/trd/models/Qwen3-4B-Instruct-2507`；验证题数512/512。
+- 完成：学生PPL=2.14900753，教师PPL=2.04969176，forward KL(T||S)=0.23148751，reverse KL(S||T)=0.21281604 nats/token；有效response tokens=234375；耗时62.9s；汇总`/root/autodl-tmp/trd/preparation/logs/ppl-kld/baseline-20261115-101823-758028-27412/summary.json`。
+
+- 训练/评测脚本CPU合成回归：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/g1ibseb4；日志`/root/autodl-tmp/trd/preparation/logs/training-development/20261115-183237-cpu-tests`；没有启动正式模型训练或benchmark评测。
+
+- 训练/评测脚本CPU合成回归v2：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/zfsssh2l；日志`/root/autodl-tmp/trd/preparation/logs/training-development/20261115-183351-cpu-tests-v2`；没有启动正式模型训练或benchmark评测。
+
+- 训练/评测脚本最终CPU合成回归：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/so9e5dn2；日志`/root/autodl-tmp/trd/preparation/logs/training-development/20261115-183526-final-cpu-tests`；没有启动正式模型训练或benchmark评测。
+
+## 2026-11-15：准备首轮9,984题训练、独立评测和串行总脚本
+
+- 用户要求先读Agent.md，按已划分的9,000多条新数据及优化方法准备训练脚本、评测脚本，以及自动完成训练+测试的总入口；两个阶段独立运行和记录。本轮仅准备脚本、校验冻结数据及CPU合成回归，没有启动正式学生/教师生成、9,984题训练或五个benchmark的模型评测。
+- 新入口为 `preparation/run_train.sh`、`preparation/run_eval.sh`、`preparation/run_train_eval.sh`，共享 `preparation/training/config.env.sh` 和 `pipeline.py`。自动加载env、balanced、splits及上游forward_kl_y_r算法默认值：FSDP2/双卡/SP1，batch2/累积32，有效128、1 epoch/78名义更新；训练上限18,432/动态预算32,768；BF16冻结权重、FP32 LoRA、Liger/梯度检查点、全词表KL recompute/chunk512、输出上限16,384，未沿用pilot短输出。
+- 训练入口锁定 `data/processed/math-v1/splits-v1/train_9984/dataset`，检查manifest、parquet与ID清单SHA256、实际HF逐行一致，以及训练/验证raw_id、sample_id、duplicate_group_id零交集；拒绝原始全集、MAX_SAMPLES及外部DATA_PATH/CORRECTED_RESPONSES_PATH。生成后再次核对全部9,984题的身份/顺序和非空响应，缺失或过滤丢题则在更新前终止。实际训练集学生提示最长1,669 tokens，0题超过2,048提示预算。
+- 独立评测覆盖AIME24/AIME25/HMMT25/BeyondAIME/AMO-Bench，现有题数30/30/30/100/39；pass@16、温度0.6/top_p0.95、TP2，并记avg@16和首8次pass@8。评测保持上游4,096提示预算及38,912输出上限，区别于训练生成16,384；增加评测资源环境参数，当前显存比例0.85、max_num_seqs16、batched tokens43,008。冻结512题PPL/KLD继续使用已有独立入口，未自动混入这两个实验。
+- 发现并修正会影响最终准确率的导出问题：原model merger把LoRA拆入lora_adapter子目录，HF主权重仍是基础学生，而原benchmark未加载adapter。新增可选 `--merge-lora`，新训练入口导出时显式启用，使用PEFT CPU safe merge将增量折入最终权重，保留原adapter和lora_merge.json；合并要求非零alpha元数据。新评测拒绝未合入adapter的旧导出，检查所有HF权重分片存在。未改变未启用该选项的上游默认导出行为。
+- 每个总运行创建 `<run-id>-train` 与 `<run-id>-eval` 两个独立SwanLab在线实验，以run-id分组。父进程从生成开始统一记录训练配置、控制台及失败，rank0通过relay转发原生训练指标，避免重复实验；评测记录来源训练链接与15个benchmark指标。每阶段summary含成功/失败状态、模型路径及实验链接并追加HISTORY；训练或导出失败不启动评测。单独评测用 `--train-run <成功训练summary.json>` 或显式 `--model`，不按latest/时间排序猜模型；文件锁避免新入口并发抢卡，已有产物拒绝覆盖。
+- 产物索引：`preparation/logs/math-runs/<run-id>/{train,eval}/summary.json`及console.log、训练metrics.jsonl、评测results.json/csv与generations；checkpoint/HF导出继续采用既有分盘方案，启动时检查20GiB/18GiB空闲空间。本次收尾系统盘约28GiB、数据盘22GiB空闲，满足现有单实验检查；双卡显存均0MiB。全部原始日志、模型、数据和缓存保持Git忽略。
+- 验证：三个入口dry-run、仓库外/tmp绝对路径启动、拒绝原始全集/遗留MAX_SAMPLES=8、shell语法、Python编译、CLI合并选项及Git diff检查通过。首轮17项CPU回归出现5处错误（测试夹具缺少模型源目录；自定义输出根时锁父目录未创建），已修正；v2的17项通过，开发记录驱动误用SDK finish状态值，最终驱动改为默认finish并完成在线上传。最终20项全部通过，覆盖数据污染/篡改、精确模型交接、训练失败停止、独立评测、缺失指标/不完整采样拒绝、真实子进程指标转发，以及随机微型Qwen3的FP32/BF16非零LoRA合并后普通HF加载数值对照；最终SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/so9e5dn2。没有用生产模型运行这些合成测试。
+- 新增 `preparation/training/README.zh-CN.md` 和小型VALIDATION.json；Agent.md第8节及准备README索引已更新。工作分支 `feat/math-train-eval-pipeline`。完整长程GPU训练、实际导出模型和真实benchmark结果须由用户启动正式脚本后验证。
