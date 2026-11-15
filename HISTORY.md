@@ -136,3 +136,8 @@
 - TRD特殊口径：当前学生看题目、教师额外看固定初始解答及修订指令，训练KL是跨条件目标。独立64–128题的固定y_o/y_r分析可选补充，单独命名，不与相同输入主表混合；不同模型各自输出上的PPL不作为前后主对比。
 - 排期：既有约7.1K训练response tokens/s不能直接作为三模型评分实测。按暂定1–4K固定参考位置/s合计评分吞吐，512题主表前后加教师预计10–30分钟，加128题训练对照和汇总15–40分钟；可选64–128题TRD长轨迹含生成0.5–2小时。首次脚本开发与核验另计2–4小时，先32题校准更新预算。所有未来评分/生成实验均须上传SwanLab并回写链接。
 - 文档与参考：`preparation/PPL_KLD_PLAN.zh-CN.md`；Hugging Face https://huggingface.co/docs/transformers/perplexity ，TRD https://arxiv.org/html/2606.08432v1 ，本地`recipe/opd/kl_trainer.py`和`dataset/data_utils.py`、pilot结果与日志。工作分支`docs/math-ppl-kld-plan`，本轮只提交方案和历史。
+
+## 2026-11-15：核实当前验证集与测试集规模
+
+- 用户追问当前项目是否已有验证集及其规模。读取实际数据文件元数据、DeepScaleR准备脚本及OPD训练/评测配置；当前没有单独划分并接入训练流程的PPL/KLD验证集，已落地规模为0，前文512题仍是待执行方案。
+- 当前DeepScaleR训练文件为40,315条，准备脚本默认只读取train split。`data/eval/`现有的是最终数学benchmark测试数据：AIME24 30、AIME25 30、HMMT25 30、BeyondAIME 100、AMO-Bench 39，合计229题；AMO-Bench原始50题与实际过滤后39题应区分。没有启动任何评测或修改数据划分，无新增SwanLab实验。
