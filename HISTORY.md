@@ -318,3 +318,10 @@
 - 恢复方式：在原HTTP地址172.17.0.6:34035和:38735分别启动独立vLLM服务，模型仍为本地4B学生，TP1×2卡、BF16、max_model_len18432、max_num_seqs16、batched tokens34816、GPU比例0.85、同温度0.6/top_p0.95/top_k20与seed0/1。首个临时包装缺少spawn的main保护导致启动失败（未恢复客户端），补齐保护后两个/health及/v1/models均通过，再SIGCONT原客户端54082。未另起原始生成任务、未重跑已经计入进度的5786条；尚未完成的请求在原异步任务内重试。替代引擎RNG重新初始化，因此不声称与完全不中断运行逐位相同。
 - 验证原客户端PID未变、完整任务仍status=running，进度从5786增长至5854并继续至5923/9984，两GPU利用率读取约93%/92%，显存约81019/81061MiB。原pipeline53607及prepare53929继续等待生成结果，输入仍为冻结9984题；后续教师改写、训练和自动评测保持原入口。未执行5000条子集方案、未新建SwanLab实验，沿用 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666 。
 - 临时恢复服务、状态及日志位于 `preparation/logs/math-runs/20261115-185850-279780-53607/train/recovery/`，均按既有规则忽略Git；supervisor PID74353，服务PID74400/74401，原生成客户端退出后自动停止替代学生服务并释放GPU供原教师阶段使用。恢复摘要recovery-summary.json记录保留进度、服务端口和清理策略；原客户端仍依赖完成全阶段后落盘，当前不能把内存中的轨迹称为已持久化缓存。
+
+
+## 2026-11-15：统一SwanLab项目复用与实验命名约定
+
+- 用户要求在Agent.md写清：所有实验经过SwanLab；主要目的和阶段相同尽量复用之前project；实验名简洁直白，包含日期、阶段和目的。
+- 已扩充Agent.md第4节：覆盖数据/生成/训练/评测/性能/数值校验及失败中断状态；启动前查历史，日期/机器/模型/参数/重跑不构成单独建project理由。当前数学OPD/TRD相关实验复用trd-math-opd，硬件性能专项优先复用trd-pro6000-pilot。
+- 统一run名称格式YYYYMMDD-阶段-目的[-关键区别][-rNN]，附清洗分层、TRD9984题、基线PPL/KL和五套pass16评测示例；完整超参留config/description。本轮仅修改约定与历史，未启动实验、改名既有run或干预正在运行的任务。
