@@ -122,6 +122,27 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(run.finish.call_args.kwargs["state"], "crashed")
         self.assertIn("fixture://failed", (self.root / "HISTORY.md").read_text())
 
+    def test_swanlab_settings_accept_legacy_plain_project_without_creating_run(self):
+        from swanlab.sdk.internal.settings import Settings
+
+        run = Mock(url="fixture://not-created")
+        fake = Mock()
+
+        def check_settings(**kwargs):
+            self.assertNotIn("SWANLAB_PROJECT", os.environ)
+            self.assertEqual(kwargs["project"], "trd-math-opd")
+            Settings()  # The real SDK parser; no experiment or network request.
+            return run
+
+        fake.init.side_effect = check_settings
+        with patch.dict(os.environ, {"SWANLAB_PROJECT": "trd-math-opd"}), \
+                patch.dict(sys.modules, {"swanlab": fake}), patch.object(p, "ROOT", self.root):
+            for stage in ("train", "eval"):
+                result = p.experiment(stage, "fixture", self.root / stage, {}, lambda run: {"fixture": True})
+                self.assertEqual(result["status"], "completed")
+                self.assertEqual(os.environ["SWANLAB_PROJECT"], "trd-math-opd")
+        self.assertEqual(fake.init.call_count, 2)
+
     def eval_fixture(self, incomplete=False, missing_metric=False):
         import pyarrow as pa
         import pyarrow.parquet as pq

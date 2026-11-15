@@ -289,3 +289,14 @@
 - 产物索引：`preparation/logs/math-runs/<run-id>/{train,eval}/summary.json`及console.log、训练metrics.jsonl、评测results.json/csv与generations；checkpoint/HF导出继续采用既有分盘方案，启动时检查20GiB/18GiB空闲空间。本次收尾系统盘约28GiB、数据盘22GiB空闲，满足现有单实验检查；双卡显存均0MiB。全部原始日志、模型、数据和缓存保持Git忽略。
 - 验证：三个入口dry-run、仓库外/tmp绝对路径启动、拒绝原始全集/遗留MAX_SAMPLES=8、shell语法、Python编译、CLI合并选项及Git diff检查通过。首轮17项CPU回归出现5处错误（测试夹具缺少模型源目录；自定义输出根时锁父目录未创建），已修正；v2的17项通过，开发记录驱动误用SDK finish状态值，最终驱动改为默认finish并完成在线上传。最终20项全部通过，覆盖数据污染/篡改、精确模型交接、训练失败停止、独立评测、缺失指标/不完整采样拒绝、真实子进程指标转发，以及随机微型Qwen3的FP32/BF16非零LoRA合并后普通HF加载数值对照；最终SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/so9e5dn2。没有用生产模型运行这些合成测试。
 - 新增 `preparation/training/README.zh-CN.md` 和小型VALIDATION.json；Agent.md第8节及准备README索引已更新。工作分支 `feat/math-train-eval-pipeline`。完整长程GPU训练、实际导出模型和真实benchmark结果须由用户启动正式脚本后验证。
+- train 失败：`/root/autodl-tmp/trd/preparation/logs/math-runs/math-trd-9984-v1/train/summary.json`；错误见 `/root/autodl-tmp/trd/preparation/logs/math-runs/math-trd-9984-v1/train/console.log` 和 summary.json。
+
+## 2026-11-15：修复正式训练的SwanLab初始化错误，实际启动后立即停止
+
+- 用户反馈前述命令启动失败，要求定位并实际尝试，确认能启动后立即停止，正式训练与自动评测由用户在另一个终端执行；本次明确不启用实验记录。按本轮用户指示关闭SwanLab/W&B，不创建或上传新的实验；保留这里的代码维护和排查结论。
+- 读取 `preparation/logs/math-runs/math-trd-9984-v1/train/summary.json`，失败发生在 `swanlab.init` 读取SDK Settings时，报 `SettingsError: error parsing value for field "project"`，内层为JSONDecodeError。配置导出的 `SWANLAB_PROJECT=trd-math-opd` 被本机SwanLab0.10.5误作嵌套JSON解析；失败早于模型启动，未创建SwanLab实验，实际没有console.log，完整异常在summary.json。此兼容点之前已在数据工程/PPL入口处理，本次正式训练入口漏接，旧dry-run及使用Mock初始化的CPU检查未覆盖。
+- 修复 `preparation/training/pipeline.py`：先捕获并暂时移除平面SWANLAB_PROJECT，将项目名作为显式参数传给SDK，finally恢复原环境，训练和独立评测共用这一路径。新增真实SDK Settings解析的回归，用替身阻止创建实验，连续验证train/eval并检查项目名与环境恢复。完整21项CPU回归通过，没有启用SwanLab；本地临时输出 `/tmp/trd-startup-repair-20261115/cpu-regression.log`。
+- 实际GPU启动验证加载与正式入口相同的env/balanced/splits和生产辅助函数参数：4B学生、8B教师分别在两卡启动2个TP1生成副本，输入9984题、输出预算16384，学生上下文18432/教师34816、GPU比例0.85、max_num_seqs16/batched tokens34816；约98秒/101秒完成启动。服务全部ready时由临时包装立即退出并关闭Ray，没有提交任何生成请求或写入正式生成缓存。
+- 再使用正式torchrun命令构造器和run_training.main初始化双卡FSDP2，师生模型、LoRA、优化器及数据加载器均成功加载；9984个冻结训练ID对应临时初始化fixture，batch2/累积32、名义78步、max_length18432、动态预算32768。临时替换train方法只确认ready并同步退出，未对fixture执行前向、反向或参数更新，未保存checkpoint、未运行评测；约31秒退出，双rank报告global_step=0。该检查覆盖实际模型初始化，不等同于完成真实生成或一次正式更新。
+- 临时诊断脚本、逐阶段输出和diagnostic-result.json均在 `/tmp/trd-startup-repair-20261115/`，不加入Git。SDK创建实验的调用在诊断时被替身阻止，但使用真实Settings检查已修复路径；正式默认仍在线分别记录训练与评测。收尾三个实际GPU启动阶段全部returncode0、相关进程已结束，两卡显存均0MiB。
+- 原失败run-id目录保留，不覆盖或删除。建议用户直接执行 `bash preparation/run_train_eval.sh`，让入口自动生成新run-id，避免重复使用math-trd-9984-v1触发已有目录保护；正式输入继续锁定新划分9984题，成功后自动合并LoRA并执行五套pass@16评测。

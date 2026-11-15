@@ -193,10 +193,18 @@ def experiment(stage, run_id, folder, config, action):
     run = None
     start = time.monotonic()
     try:
-        run = swanlab.init(project=os.environ.get("SWANLAB_PROJECT", "trd-math-opd"),
-                           name=f"{run_id}-{stage}", job_type=stage, group=run_id,
-                           mode="online", on_online_error="raise", config=config,
-                           log_dir=str(folder / "swanlab"), reinit=True)
+        # SwanLab 0.10.5 parses SWANLAB_PROJECT as a nested JSON object.
+        # Pass our legacy plain project name explicitly and hide it while the
+        # SDK reads settings. Restore it for the next stage and child processes.
+        legacy_project = os.environ.pop("SWANLAB_PROJECT", None)
+        try:
+            run = swanlab.init(project=legacy_project or "trd-math-opd",
+                               name=f"{run_id}-{stage}", job_type=stage, group=run_id,
+                               mode="online", on_online_error="raise", config=config,
+                               log_dir=str(folder / "swanlab"), reinit=True)
+        finally:
+            if legacy_project is not None:
+                os.environ["SWANLAB_PROJECT"] = legacy_project
         summary.update(status="running", swanlab_url=run.url)
         write_json(summary_path, summary)
         append_history(f"\n## {summary['started_at']}：数学 TRD {stage} / {run_id}\n\n"
