@@ -142,6 +142,13 @@
 - 用户追问当前项目是否已有验证集及其规模。读取实际数据文件元数据、DeepScaleR准备脚本及OPD训练/评测配置；当前没有单独划分并接入训练流程的PPL/KLD验证集，已落地规模为0，前文512题仍是待执行方案。
 - 当前DeepScaleR训练文件为40,315条，准备脚本默认只读取train split。`data/eval/`现有的是最终数学benchmark测试数据：AIME24 30、AIME25 30、HMMT25 30、BeyondAIME 100、AMO-Bench 39，合计229题；AMO-Bench原始50题与实际过滤后39题应区分。没有启动任何评测或修改数据划分，无新增SwanLab实验。
 
+## 2026-11-15：核查TRD论文公开权重
+
+- 用户询问论文是否提供训练前base、教师及蒸馏后学生权重。在线核查最新论文v2 https://arxiv.org/html/2606.08432v2 、作者仓库 https://github.com/louieworth/trd 的README/完整文件树/Releases/Issues，以及HF论文页 https://huggingface.co/papers/2606.08432 。作者仓库当前无Release，文件树无模型权重，README无蒸馏后模型下载链接；HF论文页关联模型为0，公开检索未找到作者发布的TRD学生checkpoint或LoRA adapter。结论限定为截至本日上述公开渠道未发现，不能据此断言作者没有私有权重。
+- 补充证据：作者仓库Issue #1 https://github.com/louieworth/trd/issues/1 标题为“Release TRD-distilled models and AMOBench on Hugging Face”，2026-06-09提出发布请求，目前仍open、0评论。该issue提及的旧README“Coming soon”不在当前README中，不将其误写为当前公告。
+- 可用初始化权重为Qwen官方 https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507 和 https://huggingface.co/Qwen/Qwen3-8B 。本地已分别有3个/5个safetensors分片，约8.04GB/16.38GB；对应路径`models/Qwen3-4B-Instruct-2507`、`models/Qwen3-8B`，revision与校验见`preparation/assets.json`。论文Base是相对本次蒸馏的起点，当前4B起点本身是Instruct模型。
+- 方法澄清：当前OPD使用冻结8B教师，只更新4B学生，因此不存在需要另取的“本次蒸馏后教师权重”；蒸馏后学生仍需自行训练或取得作者checkpoint，不能从结果表恢复。只做在线资料核查和本地权重文件清点，未下载新权重、未启动实验，无新增SwanLab运行。
+
 
 ## 2026-11-15：数据工程只读审计与清洗/难度分层方案
 
