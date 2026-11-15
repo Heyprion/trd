@@ -217,3 +217,15 @@
 - 独立分层入口验证：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/fpcewyw1，读取复制的clean阶段产物、显式传入不存在的原始input路径仍可完成，说明阶段2不依赖原始输入；23条可用、0新增排除。完成阶段--resume验证 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/hnmrdyc0 通过，无新增GPU工作。
 - 检验：12项CPU回归检查、三入口dry-run、shell语法、训练metadata传递、Git diff检查通过。GPU均已退出并释放；未启动全量GPU数据工程、正式生成或训练。配置、README及小型VALIDATION.json入Git，原数据/逐题产物/日志不入Git。脚本包仅含代码、配置、文档和小摘要。
 - 可搬运代码包已生成：`/mnt/data/math-data-engineering-scripts.zip`，38,078字节，SHA256 f80b22666b2933a5bb71f79f2b1dc37c98fa0afa739ac27dfc4b3dd541390d36。解压到独立/tmp目录后，一键入口dry-run与12项CPU回归检查均通过。包内仅15个代码/配置/说明/小摘要文件（含可选训练metadata适配patch），没有数据、权重、缓存或原始日志。
+
+## 2026-11-15 08:56:26 UTC：数据工程 all
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/oqwvc29e；配置及日志：`/root/autodl-tmp/trd/data/processed/math-v1/logs/20261115-085622-all`；输出：`/root/autodl-tmp/trd/data/processed/math-v1`。
+- 完成：输入40315，可用33236，排除7079，技术排除0，耗时245.8s；汇总`/root/autodl-tmp/trd/data/processed/math-v1/logs/20261115-085622-all/summary.json`。
+
+
+## 2026-11-15：核实用户终端启动的全量数据工程已完成
+
+- 用户询问其他终端启动的一键命令是否跑完。本轮只读核查进程、GPU、manifest及实际产物，未重新运行清洗或分层。
+- 两阶段completed均为true；无残留pipeline/vLLM工作进程，两GPU显存均为0MiB。输入40,315，最终可用33,236（82.44%），排除7,079，技术排除0；易4,496／中21,496／难7,244；模型标签30,186、原始标签3,050。运行summary的处理至导出耗时245.77秒（最终同步及退出另计）。
+- 核实clean/final的usable/excluded/decisions parquet分别为33,236/7,079/40,315行；实际final/dataset可加载为33,236题，ID唯一，领域非空，难度仅easy/medium/hard。产物data/processed/math-v1/final/dataset，汇总data/processed/math-v1/summary.json；SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/oqwvc29e 。自动排除理由是模型/规则决策，不在本次状态核查中重新证明清洗精确率。
