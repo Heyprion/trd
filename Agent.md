@@ -42,3 +42,7 @@ bash preparation/run_math_opd.sh forward_kl_y_r
 ## 6. 数据工程与暂定划分索引（2026-11-15）
 
 原始数据、抽样观察、清洗/分层、训练—测试排重及当前划分统一遵循[数据工程完整记录](preparation/data_engineering/REPORT.zh-CN.md)。当前固定验证512题、训练池32,724题，首轮仅训练其中分层抽取的9,984题（有效batch128，共78个名义更新/epoch）；验证题及同题组不得参与训练或训练生成。加载`preparation/data_engineering/splits.env.sh`选择当前子集和独立生成缓存；后续扩充保留验证清单，沿固定训练池顺序取更长前缀。原始全量数据保留作复现版本，不是当前默认训练输入。
+
+## 7. 固定验证集 PPL/KLD 入口（2026-11-15）
+
+在根目录执行`bash preparation/run_ppl_kld.sh`计算蒸馏前基线，默认固定512题、原始4B学生与冻结8B教师、双卡分片评分；`--dry-run`只核对输入。训练后用`--label distilled --student-model <HF模型或LoRA目录> --compare-to preparation/logs/ppl-kld/latest-baseline.json`进行同口径比较。指标为相同题目/参考前缀上的response PPL与全词表forward/reverse KL，区别于教师额外看初始解答的TRD训练KL；详见[评分说明](preparation/ppl_kld/README.zh-CN.md)。实际运行自动上传SwanLab并追加HISTORY；准备脚本不代表已经完成基线评分。

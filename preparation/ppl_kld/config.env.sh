@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Paths may be overridden here or with CLI arguments; no training settings change.
+PPL_KLD_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+export PPL_KLD_SPLIT_ROOT="${PPL_KLD_SPLIT_ROOT:-${MATH_SPLIT_ROOT:-$PPL_KLD_ROOT/data/processed/math-v1/splits-v1}}"
+export PPL_KLD_BASE_MODEL="${PPL_KLD_BASE_MODEL:-$PPL_KLD_ROOT/models/Qwen3-4B-Instruct-2507}"
+export PPL_KLD_STUDENT_MODEL="${PPL_KLD_STUDENT_MODEL:-$PPL_KLD_BASE_MODEL}"
+export PPL_KLD_TEACHER_MODEL="${PPL_KLD_TEACHER_MODEL:-$PPL_KLD_ROOT/models/Qwen3-8B}"
+export PPL_KLD_OUTPUT_ROOT="${PPL_KLD_OUTPUT_ROOT:-$PPL_KLD_ROOT/preparation/logs/ppl-kld}"
+export PPL_KLD_GPU_IDS="${PPL_KLD_GPU_IDS-${CUDA_VISIBLE_DEVICES-0,1}}"
+export PPL_KLD_PROJECT="${PPL_KLD_PROJECT:-trd-math-opd}"
+export PPL_KLD_BATCH_SIZE="${PPL_KLD_BATCH_SIZE:-8}"
+export PPL_KLD_BATCH_TOKENS="${PPL_KLD_BATCH_TOKENS:-8192}"
+export PPL_KLD_MAX_LENGTH="${PPL_KLD_MAX_LENGTH:-18432}"
+export PPL_KLD_CHUNK_SIZE="${PPL_KLD_CHUNK_SIZE:-512}"
+export PPL_KLD_MEMORY_FRACTION="${PPL_KLD_MEMORY_FRACTION:-0.92}"

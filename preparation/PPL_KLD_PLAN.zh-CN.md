@@ -2,6 +2,8 @@
 
 日期：2026-11-15。状态：指标方案，尚未运行模型评分。数据划分现已按[数据工程完整记录](data_engineering/REPORT.zh-CN.md)落地：验证512、训练池32,724、首轮训练9,984；冻结验证目录为`data/processed/math-v1/splits-v1/validation/dataset`。
 
+评分入口现已实现：[启动脚本](run_ppl_kld.sh)、[参数与使用说明](ppl_kld/README.zh-CN.md)。默认在固定512题上计算原始4B与固定8B教师的response PPL、全词表forward/reverse KL；训练后传入HF模型或LoRA目录复用同一口径。已做软件回归及真实数据dry-run，生产模型GPU评分留给用户自行启动。
+
 ## 1. 本次核实的事实
 
 - 基线学生为 `models/Qwen3-4B-Instruct-2507`，固定教师为 `models/Qwen3-8B`；蒸馏后学生应使用正式训练的 LoRA checkpoint 或对应合并模型。
@@ -63,7 +65,7 @@ FKL(T || S) = sum_{i,t,v}[p_T(v | x_i,y_i,<t)
 3. 正式训练前评分S0/T；训练后用相同清单评分S1/T。基线可以在训练后重新加载原始4B模型补测，只要保留了真正未参与蒸馏的验证集。
 4. 主要产物为逐题NLL/KL总和、token数、截断标记，以及整体/长度分桶/训练对照结果、配对差值区间。所有模型实验上传SwanLab `trd-math-opd`，在HISTORY记录运行链接。
 
-硬件沿用2×RTX PRO 6000 96GB和BF16/FlashAttention；评分不需要优化器、反向传播和梯度检查点。以无梯度模式对样本分片或使用现有FSDP2加载路径，先校准后选择batch，不直接沿用训练batch。全词表KL按token分块并及时释放logits，避免保存完整教师logits：仅上述约21.2万参考token的BF16全词表教师分布，按151,936词表估计就约64.3GB（59.9GiB），超过当前数据盘可用空间。保存逐题统计足够支持汇总与bootstrap；要重算分布指标时重新前向。
+硬件沿用2×RTX PRO 6000 96GB和BF16/FlashAttention；评分不需要优化器、反向传播和梯度检查点。实际脚本使用每卡完整师生副本、互不重复的数据batch，默认batch最多8条、padded token预算8,192，不直接沿用训练batch。取隐藏状态后仅对response位置分块调用LM head和全词表KL，避免生成/保存完整教师logits：当前234,375个参考token的BF16全词表教师分布，按151,936词表估计就约71.2GB（66.3GiB）。保存逐题统计足够支持汇总与bootstrap；要重算分布指标时重新前向。
 
 ## 5. 耗时预估
 

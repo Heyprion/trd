@@ -250,3 +250,19 @@
 - 自动检查：四个实际HF目录和parquet条数、各文件SHA256均通过；raw_id/sample_id/duplicate_group_id在验证与训练池间交集0，训练子集与后备交集0，全部输入恰好分配；原可用parquet哈希未变；执行脚本SHA256与冻结manifest一致。新增6项划分检查，合计18项CPU回归通过；抽样可重现、跨原始输入顺序稳定、扩充保持子集嵌套。
 - 默认入口：新增splits.env.sh；env.sh仅在未显式指定TRAIN_DATA_PATH且冻结manifest存在时启用子集，并保留显式路径，修复run_math_opd.sh再次source环境把用户选定输入重置成原始全集的问题。生成缓存隔离为gen_results/math-v1-splits-v1/train_9984。fresh环境自动激活、显式输入覆盖、shell语法及训练dry-run通过（batch2/acc32、有效128）；训练准备器继续传递split_version/sampling_rank。
 - 文档：新增preparation/data_engineering/REPORT.zh-CN.md，详细记录原始数据、64题观察、清洗规则、589对候选判断、训练/测试去污染范围、正式排除数、标签来源和分布、双卡实测、冻结划分/扩充、实际路径及哈希。仓库已有工作约定是Agent.md（AGENTS.md链接至它），已更新其中索引和默认数据范围，并按用户字面文件名新增根a.md短索引；旧PPL/KLD方案与准备README同步到当前划分。验证评分仅准备了输入，尚未接入训练中的自动定期评估。
+
+- PPL/KLD脚本CPU回归验证：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/725t9w03；合成微型Qwen3与临时划分，未使用生产权重或评分真实验证集；日志`/root/autodl-tmp/trd/preparation/logs/ppl-kld-development/20261115-100544-cpu-tests`。
+
+- PPL/KLD脚本CPU回归验证v2：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/deb4gj3t；FP32/BF16合成微型Qwen3、显式CPU LoRA加载及临时划分；日志`/root/autodl-tmp/trd/preparation/logs/ppl-kld-development/20261115-100741-cpu-tests-v2`。
+
+- PPL/KLD脚本最终CPU与合成流程回归：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/c8slwskd；未使用生产权重、未给真实验证集打分；日志`/root/autodl-tmp/trd/preparation/logs/ppl-kld-development/20261115-101333-final-cpu-tests`。
+
+## 2026-11-15：准备固定512题验证集PPL/KLD启动脚本，正式运行交给用户
+
+- 用户要求先阅读Agent.md最新数据划分，再准备好启动脚本由用户自行运行。本轮已按新第6节读取冻结验证512题/训练池32,724/首轮9,984的manifest和实际文件，没有修改划分或启动生产模型的验证评分、生成及训练。
+- 新增`preparation/run_ppl_kld.sh`、`preparation/ppl_kld/{config.env.sh,evaluate.py,scoring.py,README.zh-CN.md,test_scoring.py,VALIDATION.json}`。启动器从任意目录运行并自动使用本仓库虚拟环境；默认完整512题、原始4B学生、固定8B教师，可传HF合并模型或LoRA目录并与已有baseline结果比较。配置与旧指标方案、Agent.md索引已同步。
+- 固定口径：题目+训练器学生instruction+换行，原始solution单独编码后拼接，不新增EOS/chat/thinking标签；教师学生相同输入和参考前缀，仅统计response。输出学生/教师NLL与PPL、全词表forward KL(T||S)/reverse KL(S||T)、领域/难度/长度分桶；FP32 log-softmax及乘积、FP64归约，不裁剪、不截top-k、不静默丢题或截断。独立于教师额外看到y_o的TRD训练KL。
+- 资源差异：评分无梯度/优化器/KV cache，无需训练FSDP2；每卡一个BF16完整师生副本，批次互不重复，默认batch上限8/padded预算8,192/chunk512/FA2/allocator fraction0.92，LoRA保留PEFT FP32推理转换。取隐藏状态后仅对response位置分块投影LM head，避免整段词表logits。实际评分GPU速度/峰值尚未测试，首轮或32题校准由用户启动。
+- 校验：真实512题HF目录逐行等于冻结parquet；validation/train_pool的parquet及ID文件SHA256通过，raw_id/sample_id/duplicate_group_id零交集；完整response tokens=234,375，含提示input tokens=281,011，最长input=1,808，默认65个batch。仓库外绝对路径启动、加载env+balanced+splits后32题dry-run、shell语法、Python导入及Git diff检查通过；dry-run不调用评分/CUDA/SwanLab。
+- 首轮12项合成回归有1项LoRA加载失败：PEFT自动device_map把微型测试模型从CPU调到CUDA；未使用生产权重或给真实题打分。已显式指定adapter的device_map和torch_device；v2 13项通过，最终16项通过。覆盖首末token/causal shift、HF原生loss与FP64 KL、BF16、chunk/padding一致性、LoRA实际加载、token加权、配对bootstrap、污染/文件篡改拒绝、合成主流程成功/失败及baseline指针、多GPU任务分配模拟。所有软件实验链接见上文，最终SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/c8slwskd；失败运行也已保留。收尾两卡显存均0MiB。
+- 用户运行`bash preparation/run_ppl_kld.sh`后自动在线记录SwanLab项目trd-math-opd并追加HISTORY，输出`preparation/logs/ppl-kld/<label>-<时间戳>-<pid>/`的逐题统计、summary、REPORT及GPU日志。仅完整成功baseline更新latest-baseline.json；后续`--label distilled --student-model <HF或LoRA目录> --compare-to preparation/logs/ppl-kld/latest-baseline.json`核对固定参考/口径/教师文件SHA256后输出前后配对差值和95%区间。没有上传权重、题目数据或token任务，Git仅包含代码、文档、配置和小型检验摘要。

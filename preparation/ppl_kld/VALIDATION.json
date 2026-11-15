@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-15",
+  "production_model_gpu_scoring_run": false,
+  "production_validation_model_scores_computed": false,
+  "software_tests": {
+    "tests": 16,
+    "passed": 16,
+    "failed": 0,
+    "device": "cpu",
+    "fixture": "random single-layer Qwen3 hidden16 vocab23, synthetic split and simulated worker dispatch",
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/c8slwskd"
+  },
+  "frozen_data_preflight": {
+    "split_version": "math-v1-splits-v1",
+    "manifest_sha256": "c75c4026968050b9a1b87983a16eed8bed4de294658a4467db05c0a8920873a0",
+    "validation_parquet_sha256": "e3bca204b91dd7012d45334335553c78b915d3edca33ecd1190bc96cb0ed05d0",
+    "frozen_rows": 512,
+    "scored_rows": 512,
+    "full_validation": true,
+    "response_tokens": 234375,
+    "input_tokens": 281011,
+    "max_input_tokens": 1808,
+    "tokenizer_vocab_sha256": "f488fa45d324a8bc64c84f0e27b47223872d550f2a6900564f77dfa67ca5ff4d",
+    "scored_token_ids_sha256": "ed2b752a58f8cc7e2232533e17cd114dfe3de211e666b16f339f35c0d40ec183",
+    "train_pool_overlap": 0
+  },
+  "default_execution": {
+    "parallelism": "independent GPU replicas; disjoint validation batches; no gradients",
+    "model_dtype": "BF16; adapter tensors retain PEFT FP32 inference casting",
+    "pad_token_id": 151643,
+    "batches": 65
+  },
+  "protocol_sha256": "0415b94470c60dc9e88677ecf9dbf08830b42033bfb404d88c660b271c5a60c4",
+  "calibration_preflight": {
+    "rows": 32,
+    "response_tokens": 16196,
+    "full_validation": false
+  },
+  "checks": {
+    "shell_syntax": true,
+    "python_imports_and_regressions": true,
+    "launcher_from_other_working_directory": true,
+    "launcher_with_env_balanced_and_splits": true,
+    "dry_run_does_not_initialize_swanlab_or_score_models": true,
+    "gpu_memory_after_checks_mib": [
+      0,
+      0
+    ]
+  },
+  "limits": [
+    "Production BF16/FlashAttention GPU throughput and peak memory have not been measured for this scorer.",
+    "No formal baseline or distilled-model validation results exist from this work."
+  ]
+}
