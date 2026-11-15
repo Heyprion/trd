@@ -171,3 +171,49 @@
 - 并行安排：CPU初始16 workers，重操作按吞吐增至32；每卡max_num_seqs由64测速到128、token批预算32K视吞吐测速64K，显存份额0.85、非思考、前缀缓存、常驻模型。当前进程可见208逻辑CPU、约1TiB系统内存；不能把增加worker当作无限加速。精确哈希保留CPU依据是先前整个分析段仅19.4秒，尚无GPU迁移更快证据；GPU用于模型判断和去重候选判定。
 - 预算：清洗和标签各最多8输出tokens，两轮上界约64.5万tokens；两卡合计500–2000token/s假设下纯decode约5.4–21.5分钟。端到端60分钟目标包含加载、256题测速、CPU/GPU处理、导出与上传，需首轮实测确认；到45分钟不追加复杂判断，55分钟未闭环记录按技术超时排除并明确计数。移除完整学生解题校准和题目修复，不在本轮新增验证集划分。脚本首次开发时间单计。
 - 本轮只修订方案、查询CPU/内存和本机vLLM0.11.0官方并行/调优文档，没有启动GPU或其他实验，无新增SwanLab链接。上文审计记录继续有效；实施阶段按新方案执行，原始数据未改动。
+
+## 2026-11-15 08:29:50 UTC：数据工程 all
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/hrovl3ci；配置及日志：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v2/logs/20261115-082947-all`；输出：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v2`。
+- 完成：输入26，可用20，排除6，技术排除0，耗时24.5s；汇总`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v2/logs/20261115-082947-all/summary.json`。
+
+## 2026-11-15 08:33:36 UTC：数据工程 all
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/z69empw0；配置及日志：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v3/logs/20261115-083332-all`；输出：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v3`。
+- 完成：输入30，可用21，排除9，技术排除2，耗时24.2s；汇总`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v3/logs/20261115-083332-all/summary.json`。
+
+- 数据工程全量CPU规模验证：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/v96h280a；日志/汇总：preparation/logs/data-engineering/script-smoke/cpu-scale。
+
+## 2026-11-15 08:37:00 UTC：数据工程 all
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qjk4letv；配置及日志：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v4/logs/20261115-083656-all`；输出：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v4`。
+- 完成：输入30，可用23，排除7，技术排除0，耗时25.5s；汇总`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v4/logs/20261115-083656-all/summary.json`。
+
+## 2026-11-15 08:38:46 UTC：数据工程 label
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/fpcewyw1；配置及日志：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/split-stage-validation/logs/20261115-083842-label`；输出：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/split-stage-validation`。
+
+## 2026-11-15 08:38:46 UTC：数据工程 all
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/hnmrdyc0；配置及日志：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v4/logs/20261115-083842-all`；输出：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v4`。
+- 已核对并复用完成产物：/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-v4/final/manifest.json；未运行GPU。
+- 完成：输入30，可用23，排除7，技术排除0，耗时23.0s；汇总`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/split-stage-validation/logs/20261115-083842-label/summary.json`。
+
+## 2026-11-15 08:40:27 UTC：数据工程 all
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yhe3bei5；配置及日志：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-final/logs/20261115-084024-all`；输出：`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-final`。
+- 完成：输入30，可用23，排除7，技术排除0，耗时23.8s；汇总`/root/autodl-tmp/trd/preparation/logs/data-engineering/script-smoke/run-final/logs/20261115-084024-all/summary.json`。
+
+
+## 2026-11-15：实现可搬运的一键清洗与分层脚本
+
+- 用户要求：两个阶段分别提供脚本，并提供一键启动，方便在其他位置执行。已实现clean.py、stratify.py及统一run.sh/pipeline.py；路径和双卡参数集中在config.env.sh。默认完整DeepScaleR，all模式总预算3600秒/清洗1800秒/导出缓冲180秒，独立两个阶段默认各1800秒；模型和原数据均不随代码包上传。
+- CPU逻辑：字段/编码/明显解答片段过滤、保守答案规范化、原来源匹配冲突整组排除、精确去重、MinHash/LSH及测试题倒排召回。保留数学符号、Unicode变量及绘图代码换行，空solution不删；每条输入必须有唯一usable/excluded结果，技术失败独立统计。
+- GPU逻辑：两个独立BF16 Qwen3-8B副本、TP1，公共前缀缓存、默认eager以减少冷启动；清洗、近重复判断、分层分别使用有限枚举约束，最多8输出tokens，格式/推理错误最多短重试一次。数据量足够时比较有效batch64/128；小样本分发也实际使用两卡。分层用语义明确的短英文枚举，保持易/中/难三档，可靠原标签优先回填。第一轮短数码标签出现领域过度归入代数、解答片段漏检，已通过明确题型示例、保留语义的枚举和CPU规则修正；这不构成全量标签准确率保证。
+- 产物：clean和final的usable/excluded/decisions parquet、完成manifest、HF Dataset训练目录、配置及逐GPU日志、每请求输出码和finish_reason。父进程总时限、输出目录锁和完成阶段输入/测试/来源/代码/模型配置及权重文件元数据指纹校验已接入；--resume只复用完成阶段。修改y_o_prepare.py传递稳定ID、版本及领域/难度，y_r继续继承extra_info。实际实验自动在线SwanLab记录和追加HISTORY。
+- 启动兼容性：首次启动发现本机SwanLab0.10.5把SWANLAB_PROJECT平面环境变量当作嵌套JSON解析；该次在模型/实验初始化前失败，日志preparation/logs/data-engineering/script-smoke/launcher-v1.log。脚本已捕获项目名并在SDK初始化前移除此冲突变量。开发试跑v2（26题）https://swanlab.cn/@WangZIyu/trd-math-opd/runs/hrovl3ci；v3（30题、两条完整标签被尾随空白触发length而误当格式失败）https://swanlab.cn/@WangZIyu/trd-math-opd/runs/z69empw0；现按完整有限枚举解析判断有效，逐请求记录finish_reason。
+- GPU验证：v4 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qjk4letv；最终代码主要路径重跑 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yhe3bei5，30输入→23可用/7排除，技术排除0，4条native+19条模型标签；easy/medium/hard为6/10/7。两GPU实际分别处理23/21个请求，含近重复/清洗/分层；模型加载约12.5–13.0秒，处理至导出约23.79秒，最终同步和退出另计。样本含已知答案冲突、缺图、解答片段、测试同题、重复和空答案，均按规则排除。原始样本和日志仅在preparation/logs/data-engineering/script-smoke/。
+- 全量CPU规模验证：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/v96h280a，40,315输入→38,839个代表/1,476初始排除；召回589对候选（含2对评测候选），无候选预算/超大桶排除，约11.23秒。这是CPU检查，不是已完成全量GPU清洗，不对候选做未实测的同题断言。
+- 独立分层入口验证：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/fpcewyw1，读取复制的clean阶段产物、显式传入不存在的原始input路径仍可完成，说明阶段2不依赖原始输入；23条可用、0新增排除。完成阶段--resume验证 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/hnmrdyc0 通过，无新增GPU工作。
+- 检验：12项CPU回归检查、三入口dry-run、shell语法、训练metadata传递、Git diff检查通过。GPU均已退出并释放；未启动全量GPU数据工程、正式生成或训练。配置、README及小型VALIDATION.json入Git，原数据/逐题产物/日志不入Git。脚本包仅含代码、配置、文档和小摘要。
+- 可搬运代码包已生成：`/mnt/data/math-data-engineering-scripts.zip`，38,078字节，SHA256 f80b22666b2933a5bb71f79f2b1dc37c98fa0afa739ac27dfc4b3dd541390d36。解压到独立/tmp目录后，一键入口dry-run与12项CPU回归检查均通过。包内仅15个代码/配置/说明/小摘要文件（含可选训练metadata适配patch），没有数据、权重、缓存或原始日志。

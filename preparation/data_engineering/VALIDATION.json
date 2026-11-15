@@ -1,0 +1,133 @@
+{
+  "date": "2026-11-15",
+  "unit_checks_passed": 12,
+  "shell_syntax": "passed",
+  "dry_run_stages": [
+    "all",
+    "clean",
+    "label"
+  ],
+  "training_metadata_adapter": "passed",
+  "final_two_gpu_smoke": {
+    "input_rows": 30,
+    "usable_rows": 23,
+    "excluded_rows": 7,
+    "exclusion_reasons": {
+      "duplicate_answer_conflict": 2,
+      "missing_diagram": 1,
+      "solution_fragment": 1,
+      "eval_near_overlap": 1,
+      "near_or_exact_duplicate": 1,
+      "missing_answer": 1
+    },
+    "technical_exclusions": 0,
+    "difficulty_counts": {
+      "easy": 6,
+      "hard": 7,
+      "medium": 10
+    },
+    "domain_counts": {
+      "algebra": 10,
+      "number_theory": 4,
+      "geometry": 6,
+      "combinatorics_probability": 3
+    },
+    "label_source_counts": {
+      "qwen3_8b_rubric": 19,
+      "native": 4
+    },
+    "wall_seconds": 23.79404040426016,
+    "gpu": {
+      "load_seconds": {
+        "0": 12.502208150923252,
+        "1": 12.980438064783812
+      },
+      "batches": 5,
+      "requests": 44,
+      "requests_by_rank": {
+        "0": 23,
+        "1": 21
+      },
+      "output_tokens": 151,
+      "worker_seconds": 2.519193612039089
+    },
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yhe3bei5"
+  },
+  "full_cpu_scale_check": {
+    "input_rows": 40315,
+    "representatives": 38839,
+    "initial_excluded": 1476,
+    "near_stats": {
+      "candidate_pairs": 589,
+      "oversized_bucket_events": 0,
+      "candidate_budget_excluded_representatives": 0
+    },
+    "eval_candidate_pairs": 2,
+    "seconds": 11.229468815028667,
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/v96h280a"
+  },
+  "standalone_label_smoke": {
+    "input_rows": 30,
+    "usable_rows": 23,
+    "excluded_rows": 7,
+    "exclusion_reasons": {
+      "duplicate_answer_conflict": 2,
+      "missing_diagram": 1,
+      "solution_fragment": 1,
+      "eval_near_overlap": 1,
+      "near_or_exact_duplicate": 1,
+      "missing_answer": 1
+    },
+    "technical_exclusions": 0,
+    "difficulty_counts": {
+      "easy": 6,
+      "hard": 7,
+      "medium": 10
+    },
+    "domain_counts": {
+      "algebra": 10,
+      "number_theory": 4,
+      "geometry": 6,
+      "combinatorics_probability": 3
+    },
+    "label_source_counts": {
+      "qwen3_8b_rubric": 19,
+      "native": 4
+    },
+    "wall_seconds": 23.026297725737095,
+    "gpu": {
+      "load_seconds": {
+        "1": 12.369908817112446,
+        "0": 13.52383529394865
+      },
+      "batches": 2,
+      "requests": 19,
+      "requests_by_rank": {
+        "0": 10,
+        "1": 9
+      },
+      "output_tokens": 100,
+      "worker_seconds": 2.1465303637087345
+    },
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/fpcewyw1"
+  },
+  "completed_stage_resume": {
+    "passed": true,
+    "new_gpu_work": false,
+    "url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/hnmrdyc0"
+  },
+  "code_sha256": {
+    "clean.py": "7b04080f3e4b478d6cfcebeb46a570f2db5be7fbb2c346a91c6dfbda0428c1ea",
+    "core.py": "e9e20278a5d2b3020dc4d8798e5a52daa9830253dfa7774dcb6ac3328bb47367",
+    "engine.py": "a2cb139428522faf76e4959ab7a3e06132c7b3a10602969cccf68232e0c62d19",
+    "pipeline.py": "939a975880be96f52766c6be97a2fdf7fb39cf99d57bc0cf99ca2a8b6f842347",
+    "stratify.py": "be754de3240641da049c80025ff5b07a9439095c2574af078defbcbf0d3ff0c1",
+    "test_pipeline.py": "5f64e24e2655c4f1039ae37695181f17bf4deada4a0af79bc86cfba751ea3824"
+  },
+  "limits": [
+    "Full 40315-row GPU cleaning/labeling was not run.",
+    "64/128 effective-batch auto-calibration is skipped for the small GPU fixture.",
+    "Model labels are coarse estimates; no mathematical correctness guarantee.",
+    "wall_seconds is measured through data export, before final SwanLab synchronization and worker shutdown."
+  ]
+}
