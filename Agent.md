@@ -32,7 +32,7 @@ Git 由 Agent 自主管理。根据不同工作目的自行创建、切换分支
 - **批量与长度**：每 DP rank batch=2，梯度累积=32，全局有效 batch=128；单条训练序列上限=18,432，单卡动态微批 token 预算=32,768，超预算自动拆微批。该序列上限低于原 TRD 默认的34,816，会更早裁剪教师初始解答提示块。
 - **GPU 优化与显存**：BF16 模型权重存储、FP32 LoRA 可训练参数；启用 FlashAttention 2、Liger、梯度检查点及 forward 后重分片；教师常驻 GPU，参数/优化器/策略 offload 均关闭；CUDA allocator fraction=0.92，以 NVML 整卡峰值约不超过90 GiB为目标。`USE_TORCH_COMPILE=false`（当前训练路径不计算 entropy，该开关没有已验证收益）。
 - **其他训练参数**：LoRA rank=64 / alpha=128，学习率=5e-6；1 epoch，当前数据范围遵循第6节的暂定划分，保留生成输出上限16,384。试跑的少量样本、1,024输出上限不沿用为正式默认。
-- **生成与评测**：rollout GPU memory utilization=0.85，max_num_seqs=16，max_num_batched_tokens=34,816；最终评测 AIME24/AIME25/HMMT25/BeyondAIME/AMO-Bench，pass@16，评测 TP=2；SwanLab 在线项目 `trd-math-opd`。
+- **生成与评测**：rollout GPU memory utilization=0.85，max_num_seqs=16，max_num_batched_tokens=34,816；按2026-11-16用户最新要求，当前最终评测仅 AIME24/AIME25，pass@16，评测 TP=2；其他三个测试集不默认执行。SwanLab 在线项目 `trd-math-opd`。
 
 在仓库根目录启动（默认使用本地已准备的模型和数据）：
 
@@ -55,4 +55,4 @@ bash preparation/run_math_opd.sh forward_kl_y_r
 
 ## 8. 正式训练与独立评测入口（2026-11-15）
 
-当前推荐一键入口为 `bash preparation/run_train_eval.sh`，自动加载 balanced 与冻结9,984题子集，训练成功并完成LoRA合并后再执行五个benchmark的pass@16评测。加 `--dry-run` 仅核对数据与配置。单独训练用 `bash preparation/run_train.sh`；单独评测用 `bash preparation/run_eval.sh --train-run <train/summary.json>` 或 `--model <已合并HF目录>`。训练和评测分别创建SwanLab实验，并追加HISTORY；详细命令、日志及检查说明见[训练评测入口说明](preparation/training/README.zh-CN.md)。固定512题PPL/KLD继续使用第7节的独立入口。
+当前推荐一键入口为 `bash preparation/run_train_eval.sh`，自动加载 balanced 与冻结9,984题子集，训练成功并完成LoRA合并后再执行AIME24/AIME25的pass@16评测（2026-11-16缩减范围）；其他测试需显式设置MATH_EVAL_DATASETS。加 `--dry-run` 仅核对数据与配置。单独训练用 `bash preparation/run_train.sh`；单独评测用 `bash preparation/run_eval.sh --train-run <train/summary.json>` 或 `--model <已合并HF目录>`。训练和评测分别创建SwanLab实验，并追加HISTORY；详细命令、日志及检查说明见[训练评测入口说明](preparation/training/README.zh-CN.md)。固定512题PPL/KLD继续使用第7节的独立入口。

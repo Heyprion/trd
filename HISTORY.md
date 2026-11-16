@@ -325,3 +325,41 @@
 - 用户要求在Agent.md写清：所有实验经过SwanLab；主要目的和阶段相同尽量复用之前project；实验名简洁直白，包含日期、阶段和目的。
 - 已扩充Agent.md第4节：覆盖数据/生成/训练/评测/性能/数值校验及失败中断状态；启动前查历史，日期/机器/模型/参数/重跑不构成单独建project理由。当前数学OPD/TRD相关实验复用trd-math-opd，硬件性能专项优先复用trd-pro6000-pilot。
 - 统一run名称格式YYYYMMDD-阶段-目的[-关键区别][-rNN]，附清洗分层、TRD9984题、基线PPL/KL和五套pass16评测示例；完整超参留config/description。本轮仅修改约定与历史，未启动实验、改名既有run或干预正在运行的任务。
+
+## 2026-11-15T15:42:03.335385+00:00：只读核实已进入8B教师改写阶段
+
+- 用户只询问当前阶段，明确不要干预任务。本轮只读取进程/GPU/日志及parquet元数据，没有发送信号、修改运行配置或启动新实验。原9984条学生生成已完成并写入math_y_o_responses.parquet，实际9984行；教师改写提示math_y_r_opd_Qwen3-8B_prompts.parquet实际9984行。当前模型进程为Qwen3-8B，输入题目及学生初始解答、生成修正轨迹y_r；最近进度：Generating responses:   0%|          | 23/9984 [01:08<6:16:46,  2.27s/it]，双卡利用率读取95%/94%。
+- 尚未启动run_training.py/launch_training.py，当前没有学生参数更新；教师改写完毕才进入FSDP2全词表KL蒸馏，再执行最终评测。新进度条从0计数属于教师阶段，不是重新生成学生轨迹。恢复用的学生服务supervisor已自行退出，状态client-finished，GPU已由原入口教师阶段使用；SwanLab仍沿用 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666 。
+
+## 2026-11-15T16:51:25.573173+00:00：评估当前完整运行的磁盘容量与保存峰值
+
+- 用户要求结合剩余空间和后续权重分析磁盘写满中止风险。本轮只读取磁盘、进程、配置、parquet元数据、模型索引及保存/导出源码，没有向后台发送信号、改配置、删文件或启动模型实验；唯一维护性写入为本历史记录。当前仍处于8B教师改写，读取进度1640/9984左右，尚无正式训练checkpoint。
+- 实测系统盘overlay总30GiB、剩余约27.48GiB；数据盘/dev/md0总50GiB、剩余约21.30GiB；/dev/shm约110GiB且几乎空闲，inode均有充足余量。checkpoint实际写/root/trd-checkpoints（系统盘）；hf_merged为已存在软链接，指向checkpoints_merged下的数据盘路径，两个st_dev不同。两处checkpoint/导出目录目前仅目录/软链接、尚无大权重文件。
+- 基础模型原文件约23GiB已包含在数据盘现有占用，不再计为后续增量。学生safetensors索引total_size=8,045,591,552 bytes（7.493GiB、BF16）；Qwen3层数36、hidden2560、intermediate9728、q_heads32、kv_heads8、head_dim128，LoRA rank64覆盖七种线性层，计算可训练参数132,120,576，FP32 adapter约0.492GiB，Adam两个FP32矩约0.984GiB。按保存源码的分片合计，BF16基础权重+FP32 LoRA+优化器理论约8.97GiB；计绑权重可能重复及元数据约9–10GiB，若意外按FP32保存基础权重则保守按约17–18GiB看待，仍低于系统盘剩余。该体积为源码/配置推算，尚未实测正式checkpoint序列化。
+- 已核实训练只保存学生的model/optimizer/extra，没有teacher checkpoint，也没有开启checkpoint目录下额外hf_model完整副本。当前1 epoch/78名义更新、save_steps100，预计只在训练结束保存一次；因此本轮不出现周期保存的旧新两份checkpoint叠加。一般情况下keep1也是新保存成功后才删旧份，并不能把keep1误解为永不出现瞬时双份，但本轮78<100且目录无旧checkpoint。
+- HF导出器将FSDP shard在CPU合并、LoRA safe merge后仅写最终HF模型及单独adapter；不会先在数据盘写一套未合并基础权重再写另一整套临时权重。导出器转换为BF16，按可能的embedding/lm_head存储重复保守预计HF+adapter约8–9GiB；再给教师输出、评测轨迹、缓存和日志预留约2–3GiB，数据盘后续预算约10–12GiB，预计仍有约9GiB以上余量。
+- 现有生成缓存约113MiB：学生prompts4.52MiB/9984行、学生responses37.58MiB/9984行、教师prompts70.89MiB/9984行。教师responses后续才写入。五个评测共229题×16=3664条响应，上限38912 tokens/条，若按8 bytes/token的文本预算约1.06GiB原始响应文本（是估算假设，不是严格词表字节上界），parquet通常进一步压缩；没有每个benchmark另存一套模型。当前/tmp/ray约139MiB、/root/.cache约88MiB、preparation/logs约28MiB，未见所查主进程持有大体积deleted文件。
+- 结论：磁盘写满在保存/导出阶段确实可能使任务失败，但当前单轮配置的剩余容量预计足够，风险较低，无需为容量问题中断任务或立即清理。此判断依赖当前只运行这一套实验且没有额外大文件写入，并非零风险保证；启动器原空间门槛20GiB系统盘/18GiB导出盘当前仍满足。现有实验链接 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666；未新增SwanLab实验。
+- train 完成：`/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/train/summary.json`；结果：{"model_path": "/root/trd-checkpoints/OPD_MATH/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_20261115-185850-279780-53607/epoch1/hf_merged", "training_data": {"rows": 9984, "sha256": "864efe8abc0a677aecbf78b4dea82158fc7c3479c4d9f6e5580098d0a482def9"}, "output_dir": "/root/autodl-tmp/trd/outputs/OPD/math/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_20261115-185850-279780-53607/epoch1"}。
+
+## 2026-11-16T00:05:19.226495+00:00：数学 TRD eval / 20261115-185850-279780-53607
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto；配置/日志/状态：`/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/eval`。
+
+## 2026-11-16T01:28:34.210547+00:00：确认训练与模型导出完成，现处于第一套最终评测
+
+- 用户询问后台当前进展及剩余工作。本轮只读取进程、GPU/磁盘、日志、summary和产物元数据，没有向后台发信号、改配置、启动新实验或执行额外评分。
+- train/summary.json已completed，训练数据9984条，教师改写结果SHA256=864efe8abc0a677aecbf78b4dea82158fc7c3479c4d9f6e5580098d0a482def9；学生/教师两轮生成均完成，FSDP2完成1 epoch、78个优化器更新，epoch日志参数更新耗时1:37:45。global_step_78完整保存，合并HF模型存在、lora_merge.json标记merged=true。训练阶段wall_seconds=47186.21954170987包含两轮生成等全部准备，不能误作纯参数训练耗时。训练实验 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666 。
+- eval/summary.json仍running，评测进程run_eval_suite.py，按顺序AIME24/AIME25/HMMT25/BeyondAIME/AMO-Bench、pass@16、TP2。当前generations尚无完成parquet、results.json尚未生成，因此正在第一套AIME24的30题×16次=480条响应；最近进度：Generating responses:  98%|█████████▊| 470/480 [1:18:36<02:57, 17.71s/it]。该约98%仅属于AIME24生成，不代表五套评测/整个实验完成98%。之后仍需判分、其余四套生成/判分及avg@16/pass@8/pass@16汇总、最终SwanLab记录。评测实验 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto 。
+- 已实际落盘容量：FSDP checkpoint约8.971GiB，HF模型与adapter约8.478GiB；实测剩余系统盘约18.30GiB、数据盘约12.46GiB，前一轮容量预算未触发写满。两卡利用率读取95%/96%，后台正常生成评测响应；没有读取或报告尚不存在的最终准确率。固定512题PPL/KLD对比不在当前总脚本内，未把该独立验证当作已经完成。
+
+- AIME评测范围控制CPU回归：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/sqv4bxha；日志`/root/autodl-tmp/trd/preparation/logs/training-development/20261116-095314-aime-scope-checks`；测试使用Mock信号、Mock恢复记录和合成数据，不干预生产进程。
+
+## 2026-11-16T01:59:31.922863+00:00：用户将最终评测缩减为AIME24和AIME25
+
+- 用户确认仅测AIME24/25，要求AIME25结束后不启动HMMT25、BeyondAIME、AMO-Bench。检查AIME24已生成30题×16次、判分写入results.json，pass@16=0.8333333333（25/30）；当前AIME25正在生成。没有重启/暂停当前生成进程，也未修改、隐藏或移动测试集文件。
+- 已安装run-local evaluation-control.json，仅选择aime24/aime25。已启动旧五套评测循环的PID120819不能通过改磁盘源文件即时改变内存循环，因此新增判分子进程边界钩子：AIME25的parquet与两套pass@16成绩全部持久化后，核对父PID、创建时间、命令及results_file路径，先关闭判分子进程Ray，再SIGTERM旧评测suite使其finally释放GPU，确保不进入下一测试集；没有使用SIGSTOP。新启动的suite则直接在每套边界读取范围文件并跳过未选集合。
+- 旧总控制器仍按五套验证，其受控退出可能暂时写failed/退出异常，这是原范围被用户主动缩减的预期中间状态，不把它冒充五套完成。独立finish_reduced_eval.py监视器等待AIME25边界以及旧控制器退出，汇总仅两套avg@16/pass@8/pass@16，验证各30题且每题16响应，生成CSV，恢复同一SwanLab评测ID yxzg5pto上传六个指标并标completed；summary记录scope_change、明确skipped_datasets三项，并保留原summary作审计，不填伪造三套分数、不新建生产评测实验、不重载模型。
+- 当前范围文件 `preparation/logs/math-runs/20261115-185850-279780-53607/eval/evaluation-control.json`；监视状态 `preparation/logs/math-runs/20261115-185850-279780-53607/eval/scope-finalizer-status.json` 为armed、PID142040；监视日志scope-finalizer.log。当前原suite仍PID120819、旧总控制器53607。最近AIME25进度：Generating responses:  35%|███▍      | 167/480 [25:31<1:06:29, 12.75s/it]。范围控制是已布置的后续动作，AIME25尚未完成，未声称结束已发生；评测链接 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto 。
+- 持久默认也调整为AIME24/AIME25：training/config.env.sh与pipeline.py使用MATH_EVAL_DATASETS选择范围，其他集合须显式覆盖；Agent.md默认索引及训练README同步。保持9984题训练数据、模型、采样参数、pass16/TP2及512题独立PPL/KLD入口不变。
+- 验证：新增8项CPU范围控制/安全及汇总检查，连同既有训练入口21项共29项通过，包含仅在两套已写成绩后退出、PID重用/其他任务不受影响、先清理与写边界标记再终止、恢复同一记录并只汇总所选六指标、缺失响应拒绝等；信号和Swan恢复使用Mock，没有干预生产进程。SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/sqv4bxha；日志preparation/logs/training-development/20261116-095314-aime-scope-checks；shell语法、Python编译及git diff检查通过。

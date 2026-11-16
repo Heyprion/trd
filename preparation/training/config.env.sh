@@ -9,6 +9,8 @@ source <(sed '/^exec bash /d' "$MATH_RUN_ROOT/recipe/opd/run/opd/math/qwen3-4b-i
     | sed '/^SCRIPT_DIR=/,/^export PYTHONPATH=/d')
 export RUN_EVAL_AFTER_TRAINING=false SAVE_MERGED_MODEL=true SWANLAB_MODE=online PASS_K=16
 export MERGE_LORA_ON_EXPORT=true
+# Current experiment scope: other prepared benchmarks require an explicit override.
+export EVAL_DATASETS="${MATH_EVAL_DATASETS:-aime24,aime25}"
 # Preserve the upstream benchmark sampling protocol (separate from training rollout).
 export EVAL_PROMPT_LENGTH="${EVAL_PROMPT_LENGTH:-4096}"
 export EVAL_RESPONSE_LENGTH="${EVAL_RESPONSE_LENGTH:-38912}"

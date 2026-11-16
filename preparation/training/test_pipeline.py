@@ -167,9 +167,9 @@ class PipelineTests(unittest.TestCase):
             result = p.evaluation("fixture", folder, model, None, {name: {"rows": 1} for name in p.BENCHMARKS})
         return result, run
 
-    def test_evaluation_uploads_all_five_benchmark_metrics(self):
+    def test_evaluation_uploads_all_selected_benchmark_metrics(self):
         result, run = self.eval_fixture()
-        self.assertEqual(len(result["metrics"]), 15)
+        self.assertEqual(len(result["metrics"]), 3 * len(p.BENCHMARKS))
         self.assertEqual(result["metrics"]["eval/aime24/pass@16"], 0.5)
         run.log.assert_called_once_with(result["metrics"])
 

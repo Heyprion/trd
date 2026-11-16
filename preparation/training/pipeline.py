@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 from recipe.opd.run.utils.run_config import build_env, print_config  # noqa: E402
 from recipe.opd.swanlab_relay import METRIC_PREFIX  # noqa: E402
 
-BENCHMARKS = ("aime24", "aime25", "hmmt25", "beyondaime", "amobench")
+BENCHMARKS = tuple(os.environ.get("MATH_EVAL_DATASETS", "aime24,aime25").split(","))
 
 
 def read_json(path):

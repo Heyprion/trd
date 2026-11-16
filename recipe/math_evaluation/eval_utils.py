@@ -371,6 +371,12 @@ def run_evaluation_suite(
         )
 
         for dataset_name, dataset_path in dataset_paths.items():
+            from recipe.math_evaluation.runtime_control import read_control
+
+            scope = read_control(output_json_path)
+            if scope and dataset_name not in scope["datasets"]:
+                logger.info("Skipping %s after requested evaluation scope change", dataset_name)
+                continue
             if not dataset_path or not os.path.exists(dataset_path):
                 logger.warning("Skipping evaluation dataset %s because %s does not exist", dataset_name, dataset_path)
                 continue

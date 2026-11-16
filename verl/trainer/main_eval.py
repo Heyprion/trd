@@ -140,6 +140,9 @@ def main(config):
             pass_k=config.get("pass_k", 1),
             model_path=config.get("model_path"),
         )
+        from recipe.math_evaluation.runtime_control import stop_legacy_suite_if_requested
+
+        stop_legacy_suite_if_requested(output_json_path, config.data.path, model_name, ray.shutdown)
 
 
 if __name__ == "__main__":

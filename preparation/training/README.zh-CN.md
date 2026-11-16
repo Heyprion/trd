@@ -31,13 +31,15 @@ bash preparation/run_eval.sh --model /absolute/path/to/epoch1/hf_merged --dry-ru
 
 默认每卡 batch=2、累积32、有效batch128，1 epoch/78个名义更新；FSDP2/2卡、SP=1；全词表 forward KL、recompute/chunk512、BF16冻结权重及FP32 LoRA、Liger、梯度检查点、18,432序列上限与32,768动态预算。训练生成上限16,384。正式入口会校验生成结果恰好包含这9,984题且身份/顺序一致；如果上游长度过滤或不完整缓存导致丢题，将在训练前报错，记录日志并停止，不静默改小数据集。
 
-评测覆盖 AIME24/AIME25/HMMT25/BeyondAIME/AMO-Bench（本机30/30/30/100/39题），每题16次采样、温度0.6、top_p0.95、TP=2；报告 pass@16，同时记录 avg@16 与首8次的 pass@8。保持原 benchmark 的提示预算4,096、输出上限38,912（这与训练生成的16,384分开）；评测 vLLM 显存比例0.85、max_num_seqs16、batched tokens43,008。通过 `EVAL_RESPONSE_LENGTH` 等环境变量修改会进入评测配置记录。自定义训练资源配置可用 `MATH_TRAIN_PROFILE=/absolute/path/profile.env.sh`，会替代 balanced；配置差异与参数快照随实验留档。
+按2026-11-16用户要求，默认只评测 AIME24/AIME25（各30题），每题16次采样、温度0.6、top_p0.95、TP=2；报告 pass@16，同时记录 avg@16 与首8次的 pass@8。HMMT25/BeyondAIME/AMO-Bench数据仍保留，但不默认运行；需要其他组合时显式设置 `MATH_EVAL_DATASETS=aime24,aime25,hmmt25`。保持原 benchmark 的提示预算4,096、输出上限38,912（这与训练生成的16,384分开）；评测 vLLM 显存比例0.85、max_num_seqs16、batched tokens43,008。通过 `EVAL_RESPONSE_LENGTH` 等环境变量修改会进入评测配置记录。自定义训练资源配置可用 `MATH_TRAIN_PROFILE=/absolute/path/profile.env.sh`，会替代 balanced；配置差异与参数快照随实验留档。
 
 FSDP 导出时显式 `--merge-lora`，将 LoRA delta 折入最终HF权重后保存，并生成 `lora_merge.json`；原adapter仍保存在模型目录的 `lora_adapter/`。评测拒绝存在adapter却没有合并完成标记的旧导出，避免只测基础模型。检查全部权重分片存在；训练/导出失败时不启动评测。原上游入口保留旧行为，新三个脚本统一使用修复后的合并路径。
 
 ## 实验记录与产物
 
-同一总运行在 SwanLab 项目 `trd-math-opd` 下创建两个独立实验，名称为 `<run-id>-train` 与 `<run-id>-eval`，以run-id分组。训练实验覆盖生成、更新、导出，转发rank0的原生训练指标；评测实验记录五个测试集的结果和来源训练链接。在线初始化失败会终止运行。控制台由父进程转发并由SwanLab采集；成功与失败均写入 `HISTORY.md`。总脚本会先等待训练进程及模型导出完成，再释放训练资源并启动独立评测。
+同一总运行在 SwanLab 项目 `trd-math-opd` 下创建两个独立实验，名称为 `<run-id>-train` 与 `<run-id>-eval`，以run-id分组。训练实验覆盖生成、更新、导出，转发rank0的原生训练指标；评测实验记录所选测试集的结果和来源训练链接。在线初始化失败会终止运行。控制台由父进程转发并由SwanLab采集；成功与失败均写入 `HISTORY.md`。总脚本会先等待训练进程及模型导出完成，再释放训练资源并启动独立评测。
+
+运行中的评测可通过其结果目录下 `evaluation-control.json` 在测试集边界缩减范围。旧版已启动进程不能热更新已加载的循环时，用PID与结果路径匹配的判分后退出钩子，先保留最后一套的响应和分数、清理Ray，再结束旧循环；`finish_reduced_eval.py` 等旧控制器退出后仅对所选集合汇总，并恢复同一个SwanLab评测记录。原控制器可能留下预期的退出异常；最终summary会注明用户变更范围，并保留旧summary作审计。此操作不暂停正在生成的测试集，不修改测试数据，也不重新加载模型做评测。
 
 本地配置、SwanLab链接、状态、异常及结果位于：
 
