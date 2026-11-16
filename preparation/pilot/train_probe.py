@@ -34,6 +34,7 @@ try:
         train_batch_size=case.get('batch',1), gradient_accumulation_steps=case.get('accum',1),
         max_length=case['length'], max_token_len_per_gpu=case['budget'],
         use_initial_response=case.get('refine',False), prompt_truncation=True,
+        sequence_format=case.get('sequence_format','plain'),
         data_path=case['data'], num_workers=0, n_gpus_per_node=2,
         fsdp_strategy='fsdp2', fsdp_size=2, ulysses_sequence_parallel_size=case.get('sp',1),
         use_torch_compile=case.get('compile',False), gradient_checkpointing=case.get('checkpoint',True),

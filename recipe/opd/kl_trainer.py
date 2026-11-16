@@ -184,6 +184,11 @@ class KLTrainer:
         sp_size = self.config.ulysses_sequence_parallel_size
         dp_size = self.world_size // sp_size
         dp_rank = self.rank // sp_size
+        teacher_tokenizer = None
+        if self.config.sequence_format == "chat":
+            teacher_tokenizer = AutoTokenizer.from_pretrained(
+                self.config.teacher_model_path or self.config.student_model_path, trust_remote_code=True,
+            )
         return create_kl_dataloader(
             data_path=self.config.data_path,
             tokenizer=self.tokenizer,
@@ -199,6 +204,8 @@ class KLTrainer:
             prompt_truncation=getattr(self.config, "prompt_truncation", False),
             distill_mode=getattr(self.config, "distill_mode", "opsd"),
             task=getattr(self.config, "task", "math"),
+            sequence_format=self.config.sequence_format,
+            teacher_tokenizer=teacher_tokenizer,
         )
 
     def _build_model_config(self, model_path: str, *, trainable: bool) -> HFModelConfig:

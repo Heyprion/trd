@@ -247,6 +247,8 @@ class KLTrainingDataset(Dataset):
         prompt_truncation: bool = False,
         distill_mode: str = "opsd",
         task: str = "math",
+        sequence_format: str = "plain",
+        teacher_tokenizer: PreTrainedTokenizer | None = None,
     ):
         self.tokenizer = tokenizer
         self.kl_type = kl_type
@@ -255,6 +257,17 @@ class KLTrainingDataset(Dataset):
         self.prompt_truncation = prompt_truncation
         self.distill_mode = distill_mode
         self.task = task
+        self.sequence_format = sequence_format
+        self.teacher_tokenizer = teacher_tokenizer or tokenizer
+        if sequence_format not in {"plain", "chat"}:
+            raise ValueError(f"Unknown sequence_format: {sequence_format}")
+        if sequence_format == "chat":
+            if not tokenizer.chat_template or not self.teacher_tokenizer.chat_template:
+                raise ValueError("Chat KL training requires both model chat templates")
+            if tokenizer.get_vocab() != self.teacher_tokenizer.get_vocab():
+                raise ValueError("Chat full-vocabulary KL requires identical token IDs")
+            if tokenizer.eos_token_id != self.teacher_tokenizer.eos_token_id:
+                raise ValueError("Chat KL training requires the same response end token")
         if prompt_truncation:
             print(
                 "[KLTrainingDataset] prompt_truncation=ON: when prompt+response > max_length, "
@@ -289,6 +302,17 @@ class KLTrainingDataset(Dataset):
     def _encode_text(self, text: str) -> list[int]:
         return self.tokenizer.encode(text, add_special_tokens=False)
 
+    def _prompt_ids(self, prompt, tokenizer=None):
+        tokenizer = tokenizer or self.tokenizer
+        if getattr(self, "sequence_format", "plain") == "chat":
+            # Match the generation endpoint's user message exactly. Do not render
+            # the assistant response through the template: Qwen's teacher template
+            # rewrites whitespace inside <think>, which would change cached targets.
+            return tokenizer.apply_chat_template(
+                [{"role": "user", "content": prompt}], tokenize=True, add_generation_prompt=True,
+            )
+        return tokenizer.encode(prompt + "\n", add_special_tokens=False)
+
     def _truncate_prompt_block(
         self,
         prompt: str,
@@ -296,8 +320,10 @@ class KLTrainingDataset(Dataset):
         start_marker: str,
         end_markers: tuple[str, ...],
         notice: str,
+        tokenizer=None,
     ) -> str:
-        prompt_ids = self._encode_text(prompt + "\n")
+        tokenizer = tokenizer or self.tokenizer
+        prompt_ids = self._prompt_ids(prompt, tokenizer)
         response_ids = self._encode_text(response)
         if len(prompt_ids) + len(response_ids) <= self.max_length:
             return prompt
@@ -313,7 +339,7 @@ class KLTrainingDataset(Dataset):
             return prompt
 
         block_text = prompt[block_text_start:end]
-        block_ids = self._encode_text(block_text)
+        block_ids = tokenizer.encode(block_text, add_special_tokens=False)
         if not block_ids:
             return prompt
 
@@ -323,25 +349,27 @@ class KLTrainingDataset(Dataset):
         if keep_tokens >= len(block_ids):
             return prompt
 
-        truncated_block = self.tokenizer.decode(block_ids[:keep_tokens], skip_special_tokens=True)
+        truncated_block = tokenizer.decode(block_ids[:keep_tokens], skip_special_tokens=True)
         return prompt[:block_text_start] + truncated_block + notice + prompt[end:]
 
-    def _truncate_initial_response(self, prompt: str, response: str) -> str:
+    def _truncate_initial_response(self, prompt: str, response: str, tokenizer=None) -> str:
         return self._truncate_prompt_block(
             prompt,
             response,
             _INIT_BLOCK_MARKER,
             (_INIT_BLOCK_END_MARKER,),
             _TRUNC_NOTICE,
+            tokenizer=tokenizer,
         )
 
-    def _truncate_reference_solution(self, prompt: str, response: str) -> str:
+    def _truncate_reference_solution(self, prompt: str, response: str, tokenizer=None) -> str:
         prompt = self._truncate_prompt_block(
             prompt,
             response,
             "**Reference Solution:**",
             (_INIT_BLOCK_MARKER, _INIT_BLOCK_END_MARKER),
             _REF_TRUNC_NOTICE,
+            tokenizer=tokenizer,
         )
         prompt = self._truncate_prompt_block(
             prompt,
@@ -349,6 +377,7 @@ class KLTrainingDataset(Dataset):
             "Here is a reference Python solution:",
             ("After understanding",),
             _REF_TRUNC_NOTICE,
+            tokenizer=tokenizer,
         )
         return self._truncate_prompt_block(
             prompt,
@@ -356,14 +385,21 @@ class KLTrainingDataset(Dataset):
             "Here is a reference solution:",
             ("After understanding",),
             _REF_TRUNC_NOTICE,
+            tokenizer=tokenizer,
         )
 
-    def _build_sequence(self, prompt: str, response: str) -> tuple[torch.Tensor, torch.Tensor, int]:
+    def _build_sequence(self, prompt: str, response: str, *, tokenizer=None, response_complete=False) -> tuple[torch.Tensor, torch.Tensor, int]:
+        tokenizer = tokenizer or self.tokenizer
         if self.prompt_truncation:
-            prompt = self._truncate_initial_response(prompt, response)
-            prompt = self._truncate_reference_solution(prompt, response)
-        prompt_ids = self._encode_text(prompt + "\n")
+            prompt = self._truncate_initial_response(prompt, response, tokenizer)
+            prompt = self._truncate_reference_solution(prompt, response, tokenizer)
+        prompt_ids = self._prompt_ids(prompt, tokenizer)
         response_ids = self._encode_text(response)
+        if getattr(self, "sequence_format", "plain") == "chat" and response_complete:
+            if tokenizer.eos_token_id is None:
+                raise ValueError("A complete chat response requires an EOS token")
+            if not response_ids or response_ids[-1] != tokenizer.eos_token_id:
+                response_ids.append(tokenizer.eos_token_id)
         full_ids = (prompt_ids + response_ids)[: self.max_length]
         prompt_len = min(len(prompt_ids), len(full_ids))
         input_ids = torch.tensor(full_ids, dtype=torch.long)
@@ -379,9 +415,14 @@ class KLTrainingDataset(Dataset):
         mask[start:end] = 1
         return mask
 
-    def _prepare_item(self, student_prompt: str, teacher_prompt: str, response: str) -> dict[str, torch.Tensor]:
-        student_input_ids, student_position_ids, student_prompt_len = self._build_sequence(student_prompt, response)
-        teacher_input_ids, teacher_position_ids, teacher_prompt_len = self._build_sequence(teacher_prompt, response)
+    def _prepare_item(self, student_prompt: str, teacher_prompt: str, response: str, *, response_complete=False) -> dict[str, torch.Tensor]:
+        student_input_ids, student_position_ids, student_prompt_len = self._build_sequence(
+            student_prompt, response, response_complete=response_complete,
+        )
+        teacher_input_ids, teacher_position_ids, teacher_prompt_len = self._build_sequence(
+            teacher_prompt, response, tokenizer=getattr(self, "teacher_tokenizer", self.tokenizer),
+            response_complete=response_complete,
+        )
 
         student_response = student_input_ids[student_prompt_len:]
         teacher_response = teacher_input_ids[teacher_prompt_len:]
@@ -481,10 +522,21 @@ class KLTrainingDataset(Dataset):
             task=self.task,
         )
 
+        if self.sequence_format == "chat":
+            # Repair caches preserve both messages used during generation. In
+            # particular the refine prompt's leading newline is significant.
+            student_prompt = extra_info.get("student_prompt", student_prompt)
+            if self.use_initial_response:
+                messages = item.get("prompt")
+                if not messages or len(messages) != 1 or messages[0]["role"] != "user":
+                    raise ValueError("Chat refine training requires the original teacher user message")
+                teacher_prompt = messages[0]["content"]
+
         return self._prepare_item(
             student_prompt=student_prompt,
             teacher_prompt=teacher_prompt,
             response=target_response,
+            response_complete=extra_info.get("response_complete") is True,
         )
 
 
@@ -503,6 +555,8 @@ def create_kl_dataloader(
     prompt_truncation: bool = False,
     distill_mode: str = "opsd",
     task: str = "math",
+    sequence_format: str = "plain",
+    teacher_tokenizer: PreTrainedTokenizer | None = None,
 ) -> DataLoader:
     dataset = KLTrainingDataset(
         data_path=data_path,
@@ -515,6 +569,8 @@ def create_kl_dataloader(
         prompt_truncation=prompt_truncation,
         distill_mode=distill_mode,
         task=task,
+        sequence_format=sequence_format,
+        teacher_tokenizer=teacher_tokenizer,
     )
 
     sampler = None

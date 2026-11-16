@@ -79,6 +79,8 @@ def build_torchrun_command(values: dict[str, str]) -> list[str]:
         "0.1",
         "--data_path",
         values["TRAINING_DATA_PATH"],
+        "--sequence_format",
+        values.get("SEQUENCE_FORMAT", "plain"),
         "--num_workers",
         values["NUM_WORKERS"],
         "--fsdp_strategy",

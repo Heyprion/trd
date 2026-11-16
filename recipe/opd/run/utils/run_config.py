@@ -175,6 +175,7 @@ def build_env() -> dict[str, str]:
         "TRAIN_DATA_PATH": _env("TRAIN_DATA_PATH"),
         "TRAIN_DATA_SOURCE": _env("TRAIN_DATA_SOURCE"),
         "DATA_PATH": data_path,
+        "SEQUENCE_FORMAT": _env("SEQUENCE_FORMAT", "plain"),
         "CORRECTED_RESPONSES_PATH": _env("CORRECTED_RESPONSES_PATH"),
         "MAX_SAMPLES": _env("MAX_SAMPLES"),
         "PROMPT_TRUNCATION": _env("PROMPT_TRUNCATION", "true"),

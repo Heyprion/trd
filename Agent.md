@@ -1,5 +1,7 @@
 # Agent 工作约定
 
+当前修复对照入口为 `bash preparation/run_repair_train_eval.sh`，仅训练用 `run_repair_train.sh`，可加 `--dry-run`。复用已完成首轮9,984题轨迹，从原始4B重新初始化LoRA，先保留全部题目及目标think，只修复训练聊天格式和结束监督。校验及实验状态见[修复说明](preparation/training/REPAIR.zh-CN.md)。旧复现入口与PPL/KLD协议保留，修复对照尚不代表已验证准确率收益。
+
 ## 1. 目的
 复现他人的项目，并可能在其他项目上开展探索和修改。当前复现范围是数学任务的 OPD：4B 学生 + 8B 教师；后续按具体目的开展工作。
 

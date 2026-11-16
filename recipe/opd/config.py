@@ -65,6 +65,7 @@ class KLTrainingConfig:
 
     # Data Settings
     data_path: str = ""  # Reverse: y_o responses. Forward: y_r rewritten responses.
+    sequence_format: Literal["plain", "chat"] = "plain"  # Keep legacy runs reproducible; repair entrypoint uses chat.
     corrected_responses_path: str = ""  # Optional legacy second file for forward KL rewrite targets
     max_samples: Optional[int] = None
     use_initial_response: bool = False  # Teacher prompt mode: False=rewrite from expert only, True=rewrite using initial response + expert guidance
@@ -138,6 +139,8 @@ class KLTrainingConfig:
 
     def __post_init__(self):
         """Validate configuration."""
+        if self.sequence_format not in {"plain", "chat"}:
+            raise ValueError(f"Unknown sequence_format: {self.sequence_format}")
         if not 0 < self.cuda_memory_fraction <= 1:
             raise ValueError("cuda_memory_fraction must be in (0, 1]")
         if self.kl_loss_backend not in {"autograd", "recompute"}:

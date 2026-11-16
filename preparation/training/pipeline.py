@@ -51,6 +51,15 @@ def append_history(message):
         stream.write(message + "\n")
 
 
+def unique_run_name(prefix, output_root):
+    used = {read_json(path).get("experiment_name") for path in Path(output_root).rglob("summary.json")}
+    number, candidate = 1, prefix
+    while candidate in used:
+        number += 1
+        candidate = f"{prefix}-r{number:02d}"
+    return candidate
+
+
 def validate_train_split(values):
     import pyarrow.parquet as pq
     from datasets import load_from_disk
@@ -228,7 +237,11 @@ def experiment(stage, run_id, folder, config, action, *, name=None):
     return summary
 
 
-def train(run_id, folder, values, split):
+def train(run_id, folder, values, split, *, cache_source=None):
+    values = values.copy()
+    if cache_source:
+        values["TRAINING_DATA_PATH"] = str(folder / "cache/chat-training.parquet")
+
     def action(run):
         output = Path(values["EPOCH_OUTPUT_DIR"])
         output.mkdir(parents=True, exist_ok=True)
@@ -236,20 +249,45 @@ def train(run_id, folder, values, split):
         env = os.environ.copy()
         env.update(values)
         env.update(SWANLAB_RELAY="1", RUN_EVAL_AFTER_TRAINING="false")
-        for script in ("preparation/stage_outputs.py", "preparation/check_ready.py",
-                       "recipe/opd/run/prepare_training_data.py"):
+        derived = None
+        if cache_source:
+            from preparation.training.cached_repair import materialize
+
+            cache = folder / "cache/chat-training.parquet"
+            derived = materialize(cache_source, cache, values["MODEL_PATH"])
+            # launch_training rebuilds values in its child; DATA_PATH is set only
+            # here after the frozen split/source checks, never as a user bypass.
+            env.update(DATA_PATH=str(cache), TRAINING_DATA_PATH=str(cache))
+            run.log({"cache/reused_rows": derived["rows"], "cache/new_generation": 0,
+                     "cache/complete_rows_with_eos": derived["complete_rows_with_eos"]})
+        scripts = ["preparation/stage_outputs.py", "preparation/check_ready.py"]
+        if not cache_source:
+            scripts.append("recipe/opd/run/prepare_training_data.py")
+        for script in scripts:
             run_command([sys.executable, str(ROOT / script)], folder, run, env)
-        generated = validate_generated(values["TRAINING_DATA_PATH"], values)
+        generated = validate_generated(env["TRAINING_DATA_PATH"], values)
         run.log({"data/source_rows": 9984, "data/generated_rows": generated["rows"]})
         run_command([sys.executable, str(ROOT / "recipe/opd/run/launch_training.py")], folder, run, env)
         model = str(Path(values["EPOCH_MODEL_SAVE_DIR"]) / "hf_merged")
         validate_model(model)
-        return {"model_path": model, "training_data": generated, "output_dir": str(output)}
+        return {"model_path": model, "training_data": generated, "output_dir": str(output),
+                **({"cache_reuse": derived} if derived else {})}
 
     config = {"training": values, "split": split, "merge_lora_on_export": True,
               "profile": os.environ.get("MATH_TRAIN_PROFILE", str(ROOT / "preparation/pilot/profiles/balanced.env.sh")),
               "kl_full_vocab_chunk_size": os.environ["KL_FULL_VOCAB_CHUNK_SIZE"]}
-    return experiment("train", run_id, folder, config, action)
+    if cache_source:
+        config["cache_reuse"] = cache_source
+        config["code_sha256"] = {path: file_hash(ROOT / path) for path in (
+            "recipe/opd/dataset/data_utils.py", "recipe/opd/config.py", "recipe/opd/kl_trainer.py",
+            "recipe/opd/run_training.py", "recipe/opd/run/launch_training.py",
+            "preparation/training/cached_repair.py", "preparation/training/pipeline.py",
+        )}
+    name = None
+    if cache_source:
+        name = unique_run_name(dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d") +
+                               "-训练-TRD聊天格式修复-9984题", folder.parent.parent)
+    return experiment("train", run_id, folder, config, action, **({"name": name} if name else {}))
 
 
 def evaluation(run_id, folder, model, source, benchmark_info, *, model_label="distilled", reference=None, run_name=None):
@@ -324,6 +362,7 @@ def arguments(argv=None):
     source.add_argument("--model", type=Path, help="Merged HF model for standalone evaluation")
     source.add_argument("--train-run", type=Path, help="Successful train/summary.json for standalone evaluation")
     parser.add_argument("--dry-run", action="store_true", help="Validate configuration/data; no GPU work or SwanLab run")
+    parser.add_argument("--reuse-train-run", type=Path, help="Reuse verified trajectories from a completed frozen training run")
     args = parser.parse_args(argv)
     if not re.fullmatch(r"[A-Za-z0-9_.-]+", args.run_id) or args.run_id in (".", ".."):
         parser.error("--run-id must be a safe directory name")
@@ -331,6 +370,8 @@ def arguments(argv=None):
         parser.error("eval requires --model <merged HF directory> or --train-run <train/summary.json>")
     if args.stage != "eval" and (args.model or args.train_run):
         parser.error("--model/--train-run are only for standalone eval")
+    if args.stage == "eval" and args.reuse_train_run:
+        parser.error("--reuse-train-run is for training, not standalone evaluation")
     args.output_root = args.output_root.expanduser().resolve()
     return args
 
@@ -342,8 +383,16 @@ def main(argv=None):
     os.environ.update(values)
     run_dir = args.output_root / args.run_id
     source, model, split, benchmarks = None, None, None, None
+    cache_source = None
     if args.stage in ("train", "all"):
         split = validate_train_split(values)
+        if args.reuse_train_run:
+            from preparation.training.cached_repair import validate_source
+
+            if values.get("SEQUENCE_FORMAT") != "chat":
+                raise ValueError("Cached repair requires SEQUENCE_FORMAT=chat")
+            cache_source = validate_source(args.reuse_train_run, values, split)
+            print("Verified cache reuse:", json.dumps(cache_source, ensure_ascii=False), flush=True)
         print_config(values)
         print("Frozen training split:", json.dumps(split, ensure_ascii=False), flush=True)
         model = Path(values["EPOCH_MODEL_SAVE_DIR"]) / "hf_merged"
@@ -375,11 +424,14 @@ def main(argv=None):
     with lock_path.open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         if args.stage in ("train", "all"):
-            source = train(args.run_id, run_dir / "train", values, split)
+            source = train(args.run_id, run_dir / "train", values, split,
+                           **({"cache_source": cache_source} if cache_source else {}))
         if args.stage in ("eval", "all"):
             evaluation(args.run_id, run_dir / "eval", model,
                        {"summary_path": str(args.train_run) if args.train_run else str(run_dir / "train/summary.json"),
-                        "swanlab_url": source["swanlab_url"]} if source else None, benchmarks)
+                        "swanlab_url": source["swanlab_url"]} if source else None, benchmarks,
+                       **({"run_name": unique_run_name(dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d") +
+                           "-评测-AIME24和25-pass16-聊天格式修复", args.output_root)} if cache_source else {}))
     print(f"Completed: {run_dir}", flush=True)
 
 

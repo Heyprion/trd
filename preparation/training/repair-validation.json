@@ -1,0 +1,64 @@
+{
+  "purpose": "Stage A: cached trajectories, chat conditioning and conservative EOS; targets unfiltered and unchanged",
+  "production_accuracy_effect": "not yet measured",
+  "cpu": {
+    "summary": "/root/autodl-tmp/trd/preparation/logs/training-development/chat-repair-cpu-20261116-070052/summary.json",
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/rcywdvtl",
+    "audit_rows": 512,
+    "aligned": true,
+    "target_truncated_rows": 0,
+    "cache": {
+      "source_summary": "/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/train/summary.json",
+      "source_summary_sha256": "65f8ed28266e865fa50d1796d97fb084122940e59a057d4efebe3e1dc1ba8f77",
+      "source_swanlab": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666",
+      "teacher_cache": "/root/autodl-tmp/trd/gen_results/math-v1-splits-v1/train_9984/OPD/math/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_20261115-185850-279780-53607/math_y_r_opd_Qwen3-8B_responses.parquet",
+      "teacher_cache_sha256": "864efe8abc0a677aecbf78b4dea82158fc7c3479c4d9f6e5580098d0a482def9",
+      "student_cache": "/root/autodl-tmp/trd/gen_results/math-v1-splits-v1/train_9984/OPD/math/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_20261115-185850-279780-53607/math_y_o_responses.parquet",
+      "student_cache_sha256": "88dda41794ad55ef4729aa8e2080ed5984d3170246b80457122ac905c96514f7",
+      "rows": 9984,
+      "generation_response_limit": 16384,
+      "new_generation": false,
+      "derived_cache": "/root/autodl-tmp/trd/preparation/logs/training-development/chat-repair-cpu-20261116-070052/cache/chat-training.parquet",
+      "derived_cache_sha256": "55af3f7c9a658074b8004f545aa31f6a85d07b12f5cdc97328fbd6cd03ad5fe6",
+      "sequence_format": "chat",
+      "target_text_changed": false,
+      "filtered_rows": 0,
+      "complete_rows_with_eos": 9932,
+      "completion_basis_counts": {
+        "inferred_complete": 9932,
+        "near_generation_limit": 44,
+        "no_parseable_box": 2,
+        "unclosed_thought": 6
+      },
+      "completion_caveat": "Inferred from saved text; original finish_reason was not stored."
+    }
+  },
+  "gpu": {
+    "summary": "/root/autodl-tmp/trd/preparation/logs/training-development/chat-repair-gpu-20261116-070304/summary.json",
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/y86py49p",
+    "optimizer_steps": 2,
+    "sample_visits": 256,
+    "all_values_finite": true,
+    "gpu_peak_gib": [
+      81.54217529296875,
+      57.43865966796875
+    ],
+    "wall_seconds": 201.169836435467
+  },
+  "regression": {
+    "summary": "/root/autodl-tmp/trd/preparation/logs/training-development/chat-repair-final-20261116-070659/summary.json",
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/bf3w6lhm",
+    "tests": 47,
+    "dry_run": "passed"
+  },
+  "failed_cpu_checks": [
+    {
+      "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mfo48l7h",
+      "reason": "Mock URL not serializable"
+    },
+    {
+      "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/l3darndn",
+      "reason": "Fixture missing reward_model"
+    }
+  ]
+}

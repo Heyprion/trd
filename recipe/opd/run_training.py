@@ -62,6 +62,7 @@ def parse_args():
     # Data Settings
     parser.add_argument("--data_path", type=str, default="")
     parser.add_argument("--corrected_responses_path", type=str, default="")
+    parser.add_argument("--sequence_format", choices=["plain", "chat"], default="plain")
     parser.add_argument("--max_samples", type=int, default=None)
     parser.add_argument(
         "--use_initial_response",
@@ -181,6 +182,7 @@ def main():
         # Data Settings
         data_path=args.data_path,
         corrected_responses_path=args.corrected_responses_path,
+        sequence_format=args.sequence_format,
         max_samples=args.max_samples,
         use_initial_response=args.use_initial_response,
         prompt_truncation=args.prompt_truncation,
