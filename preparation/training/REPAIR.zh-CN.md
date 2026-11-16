@@ -43,6 +43,18 @@ SwanLab继续使用trd-math-opd，训练与评测分别记录，失败保留。�
 
 后续去除教师改写思考监督与可靠终答筛选分别作为独立对照，保留当前格式修复结果，以便判断收益来自哪项修改。
 
+## 本轮完成结果（2026-11-16）
+
+训练78次更新及LoRA合并完成；AIME25评测与范围收尾于10:14 UTC全部完成。仅生成AIME25的30题×16次回答，AIME24未运行；控制器及收尾进程均退出，两卡空闲。[评测SwanLab](https://swanlab.cn/@WangZIyu/trd-math-opd/runs/jtt6dac0)。
+
+| AIME25模型 | pass@16 | avg@16 | pass@8 |
+| --- | --- | --- | --- |
+| 原始4B | 76.6667%（23/30） | 46.0417%（221/480） | 66.6667% |
+| 首轮蒸馏 | 70.0000%（21/30） | 41.8750%（201/480） | 60.0000% |
+| 本轮聊天格式修复 | 66.6667%（20/30） | 41.4583%（199/480） | 66.6667% |
+
+本轮相对原始4B，pass@16低10个百分点、avg@16低4.5833个百分点；相对首轮蒸馏，覆盖少1题、正确回答少2次。本次结果没有显示格式修复的正确率收益，单次采样结果不能确定各候选机制的贡献。训练含准备/导出耗时6130.28秒，单套评测约4701.20秒；原始summary、结果及范围变更前失败summary均保留。
+
 正式格式对照已于2026-11-16 07:13 UTC启动，run-id为`repair-chat-9984-v1`，[训练SwanLab](https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16)。控制器日志为`preparation/logs/repair-launchers/repair-chat-9984-v1.log`，训练状态为`preparation/logs/math-runs/repair-chat-9984-v1/train/summary.json`。训练与合并成功后自动启动AIME25评测；实际完成状态及成绩以各阶段summary为准。
 
 用户随后将本轮范围缩减为仅AIME25。运行根目录的evaluation-control.json在生成前跳过AIME24；已加载旧两套汇总逻辑的控制器可能在收尾时报缺少AIME24，后台finish_reduced_eval.py等待其自然退出后，仅核对AIME25全部30×16响应、恢复同一SwanLab记录并生成最终summary。旧summary及日志保留，训练进程不接收信号。新启动入口直接按AIME25汇总，不需要该兼容收尾。控制器状态见evaluation-scope-status.json。

@@ -1,6 +1,6 @@
 {
   "purpose": "Stage A: cached trajectories, chat conditioning and conservative EOS; targets unfiltered and unchanged",
-  "production_accuracy_effect": "not yet measured",
+  "production_accuracy_effect": "No AIME25 improvement in this completed run; causal attribution requires further controls.",
   "cpu": {
     "summary": "/root/autodl-tmp/trd/preparation/logs/training-development/chat-repair-cpu-20261116-070052/summary.json",
     "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/rcywdvtl",
@@ -60,5 +60,33 @@
       "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/l3darndn",
       "reason": "Fixture missing reward_model"
     }
-  ]
+  ],
+  "formal_evaluation": {
+    "run_id": "repair-chat-9984-v1",
+    "status": "completed",
+    "completed_at": "2026-11-16T10:14:07.889520+00:00",
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/jtt6dac0",
+    "datasets": [
+      "aime25"
+    ],
+    "pass16_correct_questions": 20,
+    "questions": 30,
+    "avg16_correct_responses": 199,
+    "responses": 480,
+    "metrics": {
+      "eval/aime25/pass@16": 0.6666666666666666,
+      "eval/aime25/avg@16": 0.41458333333333336,
+      "eval/aime25/pass@8": 0.6666666666666666
+    },
+    "base_metrics": {
+      "eval/aime25/pass@16": 0.7666666666666667,
+      "eval/aime25/avg@16": 0.46041666666666664,
+      "eval/aime25/pass@8": 0.6666666666666666
+    },
+    "previous_distilled_metrics": {
+      "eval/aime25/pass@16": 0.7,
+      "eval/aime25/avg@16": 0.41875,
+      "eval/aime25/pass@8": 0.6
+    }
+  }
 }
