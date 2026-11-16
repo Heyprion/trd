@@ -482,3 +482,11 @@
 - 9984条教师目标与原始缓存SHA256仍为864efe8abc0a677aecbf78b4dea82158fc7c3479c4d9f6e5580098d0a482def9；派生缓存SHA256为55af3f7c9a658074b8004f545aa31f6a85d07b12f5cdc97328fbd6cd03ad5fe6，与CPU/双卡检验相同。manifest确认target_text_changed=false、filtered_rows=0、new_generation=false；原始初稿/教师改写未覆盖。
 - 本轮保持batch2/acc32、全局128、1 epoch/78更新、LR5e-6、LoRA64/128、18K训练长度及32K动态预算、BF16/FP32 LoRA与recompute/FA2/Liger等配置；末次空间检查通过，checkpoint和HF分别写原两块盘的新run目录，上一轮模型保留。当前status=running，已实际观测优化器更新1，已记录数值有限；这只证明进入参数更新，不是训练完成或准确率提升证据。
 - 训练/LoRA合并完成后由同一后台控制器自动评测AIME24/AIME25、pass16、TP2，其他三套不默认运行；独立评测SwanLab在评测开始时创建。当前尚无新模型最终成绩。summary位置preparation/logs/math-runs/repair-chat-9984-v1/train/summary.json，README修复说明增加运行索引。保留入会话前已有HISTORY及readiness运行差异，未上传权重/数据/原始日志。
+
+
+## 2026-11-16T07:23:05.391709+00:00：解释格式修复对照范围及本轮耗时估计
+
+- 用户要求简单说明“对照训练”，确认是否省去学生/教师轨迹采集、只需KL训练与评测，并询问速度。本轮只读取运行summary、metrics和进度日志，不启动新实验或干预任务；已有正式训练SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16 。
+- 对照含义：与上一轮保持原始4B起点、冻结8B、同一9984条缓存、相同主要优化参数；本轮修改chat条件/response因果位置与保守结束监督，保留原目标think及全部样本，比较最终独立解题成绩。没有重新生成学生初稿或教师改写；教师仍在每批KL训练中前向计算分布，不是取消教师计算。
+- UTC2026-11-16T07:22:28读取status=running，最新优化器step5/78，微批进度182/2496约7%，训练进度条[07:37<2:02:22]。上一轮纯KL训练约1:37:45（既有历史），两套蒸馏后AIME评测wall_seconds=10150.07约2.82小时，原始学生同口径评测9993.51秒约2.78小时。上一轮train summary的47186.22秒包含两轮生成，不能当作纯KL耗时。
+- 本轮粗估纯KL约1.5–2小时、合并若干分钟、两套AIME pass16评测约2.8小时，从启动到成绩约4–5小时；这是参考历史和当前早期进度的范围估计，实际受长度和生成尾部影响，评测仍需重新生成新模型回答。既有base评测结果继续复用，不再重测原始学生。
