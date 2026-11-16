@@ -28,6 +28,18 @@ bash preparation/run_ppl_kld.sh --label calibration --max-samples 32
 
 正式训练后，传入HF合并模型目录，或者含 `adapter_config.json` / `adapter_model.safetensors` 的LoRA目录；其他参数保持一致。
 
+当前9,984题训练已完成（78个更新），合并模型及完整基线均已落盘。针对这一轮可以直接运行已固定训练记录和基线的快捷入口：
+
+```bash
+bash preparation/run_ppl_kld_distilled.sh
+# 只核对512题、模型目录和已有基线，不启动评分：
+bash preparation/run_ppl_kld_distilled.sh --dry-run
+```
+
+该入口读取 `preparation/logs/math-runs/20261115-185850-279780-53607/train/summary.json`，要求训练completed且LoRA合并完成；基线固定为 `baseline-20261115-101823-758028-27412/summary.json`，避免后续latest指针变化选错比较对象。沿同一512题、234,375个response tokens评分，自动生成前后差值与按题配对95%区间。当前基线学生PPL=2.14900753、forward KL=0.23148751、reverse KL=0.21281604，实测全流程62.9秒；蒸馏后评分尚未执行。
+
+其他训练轮次使用通用入口：
+
 ```bash
 bash preparation/run_ppl_kld.sh \
   --label distilled \
@@ -58,7 +70,7 @@ bash preparation/run_ppl_kld.sh --gpu-ids 0
 
 默认两卡各一个“4B学生＋8B教师”完整副本，处理互不重叠的验证batch，无需FSDP/NCCL。batch最多8条、padded token预算8,192、全词表chunk512、FlashAttention 2、allocator fraction0.92。评分可以单卡运行；不改变训练balanced配置。峰值显存指标为PyTorch allocated/reserved，不是NVML整卡实测。
 
-日志中会分别记录模型加载和纯评分耗时、有效token数量及每卡峰值。当前只做了CPU合成模型回归和真实512题dry-run，没有运行生产模型GPU评分；完整基线暂预留10–30分钟，实际以首轮或32题校准为准。正式运行还会读取模型文件计算SHA256，作为教师冻结和模型来源证据。
+日志中会分别记录模型加载和纯评分耗时、有效token数量及每卡峰值。现有完整512题基线实测全流程62.9秒；蒸馏后模型预计同量级，仍以本次实际运行计时为准。正式运行还会读取模型文件计算SHA256，作为教师冻结和模型来源证据。
 
 每次运行创建独立目录：
 
@@ -75,6 +87,8 @@ preparation/logs/ppl-kld/<label>-<时间戳>-<pid>/
 ```
 
 完整且成功的 `baseline` 运行会更新 `preparation/logs/ppl-kld/latest-baseline.json`；校准、失败和其他label不会更新它。每轮运行自动上传SwanLab `trd-math-opd`并将链接、参数入口、结果或失败原因追加到 `HISTORY.md`。SwanLab失败时不回退离线运行。逐题数据、tokenized任务和日志只保存在被Git忽略的本地目录；在线上传汇总、配置和日志，不上传权重或题目文本。
+
+新增运行按Agent.md最新要求命名，例如 `20261116-评测-PPL和KL-蒸馏后`；同日同目的重跑依已有本地SwanLab记录追加 `-r02`、`-r03`。保留原有基线记录及评分口径。
 
 `--compare-to`会校验基线结果SHA256、相同题目/前缀/token数/评分口径和固定教师权重，拒绝不一致的比较；输出current−baseline的变化及按题目配对bootstrap 95%区间（默认1,000次）。如要固定某次基线，直接传那次运行的 `summary.json`，而不是可被后续完整基线更新的latest指针。
 

@@ -60,6 +60,15 @@ def append_history(path, message):
         stream.write(message + "\n")
 
 
+def swanlab_run_name(label, output_root, day=None):
+    day = day or dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d")
+    purpose = {"baseline": "基线", "distilled": "蒸馏后", "calibration": "校准"}.get(label, label)
+    previous = sum((folder / "swanlab.json").is_file()
+                   for folder in Path(output_root).glob(f"{label}-{day}-*"))
+    suffix = f"-r{previous + 1:02d}" if previous else ""
+    return f"{day}-评测-PPL和KL-{purpose}{suffix}"
+
+
 def arguments(argv=None):
     def env(name, default):
         return os.environ.get("PPL_KLD_" + name, str(default))
@@ -390,9 +399,11 @@ def main(argv=None):
     # SwanLab 0.10.5 parses a flat SWANLAB_PROJECT env var as nested JSON.
     os.environ.pop("SWANLAB_PROJECT", None)
     import swanlab
-    run = swanlab.init(project=a.project, name=f"math-validation-{a.label}", mode="online", on_online_error="raise",
+    run_name = swanlab_run_name(a.label, a.output_root)
+    config["swanlab_run_name"] = run_name
+    run = swanlab.init(project=a.project, name=run_name, mode="online", on_online_error="raise",
                        log_dir=str(output / "swanlab"), job_type="ppl-kld", config=config)
-    write_json(output / "swanlab.json", {"url": run.url, "id": run.id})
+    write_json(output / "swanlab.json", {"url": run.url, "id": run.id, "name": run_name})
     a.history_file.parent.mkdir(parents=True, exist_ok=True)
     append_history(a.history_file, f"\n## {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M:%S UTC}：验证集PPL/KLD {a.label}\n\n"
                    f"- SwanLab：{run.url}；输出/日志：`{output}`；学生：`{a.student_model}`；"

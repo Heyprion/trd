@@ -363,3 +363,13 @@
 - 当前范围文件 `preparation/logs/math-runs/20261115-185850-279780-53607/eval/evaluation-control.json`；监视状态 `preparation/logs/math-runs/20261115-185850-279780-53607/eval/scope-finalizer-status.json` 为armed、PID142040；监视日志scope-finalizer.log。当前原suite仍PID120819、旧总控制器53607。最近AIME25进度：Generating responses:  35%|███▍      | 167/480 [25:31<1:06:29, 12.75s/it]。范围控制是已布置的后续动作，AIME25尚未完成，未声称结束已发生；评测链接 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto 。
 - 持久默认也调整为AIME24/AIME25：training/config.env.sh与pipeline.py使用MATH_EVAL_DATASETS选择范围，其他集合须显式覆盖；Agent.md默认索引及训练README同步。保持9984题训练数据、模型、采样参数、pass16/TP2及512题独立PPL/KLD入口不变。
 - 验证：新增8项CPU范围控制/安全及汇总检查，连同既有训练入口21项共29项通过，包含仅在两套已写成绩后退出、PID重用/其他任务不受影响、先清理与写边界标记再终止、恢复同一记录并只汇总所选六指标、缺失响应拒绝等；信号和Swan恢复使用Mock，没有干预生产进程。SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/sqv4bxha；日志preparation/logs/training-development/20261116-095314-aime-scope-checks；shell语法、Python编译及git diff检查通过。
+
+## 2026-11-16：定位已完成蒸馏模型并准备PPL/KLD对比入口
+
+- 用户确认训练已完成，要求给出蒸馏后模型的同口径测试脚本，由用户自行运行。本轮核对Agent.md新约定、实际train/summary.json、LoRA合并标记及既有基线；没有启动正式模型评分、生成或训练。
+- 定位训练run 20261115-185850-279780-53607：9984题、1 epoch/78更新，status=completed。模型路径由训练summary的result.model_path读取，解析到`checkpoints_merged/OPD_MATH/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_20261115-185850-279780-53607/epoch1/hf_merged`，两个safetensors分片及lora_merge.json merged=true均存在；训练实验 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666 。
+- 新增`preparation/run_ppl_kld_distilled.sh`：固定这次completed训练记录和完整基线`preparation/logs/ppl-kld/baseline-20261115-101823-758028-27412/summary.json`，自动调用通用评分器，默认双卡、完整512题；输出学生/教师PPL与NLL、全词表forward/reverse KL、分桶和前后配对差值/95%区间，并自动在线SwanLab和追加HISTORY。支持--dry-run，无需用户填写长模型路径。README与Agent.md索引已同步。
+- 原基线已完成，学生PPL=2.1490075304，教师PPL=2.0496917593，forward KL=0.2314875093、reverse KL=0.2128160385 nats/token，wall_seconds=62.8691；基线实验 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/348lb6qg 。蒸馏后的指标目前仍未运行，不把训练或AIME结果当作这些指标。
+- 启动前按Agent.md最新命名规范调整PPL/KLD实验名：YYYYMMDD-评测-PPL和KL-基线/蒸馏后/校准；同日同目的根据已有本地SwanLab记录递增r02等。继续复用trd-math-opd，不修改评分数学口径或既有基线。
+- 检验：仓库外目录执行蒸馏后脚本--dry-run通过，实际512题、234375 response tokens、protocol_sha256与基线一致；shell语法及git diff检查通过。5项CPU合成/命名/主流程相关回归全部通过，在线记录 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/a228n5vk ，日志`preparation/logs/ppl-kld-development/20261116-031549-distilled-launcher-checks`。无生产模型推理，无新增正式蒸馏后评分链接。
+- 保留进入会话时已有及其他会话新增的HISTORY、readiness和训练/原始学生评测改动，仅提交本次PPL/KLD入口、相关命名代码/检查、文档与本条历史；未将模型、数据或原始日志纳入Git。

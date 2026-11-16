@@ -216,6 +216,24 @@ class FrozenDataTests(unittest.TestCase):
                 evaluate.load_validation(root)
 
 
+class NamingTests(unittest.TestCase):
+    def test_date_stage_purpose(self):
+        with tempfile.TemporaryDirectory() as temp:
+            self.assertEqual(evaluate.swanlab_run_name("distilled", temp, "20261116"),
+                             "20261116-评测-PPL和KL-蒸馏后")
+
+    def test_reruns_count_only_same_date_and_purpose(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for name in ("distilled-20261116-first", "baseline-20261116-first", "distilled-20261115-first"):
+                folder = root / name
+                folder.mkdir()
+                (folder / "swanlab.json").write_text("{}")
+            (root / "distilled-20261116-not-started").mkdir()
+            self.assertEqual(evaluate.swanlab_run_name("distilled", root, "20261116"),
+                             "20261116-评测-PPL和KL-蒸馏后-r02")
+
+
 class ParentPipelineTests(unittest.TestCase):
     def config_fixture(self, arguments):
         rows = rows_fixture()
