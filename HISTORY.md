@@ -504,3 +504,10 @@
 - 对新启动父进程，evaluation在开始前读取范围，仅生成/校验/上传所选测试集。对当前旧父进程，新增finish_reduced_eval.py --wait-for-controller兼容模式：后台watcher PID191299核对原控制器PID与创建时间，等待其自然退出；若旧两套汇总因AIME24缺失报错，保留原summary及日志，在确认训练completed和AIME25全部30×16响应存在后，恢复原评测SwanLab记录、重算并仅上传AIME25三项指标，生成最终completed summary。没有向训练或评测进程发送信号，也不伪造AIME24成绩。
 - 本轮范围控制状态preparation/logs/math-runs/repair-chat-9984-v1/evaluation-scope-status.json为armed；control、watcher log同目录。复核时训练status=running，实际更新到17/78，eval目录尚未创建，表明仍在原训练阶段；训练SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16 。
 - CPU检查复用trd-math-opd，命名20261116-数值校验-AIME25范围控制，SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/5if3k9pw 。40项检查通过，包含run根范围文件读取且不创建eval目录、仅AIME25汇总且无AIME24 parquet、watcher自然等待/不发信号、旧记录恢复、既有数据/模型交接/基线兼容检查；train+eval dry-run确认Benchmarks=aime25/pass16/TP2。日志preparation/logs/training-development/aime25-scope-*与/tmp/trd-aime25-scope-checks.log；shell语法及git diff检查通过。所有实际GPU工作仍为既有训练，本轮测试不加载生产权重或生成评测回答。
+
+
+## 2026-11-16T07:49:00.476474+00:00：按用户要求只读核查后台是否运行
+
+- 用户询问当前阶段及是否需要手动训练，并明确若后台没有运行则不要启动、只提供脚本。本轮只读取进程、GPU、summary、指标和进度日志，没有启动/重启/暂停任何训练、生成或评测进程。
+- UTC2026-11-16T07:48:20检查：原控制器PID188885仍在，双卡训练rank189387/189388活跃；train summary running，最近优化器更新26/78（指标文件07:47:44更新），微批847/2496约34%，进度条[33:28<55:29]。GPU利用率97%/100%，显存82863/73843MiB；有实际训练负载，不是只有空闲控制器。
+- 当前仍在KL参数训练，无eval summary；AIME25-only控制文件有效，收尾watcher PID191299为armed，等待当前控制器结束。无需用户再启动训练；原任务成功训练/合并后自动只评AIME25。训练SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16 。本轮没有新实验，所有原有进程按既有配置继续。
