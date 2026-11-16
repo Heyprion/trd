@@ -11,9 +11,14 @@ def read_control(output_json_path):
         return None
     path = Path(output_json_path).resolve().with_name("evaluation-control.json")
     if not path.is_file():
-        return None
+        # Requests made during training live at the run root, so the old
+        # controller can still create the eval directory with exist_ok=False.
+        path = path.parent.parent / "evaluation-control.json"
+        if not path.is_file():
+            return None
     control = json.loads(path.read_text())
-    if not control.get("datasets") or len(set(control["datasets"])) != len(control["datasets"]):
+    names = control.get("datasets")
+    if not isinstance(names, list) or not names or not all(isinstance(n, str) and n for n in names) or len(set(names)) != len(names):
         raise ValueError(f"Invalid evaluation scope in {path}")
     return control
 

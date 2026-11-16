@@ -26,7 +26,7 @@ bash preparation/run_train_eval.sh --run-id math-trd-9984-v1
 - 学生：`Qwen/Qwen3-4B-Instruct-2507`
 - 教师：`Qwen/Qwen3-8B`
 - 训练来源：`agentica-org/DeepScaleR-Preview-Dataset`，完整原始版本保留；当前训练范围按上述数据工程记录选择9,984题子集。
-- 评测：AIME24、AIME25、HMMT25、BeyondAIME、AMO-Bench。AMO-Bench 沿用原脚本，过滤 `answer_type=description`。
+- 已准备评测数据：AIME24、AIME25、HMMT25、BeyondAIME、AMO-Bench；当前默认只执行AIME25。AMO-Bench 沿用原脚本，过滤 `answer_type=description`。
 - 支持原仓库全部五种数学 OPD 变体。`forward_kl_y_r` 是论文 TRD 方法；`forward_kl` 是普通 OPD 前向 KL 基线。
 
 ## 本机环境

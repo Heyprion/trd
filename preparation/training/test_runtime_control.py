@@ -34,6 +34,39 @@ class ScopeTests(unittest.TestCase):
             self.assertFalse(c.stop_legacy_suite_if_requested(self.output, "aime25_pass16_generation.parquet", "model", Mock()))
         kill.assert_not_called()
 
+    def test_run_root_scope_is_read_without_creating_evaluation_folder(self):
+        path = self.root / "eval/results.json"
+        self.control["datasets"] = ["aime25"]
+        self.arm()
+        self.assertEqual(c.read_control(path)["datasets"], ["aime25"])
+        self.assertFalse(path.parent.exists())
+
+    def test_watcher_waits_for_owner_without_sending_signals(self):
+        run = self.root / "run"
+        folder = run / "eval"
+        folder.mkdir(parents=True)
+        (run / "train").mkdir()
+        (run / "train/summary.json").write_text('{"status":"completed"}')
+        (folder / "summary.json").write_text("{}")
+        with patch.object(finalizer, "process_alive", side_effect=[True, False]), \
+                patch.object(finalizer.time, "sleep") as sleep, patch.object(os, "kill") as kill, \
+                patch.object(finalizer, "finalize", return_value={"eval/aime25/pass@16": .5}) as finish:
+            finalizer.finish_after_controller(folder, {"datasets": ["aime25"]}, 123, 42.)
+        kill.assert_not_called()
+        sleep.assert_called_once_with(2)
+        finish.assert_called_once()
+        self.assertEqual(json.loads((run / "evaluation-scope-status.json").read_text())["status"], "completed")
+
+    def test_watcher_does_not_finalize_failed_training(self):
+        run = self.root / "run"
+        (run / "train").mkdir(parents=True)
+        (run / "train/summary.json").write_text('{"status":"failed"}')
+        with patch.object(finalizer, "process_alive", return_value=False), \
+                patch.object(finalizer, "finalize") as finish:
+            with self.assertRaisesRegex(RuntimeError, "Training did not complete"):
+                finalizer.finish_after_controller(run / "eval", {"datasets": ["aime25"]}, 123, 42.)
+        finish.assert_not_called()
+
     def test_first_benchmark_does_not_stop_current_generation(self):
         self.arm()
         cleanup = Mock()
@@ -134,6 +167,31 @@ class ScopeTests(unittest.TestCase):
         self.assertEqual(list(revised["config"]["datasets"]), ["aime24", "aime25"])
         self.assertEqual(revised["scope_change"]["skipped_datasets"], ["hmmt25", "beyondaime", "amobench"])
         self.assertTrue((self.root / "summary-before-scope-finalization.json").is_file())
+
+    def test_finalizer_reports_aime25_without_any_aime24_responses(self):
+        import sys
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        folder = self.root / "eval"
+        (folder / "generations").mkdir(parents=True)
+        pq.write_table(pa.Table.from_pylist([{"responses": ["fixture"] * 16}]),
+                       folder / "generations/aime25_pass16_generation.parquet")
+        entry = {f"aime25_{key}_generation_pass_16": .5 for key in ("pass16", "pass8", "avg_pass1")}
+        (folder / "results.json").write_text(json.dumps({"fixture-distilled": entry}))
+        original = {"stage": "eval", "run_id": "fixture", "status": "failed", "error": "old scope expected AIME24",
+                    "swanlab_url": "https://swanlab.cn/@fixture/project/runs/abcd1234",
+                    "config": {"model_path": "/fixture/model", "datasets": {"aime24": {"rows": 30}, "aime25": {"rows": 1}}}}
+        (folder / "summary.json").write_text(json.dumps(original))
+        control = {"datasets": ["aime25"], "reason": "user_requested_aime25_only"}
+        with patch.dict(sys.modules, {"swanlab": Mock()}), patch.object(finalizer, "ROOT", self.root), \
+                patch.object(finalizer.subprocess, "run"):
+            metrics = finalizer.finalize(folder, control)
+        self.assertEqual(len(metrics), 3)
+        result = json.loads((folder / "summary.json").read_text())
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(list(result["config"]["datasets"]), ["aime25"])
+        self.assertEqual(result["scope_change"]["skipped_datasets"], ["aime24"])
+        self.assertFalse((folder / "generations/aime24_pass16_generation.parquet").exists())
 
 
 if __name__ == "__main__":

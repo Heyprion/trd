@@ -81,9 +81,12 @@ def finalize(folder, control):
     revised["config"]["datasets"] = {name: original["config"]["datasets"][name] for name in datasets}
     revised["config"]["generation"] = {**original["config"].get("generation", {}),
                                         "EVAL_DATASETS": ",".join(datasets)}
-    revised["scope_change"] = {"reason": "user_requested_aime24_aime25_only", "datasets": datasets,
+    control_path = folder / "evaluation-control.json"
+    if not control_path.is_file():
+        control_path = folder.parent / "evaluation-control.json"
+    revised["scope_change"] = {"reason": control.get("reason", "user_requested_scope_reduction"), "datasets": datasets,
                                "skipped_datasets": [name for name in previous if name not in datasets],
-                               "request_file": str(folder / "evaluation-control.json")}
+                               "request_file": str(control_path)}
     import swanlab
 
     os.environ.pop("SWANLAB_PROJECT", None)
@@ -105,17 +108,46 @@ def finalize(folder, control):
     write_json(folder / "summary.json", revised)
     with (ROOT / "HISTORY.md").open("a") as history:
         fcntl.flock(history, fcntl.LOCK_EX)
-        history.write(f"\n- 用户缩减后的AIME24/AIME25评测完成：{original['swanlab_url']}；"
-                      f"后续三套未执行；汇总`{folder / 'summary.json'}`；指标{json.dumps(metrics)}。\n")
+        history.write(f"\n- 用户缩减后的{'/'.join(datasets)}评测完成：{original['swanlab_url']}；"
+                      f"跳过{revised['scope_change']['skipped_datasets']}；汇总`{folder / 'summary.json'}`；"
+                      f"指标{json.dumps(metrics)}。\n")
     return metrics
+
+
+def finish_after_controller(folder, control, pid, created_at):
+    """Finalize after the old owner's natural exit; never signal training."""
+    status_path = folder.parent / "evaluation-scope-status.json"
+    write_json(status_path, {"status": "armed", "datasets": control["datasets"],
+                            "watcher_pid": os.getpid(), "controller_pid": pid})
+    try:
+        while process_alive(pid, created_at):
+            time.sleep(2)
+        if read_json(folder.parent / "train/summary.json").get("status") != "completed":
+            raise RuntimeError("Training did not complete; evaluation cannot be finalized")
+        if not (folder / "summary.json").is_file():
+            raise RuntimeError("Controller exited before creating an evaluation record")
+        write_json(status_path, {"status": "finalizing", "datasets": control["datasets"]})
+        metrics = finalize(folder, control)
+        write_json(status_path, {"status": "completed", "datasets": control["datasets"], "metrics": metrics})
+        return metrics
+    except BaseException:
+        write_json(status_path, {"status": "failed", "datasets": control["datasets"], "error": traceback.format_exc()})
+        raise
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--eval-dir", type=Path, required=True)
+    parser.add_argument("--wait-for-controller", type=int)
+    parser.add_argument("--controller-created-at", type=float)
     args = parser.parse_args()
     folder = args.eval_dir.resolve()
     control = read_control(folder / "results.json")
+    if args.wait_for_controller:
+        if not control or args.controller_created_at is None:
+            raise ValueError("A scope request and exact controller creation time are required")
+        finish_after_controller(folder, control, args.wait_for_controller, args.controller_created_at)
+        return
     if not control or not control.get("legacy_suite_pid"):
         raise ValueError("A PID-specific legacy boundary control is required")
     status_path = folder / "scope-finalizer-status.json"

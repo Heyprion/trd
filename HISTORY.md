@@ -490,3 +490,17 @@
 - 对照含义：与上一轮保持原始4B起点、冻结8B、同一9984条缓存、相同主要优化参数；本轮修改chat条件/response因果位置与保守结束监督，保留原目标think及全部样本，比较最终独立解题成绩。没有重新生成学生初稿或教师改写；教师仍在每批KL训练中前向计算分布，不是取消教师计算。
 - UTC2026-11-16T07:22:28读取status=running，最新优化器step5/78，微批进度182/2496约7%，训练进度条[07:37<2:02:22]。上一轮纯KL训练约1:37:45（既有历史），两套蒸馏后AIME评测wall_seconds=10150.07约2.82小时，原始学生同口径评测9993.51秒约2.78小时。上一轮train summary的47186.22秒包含两轮生成，不能当作纯KL耗时。
 - 本轮粗估纯KL约1.5–2小时、合并若干分钟、两套AIME pass16评测约2.8小时，从启动到成绩约4–5小时；这是参考历史和当前早期进度的范围估计，实际受长度和生成尾部影响，评测仍需重新生成新模型回答。既有base评测结果继续复用，不再重测原始学生。
+
+## 2026-11-16T07:33:01.595534+00:00：数学 TRD 数值校验 / aime25-scope-20261116-073301
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/5if3k9pw；配置/日志/状态：`/root/autodl-tmp/trd/preparation/logs/training-development/aime25-scope-20261116-073301`。
+- 数值校验 完成：`/root/autodl-tmp/trd/preparation/logs/training-development/aime25-scope-20261116-073301/summary.json`；结果：{"selected_datasets": ["aime25"], "pass_k": 16, "tp": 2, "tests": "passed", "dry_run": "passed", "production_signals_sent": false, "new_production_generation": false}。
+
+
+## 2026-11-16T07:37:31.751409+00:00：用户将当前及默认评测缩减为仅AIME25
+
+- 用户要求本轮不再评测AIME24，只评测AIME25。已将env.sh、training/config.env.sh及pipeline默认范围改为aime25，保持30题×16次、温度0.6/top_p0.95、TP2等口径；Agent.md和当前训练/修复说明同步，历史两套基线数据及说明保留。没有重新生成训练轨迹或重启训练。
+- 活动repair-chat-9984-v1仍由原PID188885训练；已加载的父进程BENCHMARKS保持旧tuple，改磁盘配置不能即时改变它。已在run根目录写evaluation-control.json（datasets=[aime25]），生成suite启动后在数据集边界读取并跳过AIME24。控制文件不提前创建eval目录，避免父进程experiment.mkdir(exist_ok=False)失败。
+- 对新启动父进程，evaluation在开始前读取范围，仅生成/校验/上传所选测试集。对当前旧父进程，新增finish_reduced_eval.py --wait-for-controller兼容模式：后台watcher PID191299核对原控制器PID与创建时间，等待其自然退出；若旧两套汇总因AIME24缺失报错，保留原summary及日志，在确认训练completed和AIME25全部30×16响应存在后，恢复原评测SwanLab记录、重算并仅上传AIME25三项指标，生成最终completed summary。没有向训练或评测进程发送信号，也不伪造AIME24成绩。
+- 本轮范围控制状态preparation/logs/math-runs/repair-chat-9984-v1/evaluation-scope-status.json为armed；control、watcher log同目录。复核时训练status=running，实际更新到17/78，eval目录尚未创建，表明仍在原训练阶段；训练SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16 。
+- CPU检查复用trd-math-opd，命名20261116-数值校验-AIME25范围控制，SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/5if3k9pw 。40项检查通过，包含run根范围文件读取且不创建eval目录、仅AIME25汇总且无AIME24 parquet、watcher自然等待/不发信号、旧记录恢复、既有数据/模型交接/基线兼容检查；train+eval dry-run确认Benchmarks=aime25/pass16/TP2。日志preparation/logs/training-development/aime25-scope-*与/tmp/trd-aime25-scope-checks.log；shell语法及git diff检查通过。所有实际GPU工作仍为既有训练，本轮测试不加载生产权重或生成评测回答。

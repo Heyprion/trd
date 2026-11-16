@@ -6,7 +6,7 @@
 # 检查来源、划分、模型和输出计划，不运行GPU或创建实验
 bash preparation/run_repair_train_eval.sh --run-id repair-chat-9984-v1 --dry-run
 
-# 训练成功并合并LoRA后，自动执行AIME24/AIME25、pass@16、TP2
+# 训练成功并合并LoRA后，自动执行AIME25、pass@16、TP2
 bash preparation/run_repair_train_eval.sh --run-id repair-chat-9984-v1
 
 # 仅训练
@@ -43,4 +43,6 @@ SwanLab继续使用trd-math-opd，训练与评测分别记录，失败保留。�
 
 后续去除教师改写思考监督与可靠终答筛选分别作为独立对照，保留当前格式修复结果，以便判断收益来自哪项修改。
 
-正式格式对照已于2026-11-16 07:13 UTC启动，run-id为`repair-chat-9984-v1`，[训练SwanLab](https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16)。控制器日志为`preparation/logs/repair-launchers/repair-chat-9984-v1.log`，训练状态为`preparation/logs/math-runs/repair-chat-9984-v1/train/summary.json`。训练与合并成功后由同一控制器自动启动两套AIME评测；实际完成状态及成绩以各阶段summary为准。
+正式格式对照已于2026-11-16 07:13 UTC启动，run-id为`repair-chat-9984-v1`，[训练SwanLab](https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16)。控制器日志为`preparation/logs/repair-launchers/repair-chat-9984-v1.log`，训练状态为`preparation/logs/math-runs/repair-chat-9984-v1/train/summary.json`。训练与合并成功后自动启动AIME25评测；实际完成状态及成绩以各阶段summary为准。
+
+用户随后将本轮范围缩减为仅AIME25。运行根目录的evaluation-control.json在生成前跳过AIME24；已加载旧两套汇总逻辑的控制器可能在收尾时报缺少AIME24，后台finish_reduced_eval.py等待其自然退出后，仅核对AIME25全部30×16响应、恢复同一SwanLab记录并生成最终summary。旧summary及日志保留，训练进程不接收信号。新启动入口直接按AIME25汇总，不需要该兼容收尾。控制器状态见evaluation-scope-status.json。

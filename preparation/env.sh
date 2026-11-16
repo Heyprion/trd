@@ -14,7 +14,7 @@ if [[ -z "${TRAIN_DATA_PATH:-}" && -f "$DATA_ROOT/processed/math-v1/splits-v1/ma
 fi
 export TRAIN_DATA_PATH="${TRAIN_DATA_PATH:-$DATA_ROOT/train/DeepScaleR}"
 export EVAL_DATASETS_DIR="$DATA_ROOT/eval"
-export EVAL_DATASETS="aime24,aime25,hmmt25,beyondaime,amobench"
+export EVAL_DATASETS="${MATH_EVAL_DATASETS:-aime25}"
 export MODEL_PATH="$VERL_ROOT/models/Qwen3-4B-Instruct-2507"
 export TEACHER_MODEL_PATH="$VERL_ROOT/models/Qwen3-8B"
 export MODEL_NAME="Qwen3-4B-Instruct-2507"

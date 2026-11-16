@@ -153,13 +153,13 @@ class PipelineTests(unittest.TestCase):
         (folder / "generations").mkdir()
         entry = {}
         for name in p.BENCHMARKS:
-            responses = ["2"] * (15 if incomplete and name == "aime24" else 16)
+            responses = ["2"] * (15 if incomplete and name == p.BENCHMARKS[0] else 16)
             pq.write_table(pa.Table.from_pylist([{"responses": responses}]),
                            folder / "generations" / f"{name}_pass16_generation.parquet")
             for key in ("pass16", "pass8", "avg_pass1"):
                 entry[f"{name}_{key}_generation_pass_16"] = 0.5
         if missing_metric:
-            entry.pop("aime24_pass16_generation_pass_16")
+            entry.pop(f"{p.BENCHMARKS[0]}_pass16_generation_pass_16")
         p.write_json(folder / "results.json", {"fixture-distilled": entry})
         run = Mock()
         with patch.object(p, "build_env", return_value=self.values), patch.object(p, "run_command"), \
@@ -170,7 +170,7 @@ class PipelineTests(unittest.TestCase):
     def test_evaluation_uploads_all_selected_benchmark_metrics(self):
         result, run = self.eval_fixture()
         self.assertEqual(len(result["metrics"]), 3 * len(p.BENCHMARKS))
-        self.assertEqual(result["metrics"]["eval/aime24/pass@16"], 0.5)
+        self.assertEqual(result["metrics"][f"eval/{p.BENCHMARKS[0]}/pass@16"], 0.5)
         run.log.assert_called_once_with(result["metrics"])
 
     def test_incomplete_evaluation_cannot_succeed(self):
@@ -180,6 +180,28 @@ class PipelineTests(unittest.TestCase):
     def test_missing_benchmark_metric_cannot_succeed(self):
         with self.assertRaises(KeyError):
             self.eval_fixture(missing_metric=True)
+
+    def test_scope_file_limits_generation_and_aggregation_to_aime25(self):
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        folder = self.root / "eval"
+        (folder / "generations").mkdir(parents=True)
+        p.write_json(self.root / "evaluation-control.json", {"datasets": ["aime25"]})
+        pq.write_table(pa.Table.from_pylist([{"responses": ["2"] * 16}]),
+                       folder / "generations/aime25_pass16_generation.parquet")
+        p.write_json(folder / "results.json", {"fixture-distilled": {
+            f"aime25_{key}_generation_pass_16": .5 for key in ("pass16", "pass8", "avg_pass1")}})
+        run = Mock()
+        def experiment(stage, rid, out, cfg, action):
+            self.assertEqual(list(cfg["datasets"]), ["aime25"])
+            return action(run)
+        with patch.object(p, "build_env", return_value=self.values), patch.object(p, "run_command") as command, \
+                patch.object(p, "experiment", side_effect=experiment):
+            result = p.evaluation("fixture", folder, self.model(), None,
+                                  {"aime24": {"rows": 30}, "aime25": {"rows": 1}})
+        self.assertEqual(command.call_args.args[3]["DATASETS"], "aime25")
+        self.assertEqual(len(result["metrics"]), 3)
+        self.assertFalse(any("aime24" in key for key in result["metrics"]))
 
 
 class FrozenDataTests(unittest.TestCase):

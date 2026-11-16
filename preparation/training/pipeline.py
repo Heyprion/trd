@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 from recipe.opd.run.utils.run_config import build_env, print_config  # noqa: E402
 from recipe.opd.swanlab_relay import METRIC_PREFIX  # noqa: E402
 
-BENCHMARKS = tuple(os.environ.get("MATH_EVAL_DATASETS", "aime24,aime25").split(","))
+BENCHMARKS = tuple(os.environ.get("MATH_EVAL_DATASETS", "aime25").split(","))
 
 
 def read_json(path):
@@ -294,10 +294,22 @@ def evaluation(run_id, folder, model, source, benchmark_info, *, model_label="di
     if model_label not in ("base", "distilled") or (reference and model_label != "base"):
         raise ValueError("A reference comparison is supported only for the original base student")
     values = build_env()
+    from recipe.math_evaluation.runtime_control import read_control
+
+    selected = tuple(benchmark_info)
+    scope = read_control(Path(folder) / "results.json")
+    if scope:
+        if not set(scope["datasets"]) <= set(selected):
+            raise ValueError("Evaluation scope can only select validated benchmark inputs")
+        selected = tuple(scope["datasets"])
+    benchmark_info = {name: benchmark_info[name] for name in selected}
     config = {"model_path": str(model), "source_training": source, "datasets": benchmark_info,
               "pass_k": 16, "temperature": 0.6, "top_p": 0.95, "tp": int(values["EVAL_GEN_TP"]),
               "generation": {key: value for key, value in os.environ.items() if key.startswith("EVAL_")}}
     config["model_label"] = model_label
+    config["generation"]["EVAL_DATASETS"] = ",".join(selected)
+    if scope:
+        config["scope_change"] = scope
     if reference:
         config["reference_evaluation"] = reference
 
@@ -305,7 +317,7 @@ def evaluation(run_id, folder, model, source, benchmark_info, *, model_label="di
         validate_model(model)
         env = os.environ.copy()
         env.pop("PYTORCH_CUDA_ALLOC_CONF", None)
-        env.update(DATASETS=" ".join(BENCHMARKS), PASS_K="16", GEN_TP=values["EVAL_GEN_TP"],
+        env.update(DATASETS=" ".join(selected), PASS_K="16", GEN_TP=values["EVAL_GEN_TP"],
                    EVAL_MODEL_NAME=f"{run_id}_base" if model_label == "base" else f"{run_id}-distilled",
                    EVAL_BASE_MODEL_NAME=values["MODEL_NAME"],
                    EVAL_RESULTS_FILE=str(folder / "results.json"), EVAL_OUTPUT_DIR=str(folder / "generations"),
@@ -316,7 +328,7 @@ def evaluation(run_id, folder, model, source, benchmark_info, *, model_label="di
         metrics = {}
         import pyarrow.parquet as pq
 
-        for name in BENCHMARKS:
+        for name in selected:
             generated = pq.read_table(folder / "generations" / f"{name}_pass16_generation.parquet")
             if len(generated) != benchmark_info[name]["rows"]:
                 raise ValueError(f"Incomplete evaluation rows: {name}")
@@ -431,7 +443,8 @@ def main(argv=None):
                        {"summary_path": str(args.train_run) if args.train_run else str(run_dir / "train/summary.json"),
                         "swanlab_url": source["swanlab_url"]} if source else None, benchmarks,
                        **({"run_name": unique_run_name(dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d") +
-                           "-评测-AIME24和25-pass16-聊天格式修复", args.output_root)} if cache_source else {}))
+                           "-评测-" + "和".join(name.upper() for name in benchmarks) +
+                           "-pass16-聊天格式修复", args.output_root)} if cache_source else {}))
     print(f"Completed: {run_dir}", flush=True)
 
 
