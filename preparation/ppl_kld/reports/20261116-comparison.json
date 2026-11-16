@@ -1,0 +1,379 @@
+{
+  "date": "2026-11-16",
+  "analysis_swanlab": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qqo1vjmx",
+  "sources": {
+    "before_summary": "/root/autodl-tmp/trd/preparation/logs/ppl-kld/baseline-20261115-101823-758028-27412/summary.json",
+    "before_summary_sha256": "4c587257867dd1998b776fe2f9e5592da392ece134da09e354e836f8674b0dec",
+    "before_swanlab": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/348lb6qg",
+    "after_summary": "/root/autodl-tmp/trd/preparation/logs/ppl-kld/distilled-20261116-031913-959867-152167/summary.json",
+    "after_summary_sha256": "a6d6a2fc2f2670d7f3fc8675f86a39f606b3860e380748e01888d68f0d1f521b",
+    "after_swanlab": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/iiroiywf",
+    "training_summary": "/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/train/summary.json",
+    "training_swanlab": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666"
+  },
+  "validation": {
+    "split_version": "math-v1-splits-v1",
+    "manifest_sha256": "c75c4026968050b9a1b87983a16eed8bed4de294658a4467db05c0a8920873a0",
+    "validation_parquet_sha256": "e3bca204b91dd7012d45334335553c78b915d3edca33ecd1190bc96cb0ed05d0",
+    "frozen_rows": 512,
+    "scored_rows": 512,
+    "full_validation": true,
+    "response_tokens": 234375,
+    "input_tokens": 281011,
+    "max_input_tokens": 1808,
+    "tokenizer_vocab_sha256": "f488fa45d324a8bc64c84f0e27b47223872d550f2a6900564f77dfa67ca5ff4d",
+    "scored_token_ids_sha256": "ed2b752a58f8cc7e2232533e17cd114dfe3de211e666b16f339f35c0d40ec183",
+    "train_pool_overlap": 0
+  },
+  "protocol_sha256": "0415b94470c60dc9e88677ecf9dbf08830b42033bfb404d88c660b271c5a60c4",
+  "teacher_content_sha256": "0fcb1c45174fe35cf172229ec1d29933954d055a3096feb1a85fae5f07cba110",
+  "metrics": {
+    "student_ppl": {
+      "before": 2.149007530370839,
+      "after": 1.8287228475452004,
+      "delta": -0.3202846828256385,
+      "relative_percent": -14.903841810659879,
+      "delta_ci95": [
+        -0.3436880909912411,
+        -0.29925037640752383
+      ]
+    },
+    "student_nll": {
+      "before": 0.7650061217821255,
+      "after": 0.6036178256932084,
+      "delta": -0.16138829608891703,
+      "relative_percent": -21.09634047279959,
+      "delta_ci95": [
+        -0.16893319355240188,
+        -0.1541197543794208
+      ]
+    },
+    "forward_kl": {
+      "before": 0.23148750927019493,
+      "after": 0.16587332804389757,
+      "delta": -0.06561418122629736,
+      "relative_percent": -28.344588195344798,
+      "delta_ci95": [
+        -0.07046098392575474,
+        -0.061121874784251164
+      ]
+    },
+    "reverse_kl": {
+      "before": 0.21281603853639858,
+      "after": 0.18221696377124594,
+      "delta": -0.03059907476515264,
+      "relative_percent": -14.378180787309025,
+      "delta_ci95": [
+        -0.03480917548016058,
+        -0.026471703991915986
+      ]
+    },
+    "teacher_ppl": {
+      "before": 2.0496917593117283,
+      "after": 2.0496917593117283,
+      "delta": 0.0,
+      "relative_percent": 0.0,
+      "delta_ci95": null
+    },
+    "teacher_nll": {
+      "before": 0.7176894205335695,
+      "after": 0.7176894205335695,
+      "delta": 0.0,
+      "relative_percent": 0.0,
+      "delta_ci95": null
+    }
+  },
+  "groups": {
+    "difficulty": {
+      "easy": {
+        "rows": 69,
+        "response_tokens": 26430,
+        "student_ppl": {
+          "before": 1.75954342084282,
+          "after": 1.4970738954660971,
+          "relative_percent": -14.916910959264662
+        },
+        "forward_kl": {
+          "before": 0.20121701051688112,
+          "after": 0.1188382111210141,
+          "relative_percent": -40.940275965861176
+        },
+        "reverse_kl": {
+          "before": 0.17885236374974914,
+          "after": 0.14160254270029637,
+          "relative_percent": -20.827133770271466
+        }
+      },
+      "hard": {
+        "rows": 112,
+        "response_tokens": 54768,
+        "student_ppl": {
+          "before": 2.993473665293189,
+          "after": 2.4475243110827813,
+          "relative_percent": -18.237987544043943
+        },
+        "forward_kl": {
+          "before": 0.3468481889477752,
+          "after": 0.2634876753388002,
+          "relative_percent": -24.033717420253442
+        },
+        "reverse_kl": {
+          "before": 0.29280722653341146,
+          "after": 0.2585039279097386,
+          "relative_percent": -11.715318310205236
+        }
+      },
+      "medium": {
+        "rows": 331,
+        "response_tokens": 153177,
+        "student_ppl": {
+          "before": 1.9758637279909534,
+          "after": 1.7056302569346065,
+          "relative_percent": -13.676726144020002
+        },
+        "forward_kl": {
+          "before": 0.1954636648122696,
+          "after": 0.1390872933756679,
+          "relative_percent": -28.84237921700057
+        },
+        "reverse_kl": {
+          "before": 0.1900756959287665,
+          "after": 0.1619486121059713,
+          "relative_percent": -14.797832876716765
+        }
+      }
+    },
+    "domain": {
+      "algebra": {
+        "rows": 205,
+        "response_tokens": 93348,
+        "student_ppl": {
+          "before": 1.9812363070828007,
+          "after": 1.6833816618551822,
+          "relative_percent": -15.033776847456615
+        },
+        "forward_kl": {
+          "before": 0.2224438708580758,
+          "after": 0.15438753274703002,
+          "relative_percent": -30.59483628320209
+        },
+        "reverse_kl": {
+          "before": 0.1929397218662851,
+          "after": 0.1631514936510562,
+          "relative_percent": -15.439137118624725
+        }
+      },
+      "calculus": {
+        "rows": 5,
+        "response_tokens": 2137,
+        "student_ppl": {
+          "before": 2.4035201303805427,
+          "after": 1.9699527914057577,
+          "relative_percent": -18.03884783382861
+        },
+        "forward_kl": {
+          "before": 0.28771469810913075,
+          "after": 0.1825171961160905,
+          "relative_percent": -36.56313100595877
+        },
+        "reverse_kl": {
+          "before": 0.2322707046802025,
+          "after": 0.1825812426212497,
+          "relative_percent": -21.39290967725215
+        }
+      },
+      "combinatorics_probability": {
+        "rows": 99,
+        "response_tokens": 41087,
+        "student_ppl": {
+          "before": 2.609822379071277,
+          "after": 2.1750831278573806,
+          "relative_percent": -16.65780992224464
+        },
+        "forward_kl": {
+          "before": 0.25621498146936406,
+          "after": 0.1882171849137788,
+          "relative_percent": -26.53935229143337
+        },
+        "reverse_kl": {
+          "before": 0.2534991128653559,
+          "after": 0.2167936356018698,
+          "relative_percent": -14.479528882210314
+        }
+      },
+      "geometry": {
+        "rows": 131,
+        "response_tokens": 62153,
+        "student_ppl": {
+          "before": 2.147476928229408,
+          "after": 1.8640363779863882,
+          "relative_percent": -13.198770450899156
+        },
+        "forward_kl": {
+          "before": 0.22130337073613263,
+          "after": 0.16739113533301878,
+          "relative_percent": -24.361235540056548
+        },
+        "reverse_kl": {
+          "before": 0.21591645767588052,
+          "after": 0.19155637924829574,
+          "relative_percent": -11.282177694927043
+        }
+      },
+      "number_theory": {
+        "rows": 69,
+        "response_tokens": 34291,
+        "student_ppl": {
+          "before": 2.025116219138858,
+          "after": 1.7281401847422482,
+          "relative_percent": -14.66464154451803
+        },
+        "forward_kl": {
+          "before": 0.23092688148692245,
+          "after": 0.16080831943537302,
+          "relative_percent": -30.3639669838612
+        },
+        "reverse_kl": {
+          "before": 0.20348910618788763,
+          "after": 0.17111072422247972,
+          "relative_percent": -15.91160459248957
+        }
+      },
+      "other": {
+        "rows": 3,
+        "response_tokens": 1359,
+        "student_ppl": {
+          "before": 6.231647293083964,
+          "after": 4.40949819328435,
+          "relative_percent": -29.24024762797277
+        },
+        "forward_kl": {
+          "before": 0.4965865933924925,
+          "after": 0.31150538090855345,
+          "relative_percent": -37.270682484505656
+        },
+        "reverse_kl": {
+          "before": 0.4110675458249477,
+          "after": 0.2989680274900364,
+          "relative_percent": -27.27034023324445
+        }
+      }
+    },
+    "response_length": {
+      "257-512": {
+        "rows": 203,
+        "response_tokens": 78381,
+        "student_ppl": {
+          "before": 2.1726041694710347,
+          "after": 1.8503708716902063,
+          "relative_percent": -14.831661575025091
+        },
+        "forward_kl": {
+          "before": 0.24245087426891837,
+          "after": 0.17153699988720963,
+          "relative_percent": -29.248760020165342
+        },
+        "reverse_kl": {
+          "before": 0.2239644478087915,
+          "after": 0.1948641225500465,
+          "relative_percent": -12.993278863433378
+        }
+      },
+      "513-1024": {
+        "rows": 195,
+        "response_tokens": 131527,
+        "student_ppl": {
+          "before": 1.9614462424612065,
+          "after": 1.670333345264157,
+          "relative_percent": -14.841747425703765
+        },
+        "forward_kl": {
+          "before": 0.20533494481159795,
+          "after": 0.14022214348964718,
+          "relative_percent": -31.710530996900733
+        },
+        "reverse_kl": {
+          "before": 0.18556854965721567,
+          "after": 0.14727387555704266,
+          "relative_percent": -20.63640318950133
+        }
+      },
+      "<=256": {
+        "rows": 111,
+        "response_tokens": 20373,
+        "student_ppl": {
+          "before": 3.7786613418628177,
+          "after": 3.1898075257797402,
+          "relative_percent": -15.583662117568398
+        },
+        "forward_kl": {
+          "before": 0.3484140484844862,
+          "after": 0.2999794703032577,
+          "relative_percent": -13.901442376364203
+        },
+        "reverse_kl": {
+          "before": 0.3459868284723564,
+          "after": 0.36054560529154744,
+          "relative_percent": 4.207899151384686
+        }
+      },
+      ">1024": {
+        "rows": 3,
+        "response_tokens": 4094,
+        "student_ppl": {
+          "before": 1.9767045066782625,
+          "after": 1.6825164597311326,
+          "relative_percent": -14.882752882548733
+        },
+        "forward_kl": {
+          "before": 0.27992533295563293,
+          "after": 0.21417685805520764,
+          "relative_percent": -23.48786164017751
+        },
+        "reverse_kl": {
+          "before": 0.2120511385040561,
+          "after": 0.17527343607589693,
+          "relative_percent": -17.343789185765534
+        }
+      }
+    }
+  },
+  "per_question": {
+    "student_nll": {
+      "improved": 512,
+      "worsened": 0,
+      "equal": 0,
+      "median_delta_nats_per_token": -0.14411860334838178
+    },
+    "forward_kl": {
+      "improved": 496,
+      "worsened": 16,
+      "equal": 0,
+      "median_delta_nats_per_token": -0.05035638467774255
+    },
+    "reverse_kl": {
+      "improved": 344,
+      "worsened": 168,
+      "equal": 0,
+      "median_delta_nats_per_token": -0.020806535770366848
+    }
+  },
+  "bootstrap": {
+    "bootstrap_repeats": 1000,
+    "bootstrap_unit": "paired problem",
+    "seed": 20261115
+  },
+  "audits": {
+    "completed_sources": true,
+    "per_sample_file_checksums": true,
+    "reaggregation_matches_saved_overall_and_groups": true,
+    "paired_identity_reference_mask_lengths_and_strata": true,
+    "same_protocol_and_teacher_content_hash": true,
+    "teacher_per_question_nll_sum_max_abs_delta": 4.547473508864641e-13,
+    "new_model_inference": false
+  },
+  "runtime": {
+    "before_wall_seconds": 62.86908847093582,
+    "after_wall_seconds": 88.91239712387323
+  }
+}

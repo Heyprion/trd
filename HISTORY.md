@@ -400,3 +400,13 @@
 - 扩展共享evaluation可区分base/distilled标签、记录参考来源，并在基线评测完成时生成comparison.json/csv：base、蒸馏后以及“蒸馏后减base”的百分点差，同时上传比较指标。原蒸馏评测文件不改写。共享experiment可传明确名称，基线复用trd-math-opd，名称YYYYMMDD-评测-AIME24和25-pass16-基线，同日重跑根据本地记录自动r02等，遵循Agent.md命名约定。
 - 验证：真实root目录dry-run通过；/tmp下绝对脚本路径启动，并故意继承EVAL_RESPONSE_LENGTH=1024、额外hmmt25集合，仍固定为38912和AIME两套，dry-run不创建实验目录、未启动GPU或SwanLab实验。新增6项CPU回归连同既有29项共35项全部通过，覆盖参考哈希/参数/成绩异常拒绝、60题输入差异拒绝、adapter模型拒绝、dry-run无评分、规范命名重跑和base标签独立/百分点对比，未评测生产模型。SwanLab数值校验 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/1v7m2ema；日志preparation/logs/training-development/20261116-112126-base-eval-checks。shell语法、Python编译及git diff检查通过，双卡显存均0MiB。
 - 使用说明补充至preparation/training/README.zh-CN.md、准备README及Agent.md第8节；用户正式运行命令为bash preparation/run_base_eval.sh。正式结束后才会出现base准确率、SwanLab基线评测链接和前后比较结果，现有蒸馏结果83.33%/70%的pass16不作为base值。
+
+## 2026-11-16：完成蒸馏前后PPL/KLD对比与初步分析报告
+
+- 用户提供蒸馏后运行完成日志，要求与蒸馏前指标比较、初步分析并形成报告。本轮读取baseline-20261115-101823-758028-27412和distilled-20261116-031913-959867-152167的summary、逐题统计及训练记录；没有重新生成、训练或运行模型评分。
+- 可比性复核：两份逐题文件SHA256通过；512个sample/raw/group ID、参考前缀token哈希、prompt/response token数及难度/领域均配对一致；评分协议与教师内容哈希分别相同。独立复算全局及所有分桶与原summary一致；有效234375 response tokens，教师总体NLL/PPL相同，逐题teacher NLL总和最大差约4.55e-13。
+- 主要变化：学生PPL 2.1490075304→1.8287228475（-14.90%）；NLL 0.7650061218→0.6036178257（-21.10%）；forward KL(T||S) 0.2314875093→0.1658733280（-28.34%）；reverse KL(S||T) 0.2128160385→0.1822169638（-14.38%）；教师PPL均2.0496917593。原评分生成的1000次按题配对bootstrap区间均位于0以下；PPL区间[-0.343688,-0.299250]，FKL[-0.070461,-0.061122]，RKL[-0.034809,-0.026472]。
+- 分布与边界：512题NLL/PPL全部下降；FKL 496题下降/16题上升，RKL 344题下降/168题上升。易中难与各领域的总体指标均改善，但<=256参考tokens的111题RKL 0.3459868285→0.3605456053（+4.21%）。难题PPL降18.24%，残余PPL和KL仍最大。微积分5题、其他3题以及>1024 tokens仅3题，不作稳定子领域/长推理推断；学生参考PPL低于教师不表示整体超过教师，也不直接表示数学正确率提升，bootstrap不覆盖训练种子或系统偏差。
+- 报告产物：`preparation/ppl_kld/reports/20261116-comparison.zh-CN.md`，附同名前缀JSON数值摘要、CSV及SVG三指标图（合计约47KB）；图已人工可视检查、链接与主要数值断言通过、git diff检查通过。PPL/KLD README增加报告索引；原始两轮summary/REPORT与逐题文件均未覆盖。
+- 原实验：基线 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/348lb6qg ，蒸馏后 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/iiroiywf ，训练 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666 。本次CPU统计复核/作图与报告继续复用trd-math-opd，命名20261116-评测-PPL和KL对比报告，链接 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qqo1vjmx；生成脚本快照、作图PNG及SwanLab日志保存在`preparation/logs/ppl-kld-analysis/20261116-033413`，最终文字在同一analysis ID恢复上传。没有上传权重、题目或逐题原始数据。
+- 本轮仅提交报告/小型汇总/图表、README索引和本条历史，保留已有运行追加历史及readiness等其他改动。
