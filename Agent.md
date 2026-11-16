@@ -58,3 +58,5 @@ bash preparation/run_math_opd.sh forward_kl_y_r
 ## 8. 正式训练与独立评测入口（2026-11-15）
 
 当前推荐一键入口为 `bash preparation/run_train_eval.sh`，自动加载 balanced 与冻结9,984题子集，训练成功并完成LoRA合并后再执行AIME24/AIME25的pass@16评测（2026-11-16缩减范围）；其他测试需显式设置MATH_EVAL_DATASETS。加 `--dry-run` 仅核对数据与配置。单独训练用 `bash preparation/run_train.sh`；单独评测用 `bash preparation/run_eval.sh --train-run <train/summary.json>` 或 `--model <已合并HF目录>`。训练和评测分别创建SwanLab实验，并追加HISTORY；详细命令、日志及检查说明见[训练评测入口说明](preparation/training/README.zh-CN.md)。固定512题PPL/KLD继续使用第7节的独立入口。
+
+蒸馏前学生的AIME24/AIME25同口径基线用 `bash preparation/run_base_eval.sh`（2026-11-16新增）；固定原始4B模型、不加载LoRA，读取已完成蒸馏评测的参数与测试集哈希，并核对60题分词输入。base缓存和成绩独立保存，结束后自动生成对比表；支持 `--reference-eval`更换参考summary，`--dry-run`仅检查。该benchmark基线与第7节固定参考PPL/KLD基线是两个独立实验。

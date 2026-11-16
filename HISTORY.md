@@ -363,6 +363,16 @@
 - 当前范围文件 `preparation/logs/math-runs/20261115-185850-279780-53607/eval/evaluation-control.json`；监视状态 `preparation/logs/math-runs/20261115-185850-279780-53607/eval/scope-finalizer-status.json` 为armed、PID142040；监视日志scope-finalizer.log。当前原suite仍PID120819、旧总控制器53607。最近AIME25进度：Generating responses:  35%|███▍      | 167/480 [25:31<1:06:29, 12.75s/it]。范围控制是已布置的后续动作，AIME25尚未完成，未声称结束已发生；评测链接 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto 。
 - 持久默认也调整为AIME24/AIME25：training/config.env.sh与pipeline.py使用MATH_EVAL_DATASETS选择范围，其他集合须显式覆盖；Agent.md默认索引及训练README同步。保持9984题训练数据、模型、采样参数、pass16/TP2及512题独立PPL/KLD入口不变。
 - 验证：新增8项CPU范围控制/安全及汇总检查，连同既有训练入口21项共29项通过，包含仅在两套已写成绩后退出、PID重用/其他任务不受影响、先清理与写边界标记再终止、恢复同一记录并只汇总所选六指标、缺失响应拒绝等；信号和Swan恢复使用Mock，没有干预生产进程。SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/sqv4bxha；日志preparation/logs/training-development/20261116-095314-aime-scope-checks；shell语法、Python编译及git diff检查通过。
+- eval 失败：`/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/eval/summary.json`；错误见 `/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/eval/console.log` 和 summary.json。
+
+- 用户缩减后的AIME24/AIME25评测完成：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto；后续三套未执行；汇总`/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/eval/summary.json`；指标{"eval/aime24/pass@16": 0.8333333333333334, "eval/aime24/avg@16": 0.5583333333333333, "eval/aime24/pass@8": 0.8, "eval/aime25/pass@16": 0.7, "eval/aime25/avg@16": 0.41875, "eval/aime25/pass@8": 0.6}。
+
+## 2026-11-16T03:01:09.230908+00:00：核实AIME24/AIME25评测全部完成并报告成功率
+
+- 用户询问两套是否跑完及成功率。只读核查summary、scope-finalizer状态、results、parquet与进程：最终均completed，完成时间2026-11-16T02:54:40.816345+00:00，原pipeline/suite/finalizer均已退出，两卡显存0MiB、利用率0%；仅有aime24/aime25两份生成文件，各30题、每题16响应、各480条，其他三套没有生成文件。
+- 最终蒸馏后学生：AIME24 pass@16=83.333333%（25/30题），平均16次中的单次正确率55.833333%；AIME25 pass@16=70.000000%（21/30题），平均单次正确率41.875000%。首8次pass@8分别80%/60%。pass@16是同题16次中至少一次正确，不将其表述为单次正确率；未新增同口径原始学生benchmark基线，不据此宣称提升。
+- 范围控制边界已实际执行：AIME25先完成480条响应与30题判分、写入0.7，然后终止旧五套循环。实际Ray/C++对SIGTERM产生了Aborted/core-dumped退出信息，旧控制器留下中断异常；没有丢失已落盘的两套结果。finalizer随后完成两套CPU汇总，恢复原SwanLab评测ID yxzg5pto，日志确认Upload complete:28 records，最终summary去除中断error并明确记录scope_change及三个skipped_datasets，保留旧summary供审计。最终结果与原控制器退出日志应区分，完成状态以范围变更后的summary和上传结果为准。
+- 结果`preparation/logs/math-runs/20261115-185850-279780-53607/eval/results.json`、CSV、summary及scope-finalizer.log均已保留；实验 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto。本轮没有重新评分、生成或干预任何进程，仅做元数据和响应数量核验，并追加此历史。
 
 ## 2026-11-16：定位已完成蒸馏模型并准备PPL/KLD对比入口
 
@@ -373,3 +383,20 @@
 - 启动前按Agent.md最新命名规范调整PPL/KLD实验名：YYYYMMDD-评测-PPL和KL-基线/蒸馏后/校准；同日同目的根据已有本地SwanLab记录递增r02等。继续复用trd-math-opd，不修改评分数学口径或既有基线。
 - 检验：仓库外目录执行蒸馏后脚本--dry-run通过，实际512题、234375 response tokens、protocol_sha256与基线一致；shell语法及git diff检查通过。5项CPU合成/命名/主流程相关回归全部通过，在线记录 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/a228n5vk ，日志`preparation/logs/ppl-kld-development/20261116-031549-distilled-launcher-checks`。无生产模型推理，无新增正式蒸馏后评分链接。
 - 保留进入会话时已有及其他会话新增的HISTORY、readiness和训练/原始学生评测改动，仅提交本次PPL/KLD入口、相关命名代码/检查、文档与本条历史；未将模型、数据或原始日志纳入Git。
+
+## 2026-11-16 03:19:18 UTC：验证集PPL/KLD distilled
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/iiroiywf；输出/日志：`/root/autodl-tmp/trd/preparation/logs/ppl-kld/distilled-20261116-031913-959867-152167`；学生：`/root/autodl-tmp/trd/checkpoints_merged/OPD_MATH/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_20261115-185850-279780-53607/epoch1/hf_merged`；验证题数512/512。
+- 完成：学生PPL=1.82872285，教师PPL=2.04969176，forward KL(T||S)=0.16587333，reverse KL(S||T)=0.18221696 nats/token；有效response tokens=234375；耗时88.9s；汇总`/root/autodl-tmp/trd/preparation/logs/ppl-kld/distilled-20261116-031913-959867-152167/summary.json`。
+
+- Base同口径评测入口CPU回归：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/1v7m2ema；日志`/root/autodl-tmp/trd/preparation/logs/training-development/20261116-112126-base-eval-checks`；合成输入与Mock运行器，未评测生产模型。
+
+## 2026-11-16T03:26:06.836596+00:00：准备蒸馏前4B学生的同口径AIME24/AIME25评测脚本
+
+- 用户要求生成评测脚本，用蒸馏前base模型在相同两个测试集上做相同评测。本轮准备脚本及检查，没有启动原始4B的正式生成/评分，也没有给出尚未计算的base成绩。工作分支feat/math-base-aime-evaluation；保留已有HISTORY追加记录和运行时readiness.json改动。
+- 新入口 `preparation/run_base_eval.sh`，执行即可评测原始models/Qwen3-4B-Instruct-2507，不加载adapter、不训练、不调用8B教师；调用base_evaluation.py，复用已成功的benchmark生成/判分链路及独立SwanLab生命周期。仅AIME24/AIME25，强制隔离输出preparation/logs/math-base-eval/<run-id>/eval，模型结果标签<run-id>_base，避免复用蒸馏后缓存或误标distilled。
+- 默认参考preparation/logs/math-runs/20261115-185850-279780-53607/eval/summary.json（SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto），校验completed、两套各30题及SHA256、最终六指标有效、pass16/温度0.6/top_p0.95/TP2一致；从参考固定提示4096、输出38912、上下文43008、GPU份额0.85、max_num_seqs16、batched tokens43008，显式单机双卡。继承的短输出1024、MATH_EVAL_DATASETS额外集合不能改变本入口的同口径协议。支持--reference-eval或BASE_EVAL_REFERENCE换参考，--run-id/--output-root及--dry-run。
+- 实际原始与合并模型generation_config除transformers_version外语义字段相同（含bos/eos/pad、采样默认等），词表/特殊token一致；用两套全部60题逐一检查add_generation_prompt的chat-template编码相同。记录vocab SHA256 c605f1c0a80a9501fca9782b942a7f01474e3f37b1c59e3efea82da0e2f20376、提示token IDs SHA256 74c7034a1550e384df3aad8b2b766374a35952bb5a07c73486bc118d4703e62f；不上传题目或token内容。沿用Rollout单副本replica_rank0加默认seed0，没有新增RolloutConfig不支持的seed字段或修改生产生成器。
+- 扩展共享evaluation可区分base/distilled标签、记录参考来源，并在基线评测完成时生成comparison.json/csv：base、蒸馏后以及“蒸馏后减base”的百分点差，同时上传比较指标。原蒸馏评测文件不改写。共享experiment可传明确名称，基线复用trd-math-opd，名称YYYYMMDD-评测-AIME24和25-pass16-基线，同日重跑根据本地记录自动r02等，遵循Agent.md命名约定。
+- 验证：真实root目录dry-run通过；/tmp下绝对脚本路径启动，并故意继承EVAL_RESPONSE_LENGTH=1024、额外hmmt25集合，仍固定为38912和AIME两套，dry-run不创建实验目录、未启动GPU或SwanLab实验。新增6项CPU回归连同既有29项共35项全部通过，覆盖参考哈希/参数/成绩异常拒绝、60题输入差异拒绝、adapter模型拒绝、dry-run无评分、规范命名重跑和base标签独立/百分点对比，未评测生产模型。SwanLab数值校验 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/1v7m2ema；日志preparation/logs/training-development/20261116-112126-base-eval-checks。shell语法、Python编译及git diff检查通过，双卡显存均0MiB。
+- 使用说明补充至preparation/training/README.zh-CN.md、准备README及Agent.md第8节；用户正式运行命令为bash preparation/run_base_eval.sh。正式结束后才会出现base准确率、SwanLab基线评测链接和前后比较结果，现有蒸馏结果83.33%/70%的pass16不作为base值。

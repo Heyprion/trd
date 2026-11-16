@@ -21,9 +21,16 @@ bash preparation/run_eval.sh --run-id math-trd-9984-v1-test \
 
 # 也可明确传入已经合并 LoRA 的 HF 模型目录
 bash preparation/run_eval.sh --model /absolute/path/to/epoch1/hf_merged --dry-run
+
+# 蒸馏前4B学生：与已完成的AIME24/AIME25评测同口径，独立记录
+bash preparation/run_base_eval.sh
 ```
 
 三个入口均支持从任意目录以绝对脚本路径执行。`--run-id` 可省略，默认使用时间戳及进程号；已有运行目录或训练产物不会被覆盖。评测失败后可以新 run-id 加 `--train-run` 单独重跑评测，无需重新训练。运行期间请保持终端连接，或由用户的 tmux/任务管理器托管；脚本本身在前台执行。
+
+`run_base_eval.sh`固定加载原始 `models/Qwen3-4B-Instruct-2507`，只测AIME24、AIME25，不加载LoRA、不训练。默认参考已完成蒸馏评测 `preparation/logs/math-runs/20261115-185850-279780-53607/eval/summary.json`，从中固定pass@16、温度0.6/top_p0.95、TP2、提示4096/输出38912/上下文43008、显存比例0.85、max_num_seqs16及batched tokens43008。数据行数与SHA256必须相同；另核对两个模型的generation defaults、词表/特殊token及全部60题的chat-template编码输入一致。沿用原生成器与判分器，单副本的默认seed0保持不变。
+
+base脚本支持 `--dry-run`（仅检查，未启动GPU或SwanLab）、`--run-id`、`--output-root`、`--reference-eval <另一份完成的蒸馏评测summary.json>`；也可用 `BASE_EVAL_REFERENCE`设置参考路径。默认独立输出 `preparation/logs/math-base-eval/<run-id>/eval/`，以 `<run-id>_base`记录成绩，使用全新的生成缓存。SwanLab复用 `trd-math-opd`，命名为 `YYYYMMDD-评测-AIME24和25-pass16-基线`，同日重跑加r02等。结束后保存results.json/csv、summary、comparison.json/csv；比较列为base、蒸馏后与“蒸馏后减base”的百分点差值，同时上传SwanLab并追加HISTORY。只生成脚本/通过dry-run不代表已经得到base准确率。
 
 ## 数据及配置
 

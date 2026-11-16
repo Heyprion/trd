@@ -182,13 +182,15 @@ def run_command(command, folder, run, env=None):
         process.stdout.close()
 
 
-def experiment(stage, run_id, folder, config, action):
+def experiment(stage, run_id, folder, config, action, *, name=None):
     import swanlab
 
     folder.mkdir(parents=True, exist_ok=False)
     summary_path = folder / "summary.json"
     summary = {"stage": stage, "run_id": run_id, "status": "starting", "config": config,
                "started_at": dt.datetime.now(dt.timezone.utc).isoformat()}
+    if name:
+        summary["experiment_name"] = name
     write_json(summary_path, summary)
     run = None
     start = time.monotonic()
@@ -199,7 +201,7 @@ def experiment(stage, run_id, folder, config, action):
         legacy_project = os.environ.pop("SWANLAB_PROJECT", None)
         try:
             run = swanlab.init(project=legacy_project or "trd-math-opd",
-                               name=f"{run_id}-{stage}", job_type=stage, group=run_id,
+                               name=name or f"{run_id}-{stage}", job_type=stage, group=run_id,
                                mode="online", on_online_error="raise", config=config,
                                log_dir=str(folder / "swanlab"), reinit=True)
         finally:
@@ -250,18 +252,24 @@ def train(run_id, folder, values, split):
     return experiment("train", run_id, folder, config, action)
 
 
-def evaluation(run_id, folder, model, source, benchmark_info):
+def evaluation(run_id, folder, model, source, benchmark_info, *, model_label="distilled", reference=None, run_name=None):
+    if model_label not in ("base", "distilled") or (reference and model_label != "base"):
+        raise ValueError("A reference comparison is supported only for the original base student")
     values = build_env()
     config = {"model_path": str(model), "source_training": source, "datasets": benchmark_info,
               "pass_k": 16, "temperature": 0.6, "top_p": 0.95, "tp": int(values["EVAL_GEN_TP"]),
               "generation": {key: value for key, value in os.environ.items() if key.startswith("EVAL_")}}
+    config["model_label"] = model_label
+    if reference:
+        config["reference_evaluation"] = reference
 
     def action(run):
         validate_model(model)
         env = os.environ.copy()
         env.pop("PYTORCH_CUDA_ALLOC_CONF", None)
         env.update(DATASETS=" ".join(BENCHMARKS), PASS_K="16", GEN_TP=values["EVAL_GEN_TP"],
-                   EVAL_MODEL_NAME=f"{run_id}-distilled", EVAL_BASE_MODEL_NAME=values["MODEL_NAME"],
+                   EVAL_MODEL_NAME=f"{run_id}_base" if model_label == "base" else f"{run_id}-distilled",
+                   EVAL_BASE_MODEL_NAME=values["MODEL_NAME"],
                    EVAL_RESULTS_FILE=str(folder / "results.json"), EVAL_OUTPUT_DIR=str(folder / "generations"),
                    WRITE_PASS16_AGGREGATES="true", WRITE_RESULTS_CSV="true")
         run_command(["bash", str(ROOT / "recipe/math_evaluation/benchmark_kl_model.sh"), str(model)],
@@ -285,9 +293,26 @@ def evaluation(run_id, folder, model, source, benchmark_info):
                 metrics[f"eval/{name}/{kind}"] = value
         run.log(metrics)
         print(json.dumps(metrics, indent=2), flush=True)
-        return {"model_path": str(model), "metrics": metrics, "results_file": str(folder / "results.json")}
+        result = {"model_path": str(model), "model_label": model_label,
+                  "metrics": metrics, "results_file": str(folder / "results.json")}
+        if reference:
+            comparison = {key: {"base": value, "distilled": reference["metrics"][key],
+                                "distilled_minus_base_pp": 100 * (reference["metrics"][key] - value)}
+                          for key, value in metrics.items()}
+            write_json(folder / "comparison.json", {"reference": reference["summary_path"], "metrics": comparison})
+            import csv
 
-    return experiment("eval", run_id, folder, config, action)
+            with (folder / "comparison.csv").open("w", newline="") as stream:
+                writer = csv.writer(stream)
+                writer.writerow(["metric", "base", "distilled", "distilled_minus_base_pp"])
+                for key, row in comparison.items():
+                    writer.writerow([key, row["base"], row["distilled"], row["distilled_minus_base_pp"]])
+            run.log({f"comparison/{key.removeprefix('eval/')}/distilled_minus_base_pp": row["distilled_minus_base_pp"]
+                     for key, row in comparison.items()})
+            result["comparison_file"] = str(folder / "comparison.json")
+        return result
+
+    return experiment("eval", run_id, folder, config, action, **({"name": run_name} if run_name else {}))
 
 
 def arguments(argv=None):
