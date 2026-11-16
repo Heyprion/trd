@@ -1,0 +1,99 @@
+{
+  "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/wigfmha2",
+  "total_rows": 9984,
+  "sources": {
+    "student": "/root/autodl-tmp/trd/gen_results/math-v1-splits-v1/train_9984/OPD/math/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_20261115-185850-279780-53607/math_y_o_responses.parquet",
+    "teacher": "/root/autodl-tmp/trd/gen_results/math-v1-splits-v1/train_9984/OPD/math/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_20261115-185850-279780-53607/math_y_r_opd_Qwen3-8B_responses.parquet",
+    "student_sha256": "88dda41794ad55ef4729aa8e2080ed5984d3170246b80457122ac905c96514f7",
+    "teacher_sha256": "864efe8abc0a677aecbf78b4dea82158fc7c3479c4d9f6e5580098d0a482def9"
+  },
+  "whole_response": {
+    "rows": 9984,
+    "student_pass": 7153,
+    "teacher_whole_response_pass": 7310,
+    "teacher_whole_response_pass_rate": 0.7321714743589743,
+    "outcomes": {
+      "pass_to_pass": 7104,
+      "fail_to_fail": 2625,
+      "fail_to_pass": 206,
+      "pass_to_fail": 49
+    }
+  },
+  "raw_text": {
+    "exact_equal": 0,
+    "equal_after_edge_strip": 0,
+    "changed": {
+      "rows": 9984,
+      "student_pass": 7153,
+      "teacher_whole_response_pass": 7310,
+      "teacher_whole_response_pass_rate": 0.7321714743589743,
+      "outcomes": {
+        "pass_to_pass": 7104,
+        "fail_to_fail": 2625,
+        "fail_to_pass": 206,
+        "pass_to_fail": 49
+      }
+    }
+  },
+  "final_solution": {
+    "closed_thought_rows": 9949,
+    "unclosed_thought_rows": 35,
+    "closed_but_empty_final": 0,
+    "equal_after_edge_strip": {
+      "rows": 0,
+      "student_pass": 0,
+      "teacher_whole_response_pass": 0,
+      "teacher_whole_response_pass_rate": null,
+      "outcomes": {}
+    },
+    "changed_after_edge_strip": {
+      "rows": 9949,
+      "student_pass": 7145,
+      "teacher_whole_response_pass": 7306,
+      "teacher_whole_response_pass_rate": 0.7343451603176199,
+      "outcomes": {
+        "pass_to_pass": 7100,
+        "fail_to_fail": 2598,
+        "fail_to_pass": 206,
+        "pass_to_fail": 45
+      }
+    },
+    "equal_ignoring_all_whitespace": {
+      "rows": 0,
+      "student_pass": 0,
+      "teacher_whole_response_pass": 0,
+      "teacher_whole_response_pass_rate": null,
+      "outcomes": {}
+    },
+    "closed_final_pass": 7302,
+    "changed_final_pass": 7302,
+    "whole_pass_but_final_not_verified": 8,
+    "closed_final_pass_rate": 0.7339431098602874,
+    "verified_final_pass_rate_all_rows": 0.7313701923076923,
+    "closed_final_outcomes": {
+      "pass_to_pass": 7099,
+      "fail_to_fail": 2601,
+      "fail_to_pass": 203,
+      "pass_to_fail": 46
+    },
+    "unclosed_original_student_pass": 8
+  },
+  "integer_gold_subset": {
+    "rows": 5829,
+    "student_pass": 4485,
+    "teacher_whole_response_pass": 4591,
+    "teacher_whole_response_pass_rate": 0.7876136558586379,
+    "outcomes": {
+      "pass_to_pass": 4462,
+      "fail_to_fail": 1215,
+      "pass_to_fail": 23,
+      "fail_to_pass": 129
+    }
+  },
+  "notes": [
+    "Pass means the existing last-boxed answer verifier passes, not proof verification.",
+    "Text difference is not necessarily a mathematical method change.",
+    "Unclosed thinking blocks have no separately identified final solution.",
+    "No training, GPU scoring, or new answer generation."
+  ]
+}

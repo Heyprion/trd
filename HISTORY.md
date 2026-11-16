@@ -558,3 +558,17 @@
 - 实现审核：配置声明LoRA dropout=.05，但模型/引擎未传递，两轮保存adapter实际0；AdamW beta2固定.95，论文C.2表9为.999；训练seed未明确固定记录。均为应单独处理/核对的偏差，尚无消融证明是主因。本机9984题/78步和18432序列限制亦非论文完整配置，具体提示裁剪覆盖率未在本轮完整归因。
 - 推荐后续先修配置/日志/种子，再用原缓存比较仅最终解答的学生目标（必须从学生前缀去除教师思考，而非仅mask思考loss），再独立比较正确性筛选，使用独立验证集自由生成和中间adapter选步数；未启动以上训练。原始轨迹保留，无需为这些缓存消融重新生成全部数据。
 - 检验：三组重新评分与既有summary一致；提示/答案匹配；三组512题评分协议哈希一致；两道错题精确枚举通过；分析脚本编译、报告本地链接、图表视觉与Git diff检查通过。首版输出分析脚本在实验初始化前发生过静态语法错误，已修正并完整执行；不存在该失败版本的模型/数据实验。原始响应/日志/缓存/权重未加入Git；保留此前HISTORY和readiness未提交差异。
+
+## 2026-11-16T11:47:42.602137+00:00：数学 TRD 数据 / rewrite-change-audit-20261116-114742
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/wigfmha2；配置/日志/状态：`/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/rewrite-change-audit-20261116-114742`。
+- 数据 完成：`/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/rewrite-change-audit-20261116-114742/summary.json`；结果：{"analysis_file": "/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/rewrite-change-audit-20261116-114742/analysis.json", "total_rows": 9984, "student_pass": 7153, "teacher_pass": 7310, "raw_equal": 0, "final_equal": 0, "final_changed": 9949}。
+
+## 2026-11-16：逐条审核教师改写数量、未改数量与最终解答通过率
+
+- 用户追问原始答对多少、教师是否全部改过、改过后的通过率，以及当前数据是否值得继续训练。仅CPU读取原始学生/教师缓存并逐条匹配gold与initial_response，没有训练、GPU评分或新生成；实际9984条而非9998条。
+- SwanLab复用trd-math-opd，20261116-数据-改写数量与正确性审核 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/wigfmha2 。结果preparation/logs/distillation-diagnostics/rewrite-change-audit-20261116-114742/analysis.json与本机per-row-flags.json；源缓存哈希与既有记录一致。脚本preparation/analysis/audit_rewrite_changes.py；小型JSON和中文报告preparation/training/reports/20261116-rewrite-change-audit.{json,zh-CN.md}，并给既有详细诊断增加补充链接。
+- 学生原始通过7153/9984=71.64%；原始整段文本完全相同0条，9984条都有差别。9949条存在闭合思考与非空最终解答，剥离思考后与学生原文相比，去首尾空白和去全部空白两种口径下均相同0条；另35条未闭合，不能判断完整最终解答。文本差异不等于数学方法变化或质量改善。
+- 旧全响应末boxed通过7310/9984=73.22%，转移7104保持通过/206修正/49通过变未通过/2625仍未通过，与既有统计一致。本次发现旧通过中4条无闭合思考、4条仅思考中的答案通过而最终解答未通过；严格最终解答确认通过7302/9984=73.14%，在9949条完整最终解答内为73.39%。旧数字保留其协议含义，不混作严格最终解答正确率。
+- 严格最终分组：原始通过→最终通过7099、未通过→通过203、通过→未通过46、仍未通过2601；未闭合35条中原始通过8、未通过27。原始未通过2831条仅203条得到通过的最终解答，纠错率7.17%；多数整体通过来自原来已通过的题。以上是轻量答案验证而非推理证明，符号等价可能漏判。
+- 判断：当前不筛选全量改写+既有训练已无准确率收益，不建议照原样扩大训练；203条纠错和7099条保持正确轨迹仍可审核复用，不能由此否定所有教师改写方法。应先处理学生目标前缀与质量分组，再独立验证小规模训练；未自动启动。编译、行数/匹配/四格及总量断言通过，结果和报告均上传同一SwanLab；只提交脚本/小型摘要/文档，保留既有HISTORY与readiness差异。
