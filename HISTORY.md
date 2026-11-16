@@ -410,3 +410,15 @@
 - 报告产物：`preparation/ppl_kld/reports/20261116-comparison.zh-CN.md`，附同名前缀JSON数值摘要、CSV及SVG三指标图（合计约47KB）；图已人工可视检查、链接与主要数值断言通过、git diff检查通过。PPL/KLD README增加报告索引；原始两轮summary/REPORT与逐题文件均未覆盖。
 - 原实验：基线 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/348lb6qg ，蒸馏后 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/iiroiywf ，训练 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666 。本次CPU统计复核/作图与报告继续复用trd-math-opd，命名20261116-评测-PPL和KL对比报告，链接 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qqo1vjmx；生成脚本快照、作图PNG及SwanLab日志保存在`preparation/logs/ppl-kld-analysis/20261116-033413`，最终文字在同一analysis ID恢复上传。没有上传权重、题目或逐题原始数据。
 - 本轮仅提交报告/小型汇总/图表、README索引和本条历史，保留已有运行追加历史及readiness等其他改动。
+
+
+## 2026-11-16T06:35:52.056770+00:00：核查首轮AIME退化原因与训练监督
+
+- 用户询问蒸馏后两个数学测试集结果下降的原因。本轮读取既有base/蒸馏后summary、四份AIME生成parquet、9984条学生初稿/教师改写、78步训练指标、训练/生成源码、固定参考PPL/KLD报告及原论文/官方模型卡；只做CPU终答重新判分、分词、配对统计和报告，没有重新生成、加载生产模型或训练。SwanLab继续复用trd-math-opd，实验名20261116-评测-AIME下降原因核查：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/z5giapo2。
+- 重新判分与原summary一致，逐题prompt/gold配对相同。AIME24正确响应289/480→268/480（avg下降4.375个百分点），pass16同为25/30且覆盖同一25题；AIME25为221/480→201/480（avg下降4.1667个百分点），pass16为23/30→21/30，实际新增1题/丢失3题。合并60题平均正确率下降4.2708个百分点；按题配对20000次bootstrap区间[-7.1875,-1.5625]个百分点，seed20261116。AIME25覆盖差的精确McNemar p=0.625，不能把覆盖少两题单独解释为稳定退化；bootstrap不包含重训练/重生成种子差异。
+- 实现风险：KLTrainingDataset._build_sequence直接拼纯文本prompt+换行+response，不使用chat template或显式追加EOS；生成/评测走chat/completions。该差异已存在于初始提交21116fb，非本机优化新增；固定参考PPL/KLD也采用纯文本，因此已有改善没有验证chat输入下独立生成。作为优先控制变量项，不宣布已证明因果。
+- 监督核查：全部9984条教师改写均以think开始，9949闭合/35未闭合；教师思考段占目标token70.7776%，5004条思考段包含rewrit。学生是non-thinking 4B-Instruct-2507，教师8B默认thinking；实际AIME输出前后均无think标签，不能说评测时学生已变成thinking模型。学生不可见初稿上的教师改写思考及模式差异可能影响监督，70.78%是token份额，非测得的梯度份额。
+- 同一boxed判分器下训练初稿通过7153/9984（71.6446%）→改写7310/9984（73.2171%），206正向/49反向变化/2625两者未通过，训练消费全部目标未按此次核验筛选。整数gold5829题通过4485→4591（76.9429%→78.7614%），129正向/23反向变化。未通过不等同于严格证明错误，字符串判等不能替代推理核验；不能假定教师改写一定正确。
+- 其他证据：无可提取boxed响应前后总计均38/960，不能用总量格式缺失解释下降；重新编码长度接近38912上限的响应95→118，但两套均长和中位数下降，未保存finish_reason，不能把全部退化归因于截断/整体变长。随机512条训练长度复核中13条裁教师初稿提示块，0条裁目标尾部；78步日志数值均有限，无发散证据。只有最终模型，无法区分欠训练、过拟合或能力干扰。
+- 分析结论：本轮未提升独立解题；PPL/KL降低表示固定参考前缀上预测改善，不等于长程自由生成改善。当前优先检查chat格式、教师thinking/改写思考和目标质量；主因需控制变量实验，不能直接断言教师弱、学习率大、训练太少或硬件优化有错。后续建议先对齐协议并用独立验证的自由生成指标和中间checkpoint做小规模对照，再决定扩大训练。
+- 产物：preparation/training/reports/20261116-aime-regression.zh-CN.md与同名前缀JSON，训练README增加索引。CPU脚本快照、逐题正确次数/长度、原文件及源码哈希、console/SwanLab日志保存在preparation/logs/aime-regression-analysis/20261116-review/；原始响应和生产代码未覆盖。全部本地报告链接、保存指标断言及git diff --check通过；同一SwanLab分析ID恢复上传整数子集核查和最终报告。Git只提交报告/小摘要/索引和本条历史，保留会话前已有HISTORY追加与readiness运行改动。

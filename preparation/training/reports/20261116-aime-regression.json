@@ -1,0 +1,249 @@
+{
+  "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/z5giapo2",
+  "created_at": "2026-11-16T06:29:20.589636+00:00",
+  "source_summary_sha256": {
+    "/root/autodl-tmp/trd/preparation/logs/math-base-eval/base-20261116-113135-834520-153610/eval/summary.json": "4b82e2f339c44c228ee66ad04bcbc554a8162799cc1e616a2c9d318852a66a9e",
+    "/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/eval/summary.json": "ba78024caf3ac27d9e31333c12641c1a8d8a5133520d7e3a0038b473b48f6af8",
+    "/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/train/summary.json": "65f8ed28266e865fa50d1796d97fb084122940e59a057d4efebe3e1dc1ba8f77"
+  },
+  "evaluation": {
+    "aime24": {
+      "base": {
+        "file_sha256": "7aa63a76aa1893d8c987500182597048769272d6857b467f3e1e5596fc578817",
+        "avg16": 0.6020833333333333,
+        "pass16": 0.8333333333333334,
+        "pass8": 0.8333333333333334,
+        "response_token_lengths": {
+          "n": 480,
+          "mean": 9767.920833333334,
+          "median": 6110.0,
+          "p95": 38912.0,
+          "max": 38912
+        },
+        "tokens_ge_output_cap_minus2": 54,
+        "no_parseable_box": 22,
+        "think_open": 0,
+        "think_close": 0,
+        "starts_think": 0,
+        "total_correct": 289,
+        "unique_response_fraction_per_question": 1.0
+      },
+      "distilled": {
+        "file_sha256": "ce81e3c290677ac43b32c9e31cae6c5ea60983f8a4e2fc8a6daeeb781aa81ee8",
+        "avg16": 0.5583333333333333,
+        "pass16": 0.8333333333333334,
+        "pass8": 0.8,
+        "response_token_lengths": {
+          "n": 480,
+          "mean": 9433.254166666668,
+          "median": 5745.5,
+          "p95": 38912.0,
+          "max": 38912
+        },
+        "tokens_ge_output_cap_minus2": 62,
+        "no_parseable_box": 17,
+        "think_open": 0,
+        "think_close": 0,
+        "starts_think": 0,
+        "total_correct": 268,
+        "unique_response_fraction_per_question": 1.0
+      },
+      "paired": {
+        "avg16_delta": -0.04375,
+        "avg16_delta_ci95_question_bootstrap": [
+          -0.08541666666666667,
+          -0.004166666666666667
+        ],
+        "questions_avg_improved": 4,
+        "questions_avg_worsened": 9,
+        "questions_avg_equal": 17,
+        "coverage_gained": 0,
+        "coverage_lost": 0,
+        "coverage_unchanged_solved": 25,
+        "coverage_unchanged_unsolved": 5,
+        "coverage_mcnemar_exact_two_sided_p": 1.0
+      }
+    },
+    "aime25": {
+      "base": {
+        "file_sha256": "fb4f637a5f77066f12a6ded51b0b0283d046f3aba467141dcca182893dfb2352",
+        "avg16": 0.46041666666666664,
+        "pass16": 0.7666666666666667,
+        "pass8": 0.6666666666666666,
+        "response_token_lengths": {
+          "n": 480,
+          "mean": 9012.477083333333,
+          "median": 7140.0,
+          "p95": 38912.0,
+          "max": 38912
+        },
+        "tokens_ge_output_cap_minus2": 41,
+        "no_parseable_box": 16,
+        "think_open": 0,
+        "think_close": 0,
+        "starts_think": 0,
+        "total_correct": 221,
+        "unique_response_fraction_per_question": 1.0
+      },
+      "distilled": {
+        "file_sha256": "52d53403bbd8025c5c567b79c1949c95407940f230686acea18a31eff41925c1",
+        "avg16": 0.41875,
+        "pass16": 0.7,
+        "pass8": 0.6,
+        "response_token_lengths": {
+          "n": 480,
+          "mean": 8903.389583333334,
+          "median": 5857.0,
+          "p95": 38912.0,
+          "max": 38912
+        },
+        "tokens_ge_output_cap_minus2": 56,
+        "no_parseable_box": 21,
+        "think_open": 0,
+        "think_close": 0,
+        "starts_think": 0,
+        "total_correct": 201,
+        "unique_response_fraction_per_question": 1.0
+      },
+      "paired": {
+        "avg16_delta": -0.041666666666666664,
+        "avg16_delta_ci95_question_bootstrap": [
+          -0.07916666666666666,
+          -0.00625
+        ],
+        "questions_avg_improved": 5,
+        "questions_avg_worsened": 11,
+        "questions_avg_equal": 14,
+        "coverage_gained": 1,
+        "coverage_lost": 3,
+        "coverage_unchanged_solved": 20,
+        "coverage_unchanged_unsolved": 6,
+        "coverage_mcnemar_exact_two_sided_p": 0.625
+      }
+    },
+    "combined": {
+      "n_questions": 60,
+      "avg16_delta": -0.042708333333333334,
+      "avg16_delta_ci95_question_bootstrap": [
+        -0.071875,
+        -0.015625
+      ],
+      "pass16_delta": -0.03333333333333333,
+      "pass16_delta_ci95_question_bootstrap": [
+        -0.1,
+        0.03333333333333333
+      ]
+    }
+  },
+  "training_targets": {
+    "y_o": {
+      "rows": 9984,
+      "file_sha256": "88dda41794ad55ef4729aa8e2080ed5984d3170246b80457122ac905c96514f7",
+      "boxed_verifier_accuracy": 0.7164463141025641,
+      "correct": 7153,
+      "response_token_lengths": {
+        "n": 9984,
+        "mean": 3268.208733974359,
+        "median": 2050.0,
+        "p95": 9314.85,
+        "max": 16385
+      },
+      "tokens_ge_generation_cap_minus2": 244,
+      "think_open": 0,
+      "think_close": 0,
+      "starts_think": 0,
+      "no_parseable_box": 90
+    },
+    "y_r": {
+      "rows": 9984,
+      "file_sha256": "864efe8abc0a677aecbf78b4dea82158fc7c3479c4d9f6e5580098d0a482def9",
+      "boxed_verifier_accuracy": 0.7321714743589743,
+      "correct": 7310,
+      "response_token_lengths": {
+        "n": 9984,
+        "mean": 3001.9988982371797,
+        "median": 2471.0,
+        "p95": 6457.250000000002,
+        "max": 16384
+      },
+      "tokens_ge_generation_cap_minus2": 44,
+      "think_open": 9984,
+      "think_close": 9949,
+      "starts_think": 9984,
+      "no_parseable_box": 37,
+      "think_token_fraction": 0.7077759053237664,
+      "think_token_lengths": {
+        "n": 9984,
+        "mean": 2124.742487980769,
+        "median": 1583.0,
+        "p95": 5333.200000000004,
+        "max": 16384
+      },
+      "mentions_rewrite_in_think": 5004
+    },
+    "paired": {
+      "wrong_to_correct": 206,
+      "correct_to_wrong": 49,
+      "both_correct": 7104,
+      "both_wrong": 2625,
+      "caveat": "Same inexpensive boxed-string verifier on generated training outputs. Not a proof of reasoning correctness; symbolic equivalence can be missed."
+    },
+    "integer_gold_subset": {
+      "rows": 5829,
+      "y_o_correct": 4485,
+      "y_r_correct": 4591,
+      "wrong_to_correct": 129,
+      "correct_to_wrong": 23,
+      "y_o_accuracy": 0.7694287184765826,
+      "y_r_accuracy": 0.7876136558586379,
+      "caveat": "Integer gold subset reduces symbolic-equivalence ambiguity but still uses generated last-boxed answers, not proof checking."
+    }
+  },
+  "training_sequence_audit": {
+    "sample_rows": 512,
+    "seed": 20261116,
+    "teacher_initial_solution_truncated_rows": 13,
+    "target_response_tail_truncated_rows": 0,
+    "response_tokens_lost": 0,
+    "training_uses_chat_template": false,
+    "training_appends_eos": false,
+    "generation_endpoint": "/v1/chat/completions"
+  },
+  "training_log_audit": {
+    "steps": 78,
+    "all_numeric_values_finite": true,
+    "first10_mean_logged_kl": 0.4110940283494567,
+    "last10_mean_logged_kl": 0.20111177009748418,
+    "metrics_caveat": "Logged KL/PPL are local rank, changing training batches, cross-conditioned teacher; no held-out checkpoint selection."
+  },
+  "manual_review": {
+    "aime25_coverage_lost_source_indices": [
+      6,
+      10,
+      22
+    ],
+    "aime25_coverage_lost_base_correct_counts": [
+      1,
+      3,
+      2
+    ],
+    "aime25_coverage_gained_source_indices": [
+      8
+    ],
+    "aime25_coverage_gained_distilled_correct_counts": [
+      2
+    ],
+    "examples": [
+      "Index 6: first distilled answer has an ordinary boxed wrong integer.",
+      "Index 10: first distilled answer repeats an incorrect final answer many times.",
+      "Index 22: first distilled answer invokes an alleged previous AIME problem and ends with a wrong integer."
+    ],
+    "caveat": "Illustrative review of one output per lost question. These patterns may already exist in base; no causal attribution or new error-type prevalence estimate."
+  },
+  "source_code_sha256": {
+    "recipe/opd/dataset/data_utils.py": "48fac0369a6e79a550cc0f2584ecd8b797ecab6f97b651fb01ce664f29ec08bc",
+    "recipe/opd/generation/y_r_prepare.py": "002954cc0e7a9299e32dd8882057b1794d25a65d42b7afeca68a97342f1fe634",
+    "recipe/opd/kl_trainer.py": "568ebb81d1458907451449cec6a7b9028f8e156dc1ce0405cad46c0f2050f2aa",
+    "verl/trainer/main_generation_server.py": "52a394d4190b3955ae9dd3a6f75c8414b39298ac001af86427a275896a812c43"
+  }
+}
