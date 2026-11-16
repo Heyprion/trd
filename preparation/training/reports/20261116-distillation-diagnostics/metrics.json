@@ -1,0 +1,1494 @@
+{
+  "date": "2026-11-16",
+  "evaluation": {
+    "base": {
+      "questions": 30,
+      "responses": 480,
+      "correct_responses": 221,
+      "avg16": 0.46041666666666664,
+      "pass16": 0.7666666666666667,
+      "pass8": 0.6666666666666666,
+      "lengths": {
+        "n": 480,
+        "mean": 9012.477083333333,
+        "median": 7140.0,
+        "p95": 38912.0,
+        "max": 38912.0,
+        "min": 942.0
+      },
+      "lengths_correct": {
+        "n": 221,
+        "mean": 3980.2171945701357,
+        "median": 2769.0,
+        "p95": 9047.0,
+        "max": 38912.0,
+        "min": 942.0
+      },
+      "lengths_wrong": {
+        "n": 259,
+        "mean": 13306.413127413127,
+        "median": 8779.0,
+        "p95": 38912.0,
+        "max": 38912.0,
+        "min": 2446.0
+      },
+      "near_cap": 41,
+      "near_cap_wrong": 40,
+      "missing_box": 16,
+      "loop_proxy": 44,
+      "loop_proxy_wrong": 43,
+      "loop_proxy_threshold_max4": 44,
+      "loop_proxy_threshold_max12": 44,
+      "think_tag_responses": 0
+    },
+    "first": {
+      "questions": 30,
+      "responses": 480,
+      "correct_responses": 201,
+      "avg16": 0.41875,
+      "pass16": 0.7,
+      "pass8": 0.6,
+      "lengths": {
+        "n": 480,
+        "mean": 8903.389583333334,
+        "median": 5857.0,
+        "p95": 38912.0,
+        "max": 38912.0,
+        "min": 812.0
+      },
+      "lengths_correct": {
+        "n": 201,
+        "mean": 3562.7114427860697,
+        "median": 2153.0,
+        "p95": 7841.0,
+        "max": 38912.0,
+        "min": 812.0
+      },
+      "lengths_wrong": {
+        "n": 279,
+        "mean": 12750.974910394265,
+        "median": 6919.0,
+        "p95": 38912.0,
+        "max": 38912.0,
+        "min": 1969.0
+      },
+      "near_cap": 56,
+      "near_cap_wrong": 54,
+      "missing_box": 21,
+      "loop_proxy": 55,
+      "loop_proxy_wrong": 53,
+      "loop_proxy_threshold_max4": 56,
+      "loop_proxy_threshold_max12": 54,
+      "think_tag_responses": 0
+    },
+    "repair": {
+      "questions": 30,
+      "responses": 480,
+      "correct_responses": 199,
+      "avg16": 0.41458333333333336,
+      "pass16": 0.6666666666666666,
+      "pass8": 0.6666666666666666,
+      "lengths": {
+        "n": 480,
+        "mean": 8504.427083333334,
+        "median": 5682.5,
+        "p95": 38912.0,
+        "max": 38912.0,
+        "min": 685.0
+      },
+      "lengths_correct": {
+        "n": 199,
+        "mean": 3515.819095477387,
+        "median": 2016.0,
+        "p95": 7644.199999999999,
+        "max": 38912.0,
+        "min": 685.0
+      },
+      "lengths_wrong": {
+        "n": 281,
+        "mean": 12037.284697508896,
+        "median": 6745.0,
+        "p95": 38912.0,
+        "max": 38912.0,
+        "min": 1367.0
+      },
+      "near_cap": 51,
+      "near_cap_wrong": 49,
+      "missing_box": 11,
+      "loop_proxy": 49,
+      "loop_proxy_wrong": 47,
+      "loop_proxy_threshold_max4": 51,
+      "loop_proxy_threshold_max12": 44,
+      "think_tag_responses": 0
+    }
+  },
+  "comparisons": {
+    "base_to_first": {
+      "avg16_delta": -0.041666666666666664,
+      "avg16_delta_ci95": [
+        -0.07916666666666666,
+        -0.00625
+      ],
+      "questions_avg_gained": 5,
+      "questions_avg_lost": 11,
+      "questions_avg_equal": 14,
+      "coverage_gained": 1,
+      "coverage_lost": 3,
+      "coverage_gained_rows": [
+        8
+      ],
+      "coverage_lost_rows": [
+        6,
+        10,
+        22
+      ],
+      "coverage_mcnemar_exact_two_sided_p": 0.625
+    },
+    "base_to_repair": {
+      "avg16_delta": -0.04583333333333333,
+      "avg16_delta_ci95": [
+        -0.09375,
+        -0.004166666666666667
+      ],
+      "questions_avg_gained": 6,
+      "questions_avg_lost": 14,
+      "questions_avg_equal": 10,
+      "coverage_gained": 1,
+      "coverage_lost": 4,
+      "coverage_gained_rows": [
+        8
+      ],
+      "coverage_lost_rows": [
+        6,
+        17,
+        19,
+        24
+      ],
+      "coverage_mcnemar_exact_two_sided_p": 0.375
+    },
+    "first_to_repair": {
+      "avg16_delta": -0.004166666666666667,
+      "avg16_delta_ci95": [
+        -0.041666666666666664,
+        0.03333333333333333
+      ],
+      "questions_avg_gained": 8,
+      "questions_avg_lost": 8,
+      "questions_avg_equal": 14,
+      "coverage_gained": 2,
+      "coverage_lost": 3,
+      "coverage_gained_rows": [
+        10,
+        22
+      ],
+      "coverage_lost_rows": [
+        17,
+        19,
+        24
+      ],
+      "coverage_mcnemar_exact_two_sided_p": 1.0
+    }
+  },
+  "difficulty_buckets": {
+    "base_0": {
+      "rows": [
+        8,
+        9,
+        12,
+        13,
+        14,
+        27,
+        29
+      ],
+      "models": {
+        "base": {
+          "avg16": 0.0,
+          "pass16": 0.0,
+          "correct_responses": 0
+        },
+        "first": {
+          "avg16": 0.017857142857142856,
+          "pass16": 0.14285714285714285,
+          "correct_responses": 2
+        },
+        "repair": {
+          "avg16": 0.017857142857142856,
+          "pass16": 0.14285714285714285,
+          "correct_responses": 2
+        }
+      }
+    },
+    "base_1_to_8": {
+      "rows": [
+        1,
+        4,
+        6,
+        10,
+        17,
+        19,
+        22,
+        24,
+        25
+      ],
+      "models": {
+        "base": {
+          "avg16": 0.1875,
+          "pass16": 1.0,
+          "correct_responses": 27
+        },
+        "first": {
+          "avg16": 0.1388888888888889,
+          "pass16": 0.6666666666666666,
+          "correct_responses": 20
+        },
+        "repair": {
+          "avg16": 0.1388888888888889,
+          "pass16": 0.5555555555555556,
+          "correct_responses": 20
+        }
+      }
+    },
+    "base_9_to_15": {
+      "rows": [
+        3,
+        7,
+        11,
+        20,
+        21,
+        23,
+        26,
+        28
+      ],
+      "models": {
+        "base": {
+          "avg16": 0.765625,
+          "pass16": 1.0,
+          "correct_responses": 98
+        },
+        "first": {
+          "avg16": 0.65625,
+          "pass16": 1.0,
+          "correct_responses": 84
+        },
+        "repair": {
+          "avg16": 0.6484375,
+          "pass16": 1.0,
+          "correct_responses": 83
+        }
+      }
+    },
+    "base_16": {
+      "rows": [
+        0,
+        2,
+        5,
+        15,
+        16,
+        18
+      ],
+      "models": {
+        "base": {
+          "avg16": 1.0,
+          "pass16": 1.0,
+          "correct_responses": 96
+        },
+        "first": {
+          "avg16": 0.9895833333333334,
+          "pass16": 1.0,
+          "correct_responses": 95
+        },
+        "repair": {
+          "avg16": 0.9791666666666666,
+          "pass16": 1.0,
+          "correct_responses": 94
+        }
+      }
+    }
+  },
+  "training": {
+    "first": {
+      "updates": 78,
+      "all_finite": true,
+      "epoch_metrics": [
+        {
+          "epoch/kl_loss": 0.28026132003829635,
+          "epoch/student_perplexity": 1.644062532735021,
+          "epoch/teacher_perplexity": 1.206607877296407
+        }
+      ],
+      "gradient_norm_gt1_updates": 15,
+      "learning_rate_max": 5e-06,
+      "learning_rate_last": 5.000000000000002e-07,
+      "windows": {
+        "first10": {
+          "kl_loss": {
+            "n": 10,
+            "mean": 0.4110940283494567,
+            "median": 0.4085862006773243,
+            "p95": 0.5955837188266069,
+            "max": 0.6726797177810078,
+            "min": 0.2837940301694877
+          },
+          "kl_loss_per_traj": {
+            "n": 10,
+            "mean": 0.43805301785469053,
+            "median": 0.4093693643808365,
+            "p95": 0.6002541601657866,
+            "max": 0.6824583411216736,
+            "min": 0.32001951336860657
+          },
+          "student_perplexity": {
+            "n": 10,
+            "mean": 1.8151874499250416,
+            "median": 1.75881025082364,
+            "p95": 2.32143953749821,
+            "max": 2.5321676865772345,
+            "min": 1.5173827915800098
+          },
+          "teacher_perplexity": {
+            "n": 10,
+            "mean": 1.1913565320593715,
+            "median": 1.1810491722247507,
+            "p95": 1.2473375312646686,
+            "max": 1.2531353728643924,
+            "min": 1.1500285688837737
+          },
+          "response_tokens": {
+            "n": 10,
+            "mean": 7843.4,
+            "median": 6045.0,
+            "p95": 17238.69999999999,
+            "max": 22096.0,
+            "min": 2580.0
+          },
+          "grad_norm": {
+            "n": 10,
+            "mean": 1.6858429431915283,
+            "median": 1.2611392736434937,
+            "p95": 3.640311479568477,
+            "max": 5.408653259277344,
+            "min": 1.195129632949829
+          },
+          "learning_rate": {
+            "n": 10,
+            "mean": 3.496919880386226e-06,
+            "median": 3.928571428571429e-06,
+            "p95": 4.999008991851474e-06,
+            "max": 5e-06,
+            "min": 7.142857142857143e-07
+          },
+          "kl_p50": {
+            "n": 10,
+            "mean": 0.009994291386101395,
+            "median": 0.0021410147310234606,
+            "p95": 0.044992204941809145,
+            "max": 0.05828498303890228,
+            "min": 9.62417689152062e-05
+          },
+          "kl_p95": {
+            "n": 10,
+            "mean": 2.1019710183143614,
+            "median": 2.1192821264266968,
+            "p95": 2.8542436599731436,
+            "max": 3.2391676902770996,
+            "min": 1.4386104345321655
+          },
+          "kl_p99": {
+            "n": 10,
+            "mean": 5.290213561058044,
+            "median": 5.222283363342285,
+            "p95": 7.475760459899901,
+            "max": 8.289615631103516,
+            "min": 3.1186158657073975
+          },
+          "kl_max": {
+            "n": 10,
+            "mean": 24.95325984954834,
+            "median": 24.945395469665527,
+            "p95": 28.26768970489502,
+            "max": 28.405542373657227,
+            "min": 19.679821014404297
+          },
+          "mean_log_ppl_gap": 0.4106810263206528
+        },
+        "middle10": {
+          "kl_loss": {
+            "n": 10,
+            "mean": 0.25290265539283896,
+            "median": 0.23594744886981844,
+            "p95": 0.34682072807185654,
+            "max": 0.3647381457322838,
+            "min": 0.18660499178965118
+          },
+          "kl_loss_per_traj": {
+            "n": 10,
+            "mean": 0.26500844955444336,
+            "median": 0.23229633271694183,
+            "p95": 0.4072658225893973,
+            "max": 0.4647766351699829,
+            "min": 0.1861085593700409
+          },
+          "student_perplexity": {
+            "n": 10,
+            "mean": 1.6088434747287867,
+            "median": 1.5838500286086334,
+            "p95": 1.8358219799539692,
+            "max": 1.8379836930916995,
+            "min": 1.4043479917813733
+          },
+          "teacher_perplexity": {
+            "n": 10,
+            "mean": 1.20736308131386,
+            "median": 1.2096109772949868,
+            "p95": 1.2518479729044336,
+            "max": 1.2526697366761252,
+            "min": 1.1320908346117105
+          },
+          "response_tokens": {
+            "n": 10,
+            "mean": 5156.2,
+            "median": 5488.0,
+            "p95": 6929.65,
+            "max": 7246.0,
+            "min": 3041.0
+          },
+          "grad_norm": {
+            "n": 10,
+            "mean": 0.238584204018116,
+            "median": 0.23055516183376312,
+            "p95": 0.2863627105951309,
+            "max": 0.28648048639297485,
+            "min": 0.2074296623468399
+          },
+          "learning_rate": {
+            "n": 10,
+            "mean": 3.045396853201352e-06,
+            "median": 3.0477232944281443e-06,
+            "p95": 3.4403857596016215e-06,
+            "max": 3.4830512891602654e-06,
+            "min": 2.6007733480210175e-06
+          },
+          "kl_p50": {
+            "n": 10,
+            "mean": 0.014143038754991722,
+            "median": 0.010268139420077205,
+            "p95": 0.04262502267956733,
+            "max": 0.04546123743057251,
+            "min": 0.00012111889373045415
+          },
+          "kl_p95": {
+            "n": 10,
+            "mean": 1.1679345548152924,
+            "median": 1.1178606748580933,
+            "p95": 1.5116046786308288,
+            "max": 1.572689414024353,
+            "min": 0.9088881611824036
+          },
+          "kl_p99": {
+            "n": 10,
+            "mean": 3.0495224475860594,
+            "median": 2.7173956632614136,
+            "p95": 4.504953730106353,
+            "max": 4.992032051086426,
+            "min": 2.197300672531128
+          },
+          "kl_max": {
+            "n": 10,
+            "mean": 15.026049041748047,
+            "median": 15.277667045593262,
+            "p95": 15.88717451095581,
+            "max": 16.13313865661621,
+            "min": 13.725625991821289
+          },
+          "mean_log_ppl_gap": 0.28352893194906026
+        },
+        "last10": {
+          "kl_loss": {
+            "n": 10,
+            "mean": 0.20111177009748418,
+            "median": 0.2057840961286636,
+            "p95": 0.2765087276939786,
+            "max": 0.3225395844993422,
+            "min": 0.12314251107229314
+          },
+          "kl_loss_per_traj": {
+            "n": 10,
+            "mean": 0.21233647614717482,
+            "median": 0.2080000787973404,
+            "p95": 0.29780314862728113,
+            "max": 0.331159770488739,
+            "min": 0.13107386231422424
+          },
+          "student_perplexity": {
+            "n": 10,
+            "mean": 1.5190410099340774,
+            "median": 1.5306662731550482,
+            "p95": 1.7368657237125966,
+            "max": 1.8291912830498278,
+            "min": 1.314149327520953
+          },
+          "teacher_perplexity": {
+            "n": 10,
+            "mean": 1.2071590628300188,
+            "median": 1.2062174308689548,
+            "p95": 1.2689306081798097,
+            "max": 1.2816165120705645,
+            "min": 1.14094261094672
+          },
+          "response_tokens": {
+            "n": 10,
+            "mean": 6763.8,
+            "median": 6127.5,
+            "p95": 12334.849999999995,
+            "max": 14768.0,
+            "min": 2708.0
+          },
+          "grad_norm": {
+            "n": 10,
+            "mean": 0.15321178138256072,
+            "median": 0.15112649649381638,
+            "p95": 0.16553261205554007,
+            "max": 0.17172516882419586,
+            "min": 0.14560635387897491
+          },
+          "learning_rate": {
+            "n": 10,
+            "mean": 5.62225363412371e-07,
+            "median": 5.449952235028638e-07,
+            "p95": 6.596111068960587e-07,
+            "max": 6.760651997550241e-07,
+            "min": 5.000000000000002e-07
+          },
+          "kl_p50": {
+            "n": 10,
+            "mean": 0.010989307421914419,
+            "median": 0.007145484909415245,
+            "p95": 0.03606872633099555,
+            "max": 0.03999611735343933,
+            "min": 5.961532951914705e-05
+          },
+          "kl_p95": {
+            "n": 10,
+            "mean": 0.9562740623950958,
+            "median": 0.9668797254562378,
+            "p95": 1.250020325183868,
+            "max": 1.418471097946167,
+            "min": 0.6719276905059814
+          },
+          "kl_p99": {
+            "n": 10,
+            "mean": 2.321323025226593,
+            "median": 2.2716481685638428,
+            "p95": 3.2201541543006886,
+            "max": 3.740629196166992,
+            "min": 1.5163875818252563
+          },
+          "kl_max": {
+            "n": 10,
+            "mean": 13.876059246063232,
+            "median": 13.665711879730225,
+            "p95": 15.457935619354249,
+            "max": 15.464761734008789,
+            "min": 11.678180694580078
+          },
+          "mean_log_ppl_gap": 0.22630794428737683
+        }
+      },
+      "logger_audit": {
+        "rank": 0,
+        "samples_in_logged_microbatches": 156,
+        "fraction_training_samples_in_step_loss_records": 0.015625,
+        "loss_records": "Last outer microbatch of each 32-batch accumulation, not the update average",
+        "gradient_records": "Both DP ranks, 32 accumulated outer batches; norm before clipping at 1.0",
+        "lr_records": "Scheduler is advanced after optimizer.step; logged LR is for the following update",
+        "step_time": "Last outer batch time including optimizer step; not whole update duration",
+        "epoch_records": "Arithmetic means of local-rank outer-batch metrics, not global token-weighted validation"
+      }
+    },
+    "repair": {
+      "updates": 78,
+      "all_finite": true,
+      "epoch_metrics": [
+        {
+          "epoch/kl_loss": 0.3268421271133149,
+          "epoch/student_perplexity": 1.684540329934738,
+          "epoch/teacher_perplexity": 1.1891874423979258
+        }
+      ],
+      "gradient_norm_gt1_updates": 19,
+      "learning_rate_max": 5e-06,
+      "learning_rate_last": 5.000000000000002e-07,
+      "windows": {
+        "first10": {
+          "kl_loss": {
+            "n": 10,
+            "mean": 0.4955476787534895,
+            "median": 0.49052587290829297,
+            "p95": 0.7482856674950827,
+            "max": 0.8779857585265782,
+            "min": 0.3286613647002421
+          },
+          "kl_loss_per_traj": {
+            "n": 10,
+            "mean": 0.5296763181686401,
+            "median": 0.49246011674404144,
+            "p95": 0.7559797406196591,
+            "max": 0.8936529159545898,
+            "min": 0.37288394570350647
+          },
+          "student_perplexity": {
+            "n": 10,
+            "mean": 1.9418449984326682,
+            "median": 1.868774325994168,
+            "p95": 2.6059112715778006,
+            "max": 2.9320197979074014,
+            "min": 1.5738752429329603
+          },
+          "teacher_perplexity": {
+            "n": 10,
+            "mean": 1.1763938363232602,
+            "median": 1.1677446374553333,
+            "p95": 1.2311993485906518,
+            "max": 1.2351410935187652,
+            "min": 1.144015084372355
+          },
+          "response_tokens": {
+            "n": 10,
+            "mean": 7845.3,
+            "median": 6047.0,
+            "p95": 17240.149999999987,
+            "max": 22097.0,
+            "min": 2582.0
+          },
+          "grad_norm": {
+            "n": 10,
+            "mean": 1.4479952812194825,
+            "median": 1.4393832087516785,
+            "p95": 1.5129465341567994,
+            "max": 1.5140348672866821,
+            "min": 1.3464581966400146
+          },
+          "learning_rate": {
+            "n": 10,
+            "mean": 3.496919880386226e-06,
+            "median": 3.928571428571429e-06,
+            "p95": 4.999008991851474e-06,
+            "max": 5e-06,
+            "min": 7.142857142857143e-07
+          },
+          "kl_p50": {
+            "n": 10,
+            "mean": 0.013706632572575473,
+            "median": 0.0026689046062529087,
+            "p95": 0.0628290724009275,
+            "max": 0.08522859215736389,
+            "min": 0.00011872965842485428
+          },
+          "kl_p95": {
+            "n": 10,
+            "mean": 2.4214504599571227,
+            "median": 2.4421746730804443,
+            "p95": 3.3623450636863694,
+            "max": 3.964672327041626,
+            "min": 1.6357160806655884
+          },
+          "kl_p99": {
+            "n": 10,
+            "mean": 6.239564776420593,
+            "median": 6.21535325050354,
+            "p95": 9.137124323844906,
+            "max": 10.687934875488281,
+            "min": 3.5892627239227295
+          },
+          "kl_max": {
+            "n": 10,
+            "mean": 50.38415374755859,
+            "median": 50.72652816772461,
+            "p95": 52.095296478271486,
+            "max": 52.249977111816406,
+            "min": 46.76342010498047
+          },
+          "mean_log_ppl_gap": 0.48560278354992475
+        },
+        "middle10": {
+          "kl_loss": {
+            "n": 10,
+            "mean": 0.289511845522887,
+            "median": 0.26448897621667256,
+            "p95": 0.40271952838818326,
+            "max": 0.42190408346255753,
+            "min": 0.21382621108301428
+          },
+          "kl_loss_per_traj": {
+            "n": 10,
+            "mean": 0.3046580746769905,
+            "median": 0.2609950602054596,
+            "p95": 0.4757623195648192,
+            "max": 0.5420478582382202,
+            "min": 0.21335001289844513
+          },
+          "student_perplexity": {
+            "n": 10,
+            "mean": 1.6239677416295155,
+            "median": 1.592029046842883,
+            "p95": 1.8686742489402888,
+            "max": 1.8780735354948321,
+            "min": 1.4199548725758222
+          },
+          "teacher_perplexity": {
+            "n": 10,
+            "mean": 1.1875856231316417,
+            "median": 1.1901529183538688,
+            "p95": 1.2273827311349879,
+            "max": 1.2324603123331617,
+            "min": 1.1158950666281957
+          },
+          "response_tokens": {
+            "n": 10,
+            "mean": 5158.2,
+            "median": 5490.0,
+            "p95": 6931.65,
+            "max": 7248.0,
+            "min": 3043.0
+          },
+          "grad_norm": {
+            "n": 10,
+            "mean": 0.298236146569252,
+            "median": 0.280317947268486,
+            "p95": 0.3954969629645347,
+            "max": 0.4336673319339752,
+            "min": 0.23836974799633026
+          },
+          "learning_rate": {
+            "n": 10,
+            "mean": 3.045396853201352e-06,
+            "median": 3.0477232944281443e-06,
+            "p95": 3.4403857596016215e-06,
+            "max": 3.4830512891602654e-06,
+            "min": 2.6007733480210175e-06
+          },
+          "kl_p50": {
+            "n": 10,
+            "mean": 0.014733020812855102,
+            "median": 0.010587713681161404,
+            "p95": 0.04331079758703708,
+            "max": 0.04678294062614441,
+            "min": 0.0001267958723474294
+          },
+          "kl_p95": {
+            "n": 10,
+            "mean": 1.267706996202469,
+            "median": 1.1797914505004883,
+            "p95": 1.6640323400497434,
+            "max": 1.781551718711853,
+            "min": 0.9907148480415344
+          },
+          "kl_p99": {
+            "n": 10,
+            "mean": 3.3495416402816773,
+            "median": 3.008687138557434,
+            "p95": 4.8829592704772935,
+            "max": 5.499827861785889,
+            "min": 2.289266586303711
+          },
+          "kl_max": {
+            "n": 10,
+            "mean": 46.20832710266113,
+            "median": 46.68754196166992,
+            "p95": 48.114887428283694,
+            "max": 48.37497329711914,
+            "min": 43.06364822387695
+          },
+          "mean_log_ppl_gap": 0.3091082294568673
+        },
+        "last10": {
+          "kl_loss": {
+            "n": 10,
+            "mean": 0.22841212846338604,
+            "median": 0.2313003777345213,
+            "p95": 0.3203211082700734,
+            "max": 0.38263925925392067,
+            "min": 0.13481049431120937
+          },
+          "kl_loss_per_traj": {
+            "n": 10,
+            "mean": 0.24420047104358672,
+            "median": 0.23669328540563583,
+            "p95": 0.3551539823412894,
+            "max": 0.4048275947570801,
+            "min": 0.14798304438591003
+          },
+          "student_perplexity": {
+            "n": 10,
+            "mean": 1.5317881374646878,
+            "median": 1.5467814966991313,
+            "p95": 1.7528046103422505,
+            "max": 1.84871679314074,
+            "min": 1.3195585984902447
+          },
+          "teacher_perplexity": {
+            "n": 10,
+            "mean": 1.191172337663982,
+            "median": 1.1917225074740356,
+            "p95": 1.2435583612651437,
+            "max": 1.2721687809095472,
+            "min": 1.1285851291662414
+          },
+          "response_tokens": {
+            "n": 10,
+            "mean": 6765.8,
+            "median": 6129.5,
+            "p95": 12336.849999999995,
+            "max": 14770.0,
+            "min": 2710.0
+          },
+          "grad_norm": {
+            "n": 10,
+            "mean": 0.17265799641609192,
+            "median": 0.1691315472126007,
+            "p95": 0.18326722383499144,
+            "max": 0.1850452870130539,
+            "min": 0.1648128181695938
+          },
+          "learning_rate": {
+            "n": 10,
+            "mean": 5.62225363412371e-07,
+            "median": 5.449952235028638e-07,
+            "p95": 6.596111068960587e-07,
+            "max": 6.760651997550241e-07,
+            "min": 5.000000000000002e-07
+          },
+          "kl_p50": {
+            "n": 10,
+            "mean": 0.011569521766796242,
+            "median": 0.008387695532292128,
+            "p95": 0.036502418480813495,
+            "max": 0.039890311658382416,
+            "min": 7.726346666458994e-05
+          },
+          "kl_p95": {
+            "n": 10,
+            "mean": 1.0200218200683593,
+            "median": 1.0076404213905334,
+            "p95": 1.3700324356555933,
+            "max": 1.5881706476211548,
+            "min": 0.7031640410423279
+          },
+          "kl_p99": {
+            "n": 10,
+            "mean": 2.5002435207366944,
+            "median": 2.5163122415542603,
+            "p95": 3.4591354250907886,
+            "max": 3.9367189407348633,
+            "min": 1.6024470329284668
+          },
+          "kl_max": {
+            "n": 10,
+            "mean": 40.28549156188965,
+            "median": 40.1408748626709,
+            "p95": 41.449760055541994,
+            "max": 41.54471969604492,
+            "min": 39.194847106933594
+          },
+          "mean_log_ppl_gap": 0.24786773917340268
+        }
+      },
+      "logger_audit": {
+        "rank": 0,
+        "samples_in_logged_microbatches": 156,
+        "fraction_training_samples_in_step_loss_records": 0.015625,
+        "loss_records": "Last outer microbatch of each 32-batch accumulation, not the update average",
+        "gradient_records": "Both DP ranks, 32 accumulated outer batches; norm before clipping at 1.0",
+        "lr_records": "Scheduler is advanced after optimizer.step; logged LR is for the following update",
+        "step_time": "Last outer batch time including optimizer step; not whole update duration",
+        "epoch_records": "Arithmetic means of local-rank outer-batch metrics, not global token-weighted validation"
+      }
+    }
+  },
+  "validation_512": {
+    "base": {
+      "rows": 512,
+      "response_tokens": 234375,
+      "student_nll_sum": 179298.30979268564,
+      "teacher_nll_sum": 168208.45793755536,
+      "forward_kl_sum": 54254.884985201934,
+      "reverse_kl_sum": 49878.75903196842,
+      "student_nll": 0.7650061217821255,
+      "student_ppl": 2.149007530370839,
+      "teacher_nll": 0.7176894205335695,
+      "teacher_ppl": 2.0496917593117283,
+      "forward_kl": 0.23148750927019493,
+      "reverse_kl": 0.21281603853639858
+    },
+    "first": {
+      "rows": 512,
+      "response_tokens": 234375,
+      "student_nll_sum": 141472.92789684574,
+      "teacher_nll_sum": 168208.45793755536,
+      "forward_kl_sum": 38876.561260288494,
+      "reverse_kl_sum": 42707.10088388577,
+      "student_nll": 0.6036178256932084,
+      "student_ppl": 1.8287228475452004,
+      "teacher_nll": 0.7176894205335695,
+      "teacher_ppl": 2.0496917593117283,
+      "forward_kl": 0.16587332804389757,
+      "reverse_kl": 0.18221696377124594
+    },
+    "repair": {
+      "rows": 512,
+      "response_tokens": 234375,
+      "student_nll_sum": 140185.1026682734,
+      "teacher_nll_sum": 168208.45793755536,
+      "forward_kl_sum": 39999.12238531551,
+      "reverse_kl_sum": 42958.16847363993,
+      "student_nll": 0.5981231047179666,
+      "student_ppl": 1.8187020816254331,
+      "teacher_nll": 0.7176894205335695,
+      "teacher_ppl": 2.0496917593117283,
+      "forward_kl": 0.1706629221773462,
+      "reverse_kl": 0.18328818548753037
+    }
+  },
+  "validation_protocol": {
+    "version": 1,
+    "context": "same problem and reference prefix for teacher and student",
+    "prompt": "problem + SPACE + instruction_following + NEWLINE; encode separately from response",
+    "instruction": "Please reason step by step, and put your final answer within \\boxed{}.",
+    "special_tokens": false,
+    "eos": "only tokens present in original solution; no appended EOS or chat tags",
+    "mask": "response only; causal shift includes first and last reference token",
+    "temperature": 1.0,
+    "vocabulary": "full model output vocabulary; no top-k or clipping",
+    "reduction": "global sum divided by global valid response token count",
+    "nll_kl_dtype": "FP32 log_softmax and products, FP64 sums",
+    "overflow": "error; never silently truncate or drop rows",
+    "max_length": 18432,
+    "tokenizer_vocab_sha256": "f488fa45d324a8bc64c84f0e27b47223872d550f2a6900564f77dfa67ca5ff4d",
+    "scored_token_ids_sha256": "ed2b752a58f8cc7e2232533e17cd114dfe3de211e666b16f339f35c0d40ec183",
+    "validation_parquet_sha256": "e3bca204b91dd7012d45334335553c78b915d3edca33ecd1190bc96cb0ed05d0"
+  },
+  "training_target_audit": {
+    "y_o": {
+      "rows": 9984,
+      "file_sha256": "88dda41794ad55ef4729aa8e2080ed5984d3170246b80457122ac905c96514f7",
+      "boxed_verifier_accuracy": 0.7164463141025641,
+      "correct": 7153,
+      "response_token_lengths": {
+        "n": 9984,
+        "mean": 3268.208733974359,
+        "median": 2050.0,
+        "p95": 9314.85,
+        "max": 16385
+      },
+      "tokens_ge_generation_cap_minus2": 244,
+      "think_open": 0,
+      "think_close": 0,
+      "starts_think": 0,
+      "no_parseable_box": 90
+    },
+    "y_r": {
+      "rows": 9984,
+      "file_sha256": "864efe8abc0a677aecbf78b4dea82158fc7c3479c4d9f6e5580098d0a482def9",
+      "boxed_verifier_accuracy": 0.7321714743589743,
+      "correct": 7310,
+      "response_token_lengths": {
+        "n": 9984,
+        "mean": 3001.9988982371797,
+        "median": 2471.0,
+        "p95": 6457.250000000002,
+        "max": 16384
+      },
+      "tokens_ge_generation_cap_minus2": 44,
+      "think_open": 9984,
+      "think_close": 9949,
+      "starts_think": 9984,
+      "no_parseable_box": 37,
+      "think_token_fraction": 0.7077759053237664,
+      "think_token_lengths": {
+        "n": 9984,
+        "mean": 2124.742487980769,
+        "median": 1583.0,
+        "p95": 5333.200000000004,
+        "max": 16384
+      },
+      "mentions_rewrite_in_think": 5004
+    },
+    "paired": {
+      "wrong_to_correct": 206,
+      "correct_to_wrong": 49,
+      "both_correct": 7104,
+      "both_wrong": 2625,
+      "caveat": "Same inexpensive boxed-string verifier on generated training outputs. Not a proof of reasoning correctness; symbolic equivalence can be missed."
+    },
+    "integer_gold_subset": {
+      "rows": 5829,
+      "y_o_correct": 4485,
+      "y_r_correct": 4591,
+      "wrong_to_correct": 129,
+      "correct_to_wrong": 23,
+      "y_o_accuracy": 0.7694287184765826,
+      "y_r_accuracy": 0.7876136558586379,
+      "caveat": "Integer gold subset reduces symbolic-equivalence ambiguity but still uses generated last-boxed answers, not proof checking."
+    }
+  },
+  "target_probe": {
+    "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/64ftt3ow",
+    "groups": {
+      "correct_correct": 8,
+      "correct_wrong": 8,
+      "wrong_correct": 8,
+      "wrong_wrong": 8
+    },
+    "population_representative": false,
+    "variants": {
+      "base_chat": {
+        "segments": {
+          "thinking": {
+            "tokens": 82134,
+            "student_nll_sum": 65982.2138312766,
+            "teacher_nll_sum": 16844.96832773611,
+            "fkl_sum": 48140.192444774264,
+            "logit_gradient_l1_sum": 33654.22072647051,
+            "student_ppl": 2.233005320463267,
+            "fkl_mean": 0.5861177154987491
+          },
+          "final_solution": {
+            "tokens": 26874,
+            "student_nll_sum": 11217.723018483508,
+            "teacher_nll_sum": 4418.780285890961,
+            "fkl_sum": 8392.188385015706,
+            "logit_gradient_l1_sum": 5745.1794314810295,
+            "student_ppl": 1.5180387096489592,
+            "fkl_mean": 0.31227909447851854
+          },
+          "eos": {
+            "tokens": 32,
+            "student_nll_sum": 222.94204288395122,
+            "teacher_nll_sum": 1.8136566535640668,
+            "fkl_sum": 203.62161313951947,
+            "logit_gradient_l1_sum": 48.60602390719578,
+            "student_ppl": 1060.9699757263943,
+            "fkl_mean": 6.363175410609983
+          },
+          "first8": {
+            "tokens": 256,
+            "student_nll_sum": 2271.7324381910694,
+            "teacher_nll_sum": 43.9732700265286,
+            "fkl_sum": 2228.4901811747372,
+            "logit_gradient_l1_sum": 231.34931302238985,
+            "student_ppl": 7143.476464911169,
+            "fkl_mean": 8.705039770213817
+          },
+          "all": {
+            "tokens": 109040,
+            "student_nll_sum": 77422.87889264406,
+            "teacher_nll_sum": 21265.562270280636,
+            "fkl_sum": 56736.002442929486,
+            "logit_gradient_l1_sum": 39448.006181858735,
+            "student_ppl": 2.0340748079459923,
+            "fkl_mean": 0.5203228397187224
+          }
+        },
+        "groups": {
+          "correct_correct": {
+            "student_ppl": 2.2120368848547285,
+            "teacher_ppl": 1.1772392895477874,
+            "fkl": 0.6350948349792578
+          },
+          "correct_wrong": {
+            "student_ppl": 1.9789040397655682,
+            "teacher_ppl": 1.2195739206397354,
+            "fkl": 0.49176335493418977
+          },
+          "wrong_correct": {
+            "student_ppl": 1.9698463744637051,
+            "teacher_ppl": 1.2335567844983457,
+            "fkl": 0.46927643262001867
+          },
+          "wrong_wrong": {
+            "student_ppl": 2.144338460551993,
+            "teacher_ppl": 1.1999239604773477,
+            "fkl": 0.5909578063725133
+          }
+        },
+        "first_token_mean_logprob_student": -49.61065101623535,
+        "first_token_mean_logprob_teacher": -1.2330697223283948e-06
+      },
+      "first_chat": {
+        "segments": {
+          "thinking": {
+            "tokens": 82134,
+            "student_nll_sum": 43069.47136153461,
+            "teacher_nll_sum": 16844.96832773611,
+            "fkl_sum": 24194.082076320286,
+            "logit_gradient_l1_sum": 25527.687927887815,
+            "student_ppl": 1.6894120028486146,
+            "fkl_mean": 0.29456841352327034
+          },
+          "final_solution": {
+            "tokens": 26874,
+            "student_nll_sum": 7721.25775775106,
+            "teacher_nll_sum": 4418.780285890961,
+            "fkl_sum": 3655.5435013841015,
+            "logit_gradient_l1_sum": 4452.014593570522,
+            "student_ppl": 1.3328417340054886,
+            "fkl_mean": 0.13602528471325823
+          },
+          "eos": {
+            "tokens": 32,
+            "student_nll_sum": 112.07492393255234,
+            "teacher_nll_sum": 1.8136566535640668,
+            "fkl_sum": 100.455442417413,
+            "logit_gradient_l1_sum": 44.93616699054837,
+            "student_ppl": 33.19307842100812,
+            "fkl_mean": 3.139232575544156
+          },
+          "first8": {
+            "tokens": 256,
+            "student_nll_sum": 1969.70848039169,
+            "teacher_nll_sum": 43.9732700265286,
+            "fkl_sum": 1924.946506764189,
+            "logit_gradient_l1_sum": 215.4268545975435,
+            "student_ppl": 2195.519016467666,
+            "fkl_mean": 7.5193222920476135
+          },
+          "all": {
+            "tokens": 109040,
+            "student_nll_sum": 50902.80404321822,
+            "teacher_nll_sum": 21265.562270280636,
+            "fkl_sum": 27950.0810201218,
+            "logit_gradient_l1_sum": 30024.638688448886,
+            "student_ppl": 1.5949252813825163,
+            "fkl_mean": 0.25632869607595193
+          }
+        },
+        "groups": {
+          "correct_correct": {
+            "student_ppl": 1.634874263786583,
+            "teacher_ppl": 1.1772392895477874,
+            "fkl": 0.3093254440988667
+          },
+          "correct_wrong": {
+            "student_ppl": 1.5653108966137692,
+            "teacher_ppl": 1.2195739206397354,
+            "fkl": 0.2354376306361921
+          },
+          "wrong_correct": {
+            "student_ppl": 1.5871651620639584,
+            "teacher_ppl": 1.2335567844983457,
+            "fkl": 0.23704488857780515
+          },
+          "wrong_wrong": {
+            "student_ppl": 1.6363528880169362,
+            "teacher_ppl": 1.1999239604773477,
+            "fkl": 0.2941562562109947
+          }
+        },
+        "first_token_mean_logprob_student": -47.77985882759094,
+        "first_token_mean_logprob_teacher": -1.2330697223283948e-06
+      },
+      "repair_chat": {
+        "segments": {
+          "thinking": {
+            "tokens": 82134,
+            "student_nll_sum": 40651.5485502655,
+            "teacher_nll_sum": 16844.96832773611,
+            "fkl_sum": 21862.005575720617,
+            "logit_gradient_l1_sum": 24272.271513986918,
+            "student_ppl": 1.640402739853851,
+            "fkl_mean": 0.2661748554279667
+          },
+          "final_solution": {
+            "tokens": 26874,
+            "student_nll_sum": 7523.67465638011,
+            "teacher_nll_sum": 4418.780285890961,
+            "fkl_sum": 3388.74599555748,
+            "logit_gradient_l1_sum": 4321.895023418215,
+            "student_ppl": 1.3230783462956275,
+            "fkl_mean": 0.1260975662557669
+          },
+          "eos": {
+            "tokens": 32,
+            "student_nll_sum": 64.12894534273073,
+            "teacher_nll_sum": 1.8136566535640668,
+            "fkl_sum": 55.92542583914474,
+            "logit_gradient_l1_sum": 34.445012658368796,
+            "student_ppl": 7.41889068000754,
+            "fkl_mean": 1.747669557473273
+          },
+          "first8": {
+            "tokens": 256,
+            "student_nll_sum": 1691.496151975828,
+            "teacher_nll_sum": 43.9732700265286,
+            "fkl_sum": 1649.986806157771,
+            "logit_gradient_l1_sum": 189.46031176549346,
+            "student_ppl": 740.5601384081758,
+            "fkl_mean": 6.445260961553793
+          },
+          "all": {
+            "tokens": 109040,
+            "student_nll_sum": 48239.35215198834,
+            "teacher_nll_sum": 21265.562270280636,
+            "fkl_sum": 25306.676997117243,
+            "logit_gradient_l1_sum": 28628.611550063502,
+            "student_ppl": 1.5564389927264595,
+            "fkl_mean": 0.2320861793572748
+          }
+        },
+        "groups": {
+          "correct_correct": {
+            "student_ppl": 1.5752566461904352,
+            "teacher_ppl": 1.1772392895477874,
+            "fkl": 0.2721387101461902
+          },
+          "correct_wrong": {
+            "student_ppl": 1.5329957457882175,
+            "teacher_ppl": 1.2195739206397354,
+            "fkl": 0.21493608351474514
+          },
+          "wrong_correct": {
+            "student_ppl": 1.5524837944370937,
+            "teacher_ppl": 1.2335567844983457,
+            "fkl": 0.2158032226469403
+          },
+          "wrong_wrong": {
+            "student_ppl": 1.5946586430307248,
+            "teacher_ppl": 1.1999239604773477,
+            "fkl": 0.26693612878144496
+          }
+        },
+        "first_token_mean_logprob_student": -43.29290163516998,
+        "first_token_mean_logprob_teacher": -1.2330697223283948e-06
+      },
+      "base_plain": {
+        "segments": {
+          "thinking": {
+            "tokens": 82134,
+            "student_nll_sum": 60024.67449944137,
+            "teacher_nll_sum": 18105.458370766955,
+            "fkl_sum": 39483.23743961173,
+            "logit_gradient_l1_sum": 30525.846188219664,
+            "student_ppl": 2.076770345796729,
+            "fkl_mean": 0.48071733313380244
+          },
+          "final_solution": {
+            "tokens": 26874,
+            "student_nll_sum": 10715.687782232493,
+            "teacher_nll_sum": 4454.7470196699405,
+            "fkl_sum": 7944.167193668616,
+            "logit_gradient_l1_sum": 5507.515574626232,
+            "student_ppl": 1.4899433559328026,
+            "fkl_mean": 0.2956079181985792
+          },
+          "first8": {
+            "tokens": 256,
+            "student_nll_sum": 1718.8927703481768,
+            "teacher_nll_sum": 666.1622909981998,
+            "fkl_sum": 885.2553437148551,
+            "logit_gradient_l1_sum": 188.00674352647383,
+            "student_ppl": 824.2096145698389,
+            "fkl_mean": 3.458028686386153
+          },
+          "all": {
+            "tokens": 109008,
+            "student_nll_sum": 70740.36228167386,
+            "teacher_nll_sum": 22560.205390436895,
+            "fkl_sum": 47427.40463328035,
+            "logit_gradient_l1_sum": 36033.361762845896,
+            "student_ppl": 1.913523908159131,
+            "fkl_mean": 0.43508187136063725
+          }
+        },
+        "groups": {
+          "correct_correct": {
+            "student_ppl": 2.0321350598135863,
+            "teacher_ppl": 1.1986896332346366,
+            "fkl": 0.5149893353671836
+          },
+          "correct_wrong": {
+            "student_ppl": 1.8775392339275514,
+            "teacher_ppl": 1.2340676475311634,
+            "fkl": 0.41886468860705056
+          },
+          "wrong_correct": {
+            "student_ppl": 1.8638430522344926,
+            "teacher_ppl": 1.243543115073636,
+            "fkl": 0.39227144948210046
+          },
+          "wrong_wrong": {
+            "student_ppl": 1.998882965426294,
+            "teacher_ppl": 1.218711996782507,
+            "fkl": 0.4931353256763713
+          }
+        },
+        "first_token_mean_logprob_student": -29.99756669998169,
+        "first_token_mean_logprob_teacher": -18.98096489906311
+      },
+      "first_plain": {
+        "segments": {
+          "thinking": {
+            "tokens": 82134,
+            "student_nll_sum": 40217.55447987942,
+            "teacher_nll_sum": 18105.458370766955,
+            "fkl_sum": 19287.61061335404,
+            "logit_gradient_l1_sum": 23367.060236581343,
+            "student_ppl": 1.6317577515026997,
+            "fkl_mean": 0.2348310153329199
+          },
+          "final_solution": {
+            "tokens": 26874,
+            "student_nll_sum": 7330.429925203519,
+            "teacher_nll_sum": 4454.7470196699405,
+            "fkl_sum": 3135.6375557581932,
+            "logit_gradient_l1_sum": 4160.245836224462,
+            "student_ppl": 1.3135985197590365,
+            "fkl_mean": 0.11667922734829922
+          },
+          "first8": {
+            "tokens": 256,
+            "student_nll_sum": 1107.2078522624288,
+            "teacher_nll_sum": 666.1622909981998,
+            "fkl_sum": 347.26597381012124,
+            "logit_gradient_l1_sum": 157.36985343263362,
+            "student_ppl": 75.56783070870189,
+            "fkl_mean": 1.356507710195786
+          },
+          "all": {
+            "tokens": 109008,
+            "student_nll_sum": 47547.98440508294,
+            "teacher_nll_sum": 22560.205390436895,
+            "fkl_sum": 22423.248169112234,
+            "logit_gradient_l1_sum": 27527.306072805804,
+            "student_ppl": 1.5467996069001364,
+            "fkl_mean": 0.20570277565969686
+          }
+        },
+        "groups": {
+          "correct_correct": {
+            "student_ppl": 1.5567616256247432,
+            "teacher_ppl": 1.1986896332346366,
+            "fkl": 0.23221383575625115
+          },
+          "correct_wrong": {
+            "student_ppl": 1.5253185987224067,
+            "teacher_ppl": 1.2340676475311634,
+            "fkl": 0.19209555795914646
+          },
+          "wrong_correct": {
+            "student_ppl": 1.5467512226644191,
+            "teacher_ppl": 1.243543115073636,
+            "fkl": 0.1941955079729496
+          },
+          "wrong_wrong": {
+            "student_ppl": 1.5798586679995277,
+            "teacher_ppl": 1.218711996782507,
+            "fkl": 0.23460560708565725
+          }
+        },
+        "first_token_mean_logprob_student": -26.046704530715942,
+        "first_token_mean_logprob_teacher": -18.98096489906311
+      }
+    },
+    "caveats": [
+      "32 bounded integer-gold targets, 8 per correction outcome; deliberately nonrepresentative.",
+      "Teacher/forced prefixes differ as in each training protocol; no independent teacher solve accuracy was measured.",
+      "Logit-gradient L1 is dKL/dlogits, not a parameter/LoRA gradient norm.",
+      "Frozen forward-only scoring in eval mode; no optimizer, parameter updates, or answer generation."
+    ]
+  },
+  "first_token_probabilities_chat": {
+    "base": {
+      "n": 32,
+      "geometric_mean": 2.8468725180028405e-22,
+      "arithmetic_mean": 2.2246382347495835e-21,
+      "min": 1.1226670384390074e-23,
+      "max": 3.557084468361303e-20,
+      "temperature": 1.0,
+      "sampling_filters_applied": false
+    },
+    "first": {
+      "n": 32,
+      "geometric_mean": 1.776114521440305e-21,
+      "arithmetic_mean": 2.1806246351815537e-20,
+      "min": 2.3035631938631488e-23,
+      "max": 2.5506538500283423e-19,
+      "temperature": 1.0,
+      "sampling_filters_applied": false
+    },
+    "repair": {
+      "n": 32,
+      "geometric_mean": 1.5780898054200311e-19,
+      "arithmetic_mean": 2.171139763041842e-18,
+      "min": 6.324127281404595e-22,
+      "max": 3.4289593635637094e-17,
+      "temperature": 1.0,
+      "sampling_filters_applied": false
+    },
+    "teacher": {
+      "geometric_mean": 0.999998766931038,
+      "min": 0.9999951124428961,
+      "max": 0.9999998807907248
+    }
+  },
+  "probe_repair_token_kl_shares": {
+    "thinking": 0.863882902453411,
+    "final_solution": 0.133907189629974,
+    "eos": 0.0022099079166148666,
+    "first8": 0.06519966277459999
+  },
+  "enumerated_cases": {
+    "file_row_22": {
+      "total_subsets": 32768,
+      "favorable": 27904,
+      "probability": "109/128",
+      "answer": 237,
+      "base": {
+        "correct": 14,
+        "wrong_answer_60671": 2
+      },
+      "first": {
+        "correct": 9,
+        "wrong_answer_60671": 6
+      },
+      "repair": {
+        "correct": 6,
+        "wrong_answer_60671": 8
+      }
+    },
+    "file_row_18": {
+      "total_colorings": 4096,
+      "valid_colorings": 82,
+      "correct_responses": {
+        "base": 4,
+        "first": 1,
+        "repair": 0
+      }
+    }
+  },
+  "sources": {
+    "base": {
+      "summary": "/root/autodl-tmp/trd/preparation/logs/math-base-eval/base-20261116-113135-834520-153610/eval/summary.json",
+      "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/lungvf9u",
+      "generation_sha256": "fb4f637a5f77066f12a6ded51b0b0283d046f3aba467141dcca182893dfb2352"
+    },
+    "first": {
+      "summary": "/root/autodl-tmp/trd/preparation/logs/math-runs/20261115-185850-279780-53607/eval/summary.json",
+      "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto",
+      "generation_sha256": "52d53403bbd8025c5c567b79c1949c95407940f230686acea18a31eff41925c1"
+    },
+    "repair": {
+      "summary": "/root/autodl-tmp/trd/preparation/logs/math-runs/repair-chat-9984-v1/eval/summary.json",
+      "swanlab_url": "https://swanlab.cn/@WangZIyu/trd-math-opd/runs/jtt6dac0",
+      "generation_sha256": "9c9f610e3ea0063b71db12098665f22fa76f61c07c393d50643990934a01455b"
+    }
+  },
+  "new_training": false,
+  "new_answer_generation": false,
+  "notes": [
+    "Probe targets are balanced 8 per outcome and not representative.",
+    "KL mass is not a parameter-gradient fraction.",
+    "Question-level exploratory bootstrap, no seed replications.",
+    "Validation PPL/KL uses legacy plain teacher-forced references.",
+    "Per-response observations and original answers remain local."
+  ]
+}

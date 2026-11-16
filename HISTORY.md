@@ -529,3 +529,32 @@
 - 本轮相对原始4B：pass16低10个百分点、avg16低4.5833个百分点；相对首轮：pass16低3.3333个百分点（少1题）、avg16低0.4167个百分点（少2次正确响应）。这次格式修复未见AIME25正确率收益，不能把单次少1题作稳定因果判断；没有新PPL/KLD评分结果。
 - 仅AIME25范围兼容收尾已按预期完成：旧两套控制器在生成/判分完成后因缺少AIME24 parquet留下FileNotFoundError，summary-before-scope-finalization.json保留；watcher随后恢复同一评测SwanLab ID jtt6dac0、上传22条记录、仅汇总AIME25三项指标并写最终completed。没有伪造AIME24成绩；以范围变更后的最终summary为准。
 - 已更新preparation/training/REPAIR.zh-CN.md完成结果表及repair-validation.json实际成绩；原始summary、响应、日志未覆盖。无需用户启动任务，本轮不自动发起新实验；保留此前HISTORY及readiness未提交差异。
+
+## 2026-11-16 10:31:21 UTC：验证集PPL/KLD chat_repaired
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/ljd1bu70；输出/日志：`/root/autodl-tmp/trd/preparation/logs/ppl-kld/chat_repaired-20261116-103117-382399-215906`；学生：`/root/autodl-tmp/trd/checkpoints_merged/OPD_MATH/Qwen3-4B-Instruct-2507/teacherQwen3-8B_y_r_kl_forward_full_vocab_clip0_refine_repair-chat-9984-v1/epoch1/hf_merged`；验证题数512/512。
+
+## 2026-11-16T10:31:29.911055+00:00：数学 TRD 评测 / distillation-diagnostics-20261116-103129
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/pxa1iezc；配置/日志/状态：`/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/distillation-diagnostics-20261116-103129`。
+- 评测 完成：`/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/distillation-diagnostics-20261116-103129/summary.json`；结果：{"analysis_file": "/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/distillation-diagnostics-20261116-103129/analysis.json", "per_question_file": "/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/distillation-diagnostics-20261116-103129/per-question.json", "base_avg16": 0.46041666666666664, "repair_avg16": 0.41458333333333336, "base_pass16": 0.7666666666666667, "repair_pass16": 0.6666666666666666}。
+- 完成：学生PPL=1.81870208，教师PPL=2.04969176，forward KL(T||S)=0.17066292，reverse KL(S||T)=0.18328819 nats/token；有效response tokens=234375；耗时62.5s；汇总`/root/autodl-tmp/trd/preparation/logs/ppl-kld/chat_repaired-20261116-103117-382399-215906/summary.json`。
+
+## 2026-11-16T10:35:27.753523+00:00：数学 TRD 数值校验 / target-kl-probe-20261116-103527
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/64ftt3ow；配置/日志/状态：`/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/target-kl-probe-20261116-103527`。
+- 数值校验 完成：`/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/target-kl-probe-20261116-103527/summary.json`；结果：{"analysis_file": "/root/autodl-tmp/trd/preparation/logs/distillation-diagnostics/target-kl-probe-20261116-103527/analysis.json", "rows": 32, "variant_protocol_pairs": 5, "new_generation": false, "new_training": false}。
+
+## 2026-11-16：蒸馏退化详细诊断（既有输出、训练日志与冻结前向）
+
+- 用户要求根据蒸馏前后回答及训练指标详细解释成绩下降。本轮未训练、未重新采集轨迹、未生成新测试回答、未运行AIME24；完成既有1440条AIME25重评分/分词、78步×2训练日志审核，以及冻结参数的512题PPL/KL和32条训练目标探针。
+- 详细报告：preparation/training/reports/20261116-distillation-diagnostics.zh-CN.md；配套目录保存3幅SVG、小型metrics.json、30题CSV。脚本：preparation/analysis/{distillation_diagnostics,probe_distillation_targets,build_diagnostic_report}.py。分支analysis/distillation-diagnostics-20261116；仅新增PPL标签中文名，不改变训练、生成或旧评分协议。
+- SwanLab复用trd-math-opd：既有输出/训练诊断20261116-评测-蒸馏退化详细诊断 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/pxa1iezc ，结果preparation/logs/distillation-diagnostics/distillation-diagnostics-20261116-103129/；报告汇总/枚举/图表恢复同一记录上传完成。修复后512题20261116-评测-PPL和KL-聊天格式修复后 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/ljd1bu70 ，结果preparation/logs/ppl-kld/chat_repaired-20261116-103117-382399-215906/，62.5秒。32条探针20261116-数值校验-思考与解答KL分段 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/64ftt3ow ，结果preparation/logs/distillation-diagnostics/target-kl-probe-20261116-103527/。
+- 三组AIME25正确响应221/480→201/480→199/480，覆盖23/30→21/30→20/30。按题bootstrap20,000次，原始→修复Avg16差-4.58个百分点、95%区间[-9.38,-0.42]；首轮→修复-0.42、区间[-4.17,+3.33]。单次生成/训练未重复，覆盖率差的证据弱；随机流受AIME24运行顺序影响，不按第j条响应跨模型配对。主要损失在原来部分会做的题，最容易6题基本保留。
+- 两轮KL/PPL/梯度范数均下降，已记录值均有限，无数值发散证据。发现step KL/PPL只记录rank0每32外层小批的最后2题，78条只覆盖156次样本访问（1.56%），不是有效batch128平均；grad_norm是实际累积、裁剪前；LR是下一更新值；step_time不是整次累积更新耗时。缺少中间checkpoint生成正确率，不能证明过拟合或训练不足。
+- 固定512题234375参考token、legacy plain同口径：基线PPL2.149008/FKL0.231488/RKL0.212816；首轮1.828723/0.165873/0.182217；修复1.818702/0.170663/0.183288。代理指标改善与AIME退化同时成立；此处教师同参考前缀，不是训练特权上下文，亦非chat自由生成指标。
+- 全量9984教师目标均以think开头，思考占70.78% token，未过滤错误目标。32条整数答案、有长度上限、四类各8条的非代表探针：原生chat起点think概率修复组最大3.43e-17、几何均值1.58e-19，教师几何均值0.9999988；三组既有AIME输出均无think。该探针修复组思考占86.39% token-KL总和（不是全训练或LoRA梯度占比）；初始对→改写错目标PPL也从1.979降至1.533。推断存在强制教师前缀与自由生成错位、错误目标被拟合的问题，需消融确认对准确率的因果影响。
+- 逐条看文件第22题（非官方题号）：正确次数14→9→6，错答案60671次数2→6→8；修复8条分别3条重复扣空集、5条错改条件分母。无接近上限或尾部循环，属于逻辑错误；枚举32768子集确认27904/32768=109/128，答案237。第18题枚举4096染色确认82，正确4→1→0。整体缺boxed16→21→11、接近上限41→56→51、循环代理44→55→49；格式/停止行为部分改善，不能解释全部下降，也没有证明语义模式崩塌。
+- 实现审核：配置声明LoRA dropout=.05，但模型/引擎未传递，两轮保存adapter实际0；AdamW beta2固定.95，论文C.2表9为.999；训练seed未明确固定记录。均为应单独处理/核对的偏差，尚无消融证明是主因。本机9984题/78步和18432序列限制亦非论文完整配置，具体提示裁剪覆盖率未在本轮完整归因。
+- 推荐后续先修配置/日志/种子，再用原缓存比较仅最终解答的学生目标（必须从学生前缀去除教师思考，而非仅mask思考loss），再独立比较正确性筛选，使用独立验证集自由生成和中间adapter选步数；未启动以上训练。原始轨迹保留，无需为这些缓存消融重新生成全部数据。
+- 检验：三组重新评分与既有summary一致；提示/答案匹配；三组512题评分协议哈希一致；两道错题精确枚举通过；分析脚本编译、报告本地链接、图表视觉与Git diff检查通过。首版输出分析脚本在实验初始化前发生过静态语法错误，已修正并完整执行；不存在该失败版本的模型/数据实验。原始响应/日志/缓存/权重未加入Git；保留此前HISTORY和readiness未提交差异。

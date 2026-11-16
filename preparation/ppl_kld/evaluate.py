@@ -62,7 +62,8 @@ def append_history(path, message):
 
 def swanlab_run_name(label, output_root, day=None):
     day = day or dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d")
-    purpose = {"baseline": "基线", "distilled": "蒸馏后", "calibration": "校准"}.get(label, label)
+    purpose = {"baseline": "基线", "distilled": "蒸馏后", "calibration": "校准",
+               "chat_repaired": "聊天格式修复后"}.get(label, label)
     previous = sum((folder / "swanlab.json").is_file()
                    for folder in Path(output_root).glob(f"{label}-{day}-*"))
     suffix = f"-r{previous + 1:02d}" if previous else ""
