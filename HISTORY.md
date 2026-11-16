@@ -469,3 +469,16 @@
 - 最终CPU回归及dry-run https://swanlab.cn/@WangZIyu/trd-math-opd/runs/bf3w6lhm ：47项通过，包含因果shift与HF原生NLL、原提示/目标保真、EOS与不完整样本、截断对齐、旧plain不变、来源/词表/模型/划分拒绝及不启动生成器等；正式train+eval dry-run确认9984题/78步/仅AIME24和25。源码AST、shell语法、文档链接及Git diff检查通过。
 - 保留旧模型和checkpoint，不删权重。当前两盘剩余约18/12GiB；通用空间门槛20/18GiB保留，新修复入口仅在已实测BF16/4B/LoRA64/有效128/1epoch/78步且不周期保存全量状态时，以12/11GiB门槛分别保留余量（旧实测checkpoint8.971/导出8.478GiB），配置不符拒绝该门槛。该对照仅保存最终checkpoint，中途checkpoint选择仍属后续验证工作。
 - 新增修复说明preparation/training/REPAIR.zh-CN.md、小型repair-validation.json，更新训练README和Agent.md索引。Git仅提交代码、配置、文档及小摘要；原始模型、缓存、逐题数据、日志与原有readiness改动均不纳入本次提交。下一步启动repair-chat-9984-v1，格式修复是否改善准确率仍待完整训练及独立评测。
+
+## 2026-11-16T07:13:22.174930+00:00：数学 TRD train / repair-chat-9984-v1
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16；配置/日志/状态：`/root/autodl-tmp/trd/preparation/logs/math-runs/repair-chat-9984-v1/train`。
+
+
+## 2026-11-16T07:17:03.362802+00:00：启动正式缓存复用的聊天格式修复对照
+
+- 全部工程/CPU/双卡检查完成后，启动bash preparation/run_repair_train_eval.sh --run-id repair-chat-9984-v1，后台控制器PID188885，启动UTC2026-11-16T07:13:16.931026+00:00。代码提交0f43fb11c40d75e170bfdb3617370dc02321788c，分支fix/cached-chat-distillation-20261116；launcher metadata/log位于preparation/logs/repair-launchers/repair-chat-9984-v1.json及.log。
+- 正式训练SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16 ，名称20261116-训练-TRD聊天格式修复-9984题。已核对真正传给torchrun的--data_path为本轮train/cache/chat-training.parquet、--sequence_format chat，学生为原始models/Qwen3-4B-Instruct-2507，教师原始8B；不是从上一轮hf_merged接着训练。
+- 9984条教师目标与原始缓存SHA256仍为864efe8abc0a677aecbf78b4dea82158fc7c3479c4d9f6e5580098d0a482def9；派生缓存SHA256为55af3f7c9a658074b8004f545aa31f6a85d07b12f5cdc97328fbd6cd03ad5fe6，与CPU/双卡检验相同。manifest确认target_text_changed=false、filtered_rows=0、new_generation=false；原始初稿/教师改写未覆盖。
+- 本轮保持batch2/acc32、全局128、1 epoch/78更新、LR5e-6、LoRA64/128、18K训练长度及32K动态预算、BF16/FP32 LoRA与recompute/FA2/Liger等配置；末次空间检查通过，checkpoint和HF分别写原两块盘的新run目录，上一轮模型保留。当前status=running，已实际观测优化器更新1，已记录数值有限；这只证明进入参数更新，不是训练完成或准确率提升证据。
+- 训练/LoRA合并完成后由同一后台控制器自动评测AIME24/AIME25、pass16、TP2，其他三套不默认运行；独立评测SwanLab在评测开始时创建。当前尚无新模型最终成绩。summary位置preparation/logs/math-runs/repair-chat-9984-v1/train/summary.json，README修复说明增加运行索引。保留入会话前已有HISTORY及readiness运行差异，未上传权重/数据/原始日志。

@@ -42,3 +42,5 @@ SwanLab继续使用trd-math-opd，训练与评测分别记录，失败保留。�
 本地检查目录为`preparation/logs/training-development/chat-repair-cpu-20261116-070052`及`chat-repair-gpu-20261116-070304`，最终回归日志位于同根目录；小型摘要见[repair-validation.json](repair-validation.json)。
 
 后续去除教师改写思考监督与可靠终答筛选分别作为独立对照，保留当前格式修复结果，以便判断收益来自哪项修改。
+
+正式格式对照已于2026-11-16 07:13 UTC启动，run-id为`repair-chat-9984-v1`，[训练SwanLab](https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qejfvx16)。控制器日志为`preparation/logs/repair-launchers/repair-chat-9984-v1.log`，训练状态为`preparation/logs/math-runs/repair-chat-9984-v1/train/summary.json`。训练与合并成功后由同一控制器自动启动两套AIME评测；实际完成状态及成绩以各阶段summary为准。
