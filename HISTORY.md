@@ -606,3 +606,10 @@
 - 同步前已 fetch origin；此前共有29个本地未同步提交，涉及87条代码/文档/配置/小型结果路径，165个新增blob版本合计3,681,527字节、最大125,426字节；已检查历史文件清单、大小与禁止上传目录，未发现大文件或被排除产物。现有未提交文件最大约128KB；Python AST、JSON格式和 `git diff --check` 通过。
 - 普通 HTTPS push 的 dry-run 因没有终端凭据失败，尚未修改远程；沿用前次已连接的 GitHub Git对象接口逐提交同步所有本地工作分支。该接口不接受原始 author/committer 时间，远程提交SHA会改变，但每个提交的文件树必须与原始提交完全相同；原始提交、分支和SHA映射备份仅保留于 `.git/codex-sync-backups/` 与 `refs/codex-local-archive/`，不上传。
 - 本轮仅进行Git保存、同步及静态格式检查，没有启动数据处理、模型生成、训练、评测或数值实验，因此不新建SwanLab实验。同步完成情况另行追加。
+
+
+## 2026-11-17T03:49:30.170391+00:00：本地保存完成，远程同步因认证/连接故障未完成
+
+- 当前未提交的4个文件已保存为提交 `343af9e`（`chore: save pending teacher-prefill pilot code and experiment records`）；随后仅追加本条同步结果记录。Python AST、JSON格式与diff空白检查通过，未启动实验。
+- 远程仍为 `https://github.com/Heyprion/trd.git`。HTTPS推送dry-run报 `could not read Username ... terminal prompts disabled`；既有GitHub连接连续3次报 `Could not start MCP server codex_apps: timed out awaiting tools/list after 30s`，未获得仓库信息，未上传对象或修改远程分支。本机无已配置的Git凭据助手、gh认证、相关token环境变量或SSH密钥，当前无法完成远程同步；需要恢复GitHub连接或配置本机Git认证后继续，不能将本轮记作已推送。
+- 原始14个本地分支、原始提交及待同步文件树/变更清单已备份到 `.git/codex-sync-backups/20261117T034500Z-save-and-sync/`（实际目录由 `.git/codex-sync-backups/active-sync-path` 索引），归档引用位于 `refs/codex-local-archive/`。这些备份均在 `.git` 内，仅保留本地。代码、文档、配置和小型结果可同步；模型/数据/环境/缓存/checkpoint/原始日志继续由既有忽略规则排除。
