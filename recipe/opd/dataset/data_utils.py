@@ -415,13 +415,26 @@ class KLTrainingDataset(Dataset):
         mask[start:end] = 1
         return mask
 
-    def _prepare_item(self, student_prompt: str, teacher_prompt: str, response: str, *, response_complete=False) -> dict[str, torch.Tensor]:
+    def _prepare_item(self, student_prompt: str, teacher_prompt: str, response: str, *, response_complete=False, teacher_response_prefix="") -> dict[str, torch.Tensor]:
+        if teacher_response_prefix:
+            if self.sequence_format != "chat":
+                raise ValueError("Teacher-only assistant prefill requires chat format")
+            # Preserve the teacher's original assistant stream exactly. Its
+            # private thought is context, never a student input or loss target.
+            if self._encode_text(teacher_response_prefix + response) != (
+                self._encode_text(teacher_response_prefix) + self._encode_text(response)
+            ):
+                raise ValueError("Teacher prefill boundary changes target tokenization")
         student_input_ids, student_position_ids, student_prompt_len = self._build_sequence(
             student_prompt, response, response_complete=response_complete,
         )
         teacher_input_ids, teacher_position_ids, teacher_prompt_len = self._build_sequence(
-            teacher_prompt, response, tokenizer=getattr(self, "teacher_tokenizer", self.tokenizer),
+            teacher_prompt, teacher_response_prefix + response, tokenizer=getattr(self, "teacher_tokenizer", self.tokenizer),
             response_complete=response_complete,
+        )
+        teacher_prompt_len = min(
+            teacher_prompt_len + len(self._encode_text(teacher_response_prefix)),
+            teacher_input_ids.numel(),
         )
 
         student_response = student_input_ids[student_prompt_len:]
@@ -537,6 +550,7 @@ class KLTrainingDataset(Dataset):
             teacher_prompt=teacher_prompt,
             response=target_response,
             response_complete=extra_info.get("response_complete") is True,
+            teacher_response_prefix=extra_info.get("teacher_response_prefix", ""),
         )
 
 

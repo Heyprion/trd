@@ -401,6 +401,10 @@
 - 验证：真实root目录dry-run通过；/tmp下绝对脚本路径启动，并故意继承EVAL_RESPONSE_LENGTH=1024、额外hmmt25集合，仍固定为38912和AIME两套，dry-run不创建实验目录、未启动GPU或SwanLab实验。新增6项CPU回归连同既有29项共35项全部通过，覆盖参考哈希/参数/成绩异常拒绝、60题输入差异拒绝、adapter模型拒绝、dry-run无评分、规范命名重跑和base标签独立/百分点对比，未评测生产模型。SwanLab数值校验 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/1v7m2ema；日志preparation/logs/training-development/20261116-112126-base-eval-checks。shell语法、Python编译及git diff检查通过，双卡显存均0MiB。
 - 使用说明补充至preparation/training/README.zh-CN.md、准备README及Agent.md第8节；用户正式运行命令为bash preparation/run_base_eval.sh。正式结束后才会出现base准确率、SwanLab基线评测链接和前后比较结果，现有蒸馏结果83.33%/70%的pass16不作为base值。
 
+## 2026-11-16T03:31:38.574597+00:00：数学 TRD eval / base-20261116-113135-834520-153610
+
+- SwanLab：https://swanlab.cn/@WangZIyu/trd-math-opd/runs/lungvf9u；配置/日志/状态：`/root/autodl-tmp/trd/preparation/logs/math-base-eval/base-20261116-113135-834520-153610/eval`。
+
 ## 2026-11-16：完成蒸馏前后PPL/KLD对比与初步分析报告
 
 - 用户提供蒸馏后运行完成日志，要求与蒸馏前指标比较、初步分析并形成报告。本轮读取baseline-20261115-101823-758028-27412和distilled-20261116-031913-959867-152167的summary、逐题统计及训练记录；没有重新生成、训练或运行模型评分。
@@ -410,6 +414,19 @@
 - 报告产物：`preparation/ppl_kld/reports/20261116-comparison.zh-CN.md`，附同名前缀JSON数值摘要、CSV及SVG三指标图（合计约47KB）；图已人工可视检查、链接与主要数值断言通过、git diff检查通过。PPL/KLD README增加报告索引；原始两轮summary/REPORT与逐题文件均未覆盖。
 - 原实验：基线 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/348lb6qg ，蒸馏后 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/iiroiywf ，训练 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/mym7h666 。本次CPU统计复核/作图与报告继续复用trd-math-opd，命名20261116-评测-PPL和KL对比报告，链接 https://swanlab.cn/@WangZIyu/trd-math-opd/runs/qqo1vjmx；生成脚本快照、作图PNG及SwanLab日志保存在`preparation/logs/ppl-kld-analysis/20261116-033413`，最终文字在同一analysis ID恢复上传。没有上传权重、题目或逐题原始数据。
 - 本轮仅提交报告/小型汇总/图表、README索引和本条历史，保留已有运行追加历史及readiness等其他改动。
+- eval 完成：`/root/autodl-tmp/trd/preparation/logs/math-base-eval/base-20261116-113135-834520-153610/eval/summary.json`；结果：{"model_path": "/root/autodl-tmp/trd/models/Qwen3-4B-Instruct-2507", "model_label": "base", "metrics": {"eval/aime24/pass@16": 0.8333333333333334, "eval/aime24/avg@16": 0.6020833333333333, "eval/aime24/pass@8": 0.8333333333333334, "eval/aime25/pass@16": 0.7666666666666667, "eval/aime25/avg@16": 0.46041666666666664, "eval/aime25/pass@8": 0.6666666666666666}, "results_file": "/root/autodl-tmp/trd/preparation/logs/math-base-eval/base-20261116-113135-834520-153610/eval/results.json", "comparison_file": "/root/autodl-tmp/trd/preparation/logs/math-base-eval/base-20261116-113135-834520-153610/eval/comparison.json"}。
+
+## 2026-11-16T06:22:27.625731+00:00：AIME24/AIME25蒸馏前后简表比较
+
+- 用户要求快速对比已完成的两套benchmark。只读核对base与蒸馏后summary及comparison.json，两者均completed，测试集哈希和pass16/温度0.6/top_p0.95/TP2一致；没有重新生成、评分或干预进程。
+- aime24 pass@16：蒸馏前83.333333%，蒸馏后83.333333%，差+0.000000个百分点。
+- aime24 avg@16：蒸馏前60.208333%，蒸馏后55.833333%，差-4.375000个百分点。
+- aime24 pass@8：蒸馏前83.333333%，蒸馏后80.000000%，差-3.333333个百分点。
+- aime25 pass@16：蒸馏前76.666667%，蒸馏后70.000000%，差-6.666667个百分点。
+- aime25 avg@16：蒸馏前46.041667%，蒸馏后41.875000%，差-4.166667个百分点。
+- aime25 pass@8：蒸馏前66.666667%，蒸馏后60.000000%，差-6.666667个百分点。
+- 本轮观察：AIME24 pass@16持平，AIME25下降2题（23/30→21/30）；两套平均单次正确率下降，未见benchmark收益。不将单次30题采样结果解释为统计显著退化。
+- base：`preparation/logs/math-base-eval/base-20261116-113135-834520-153610/eval/summary.json`；SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/lungvf9u；蒸馏后：`preparation/logs/math-runs/20261115-185850-279780-53607/eval/summary.json`；SwanLab https://swanlab.cn/@WangZIyu/trd-math-opd/runs/yxzg5pto。已存在比较文件为base评测目录下comparison.json/csv，本轮仅追加查询结论。
 
 
 ## 2026-11-16T06:35:52.056770+00:00：核查首轮AIME退化原因与训练监督
@@ -580,3 +597,12 @@
 - 当前实现是学生pS(.|x,y_r前缀)对齐教师pT(.|x,y_o,y_r前缀)的全词表forward KL；y_r决定训练访问的前缀，教师分布决定各前缀上的软监督，不等同于将每个改写token作为绝对正确硬标签。教师看到y_o并在提示中要求保留结构，不能保证改写仍是学生高概率或易学习轨迹。
 - 明确收紧先前解读：低概率think开头是分布差异的诊断线索，不是改写监督无用或无法学习的证明；自回归监督本来可以提高原先低概率路径。最终答案通过率也只是轨迹/前缀质量代理，无法给出逐前缀成功概率；原本正确的改写也可能提供有效新推导。
 - 当前数据严格最终解答通过率提高有限，整套训练AIME未见收益；尚无同预算/格式且控制教师条件的正式原轨迹KL对改写轨迹KL消融，因此不能将负结果直接归因于改写，亦未证明改写优于原轨迹。后续判断需真实独立生成对照；本轮只解释机制，不启动任何训练。
+
+
+## 2026-11-17T03:41:57.182809+00:00：保存当前未提交改动并同步代码仓库
+
+- 用户要求保存当前全部未提交内容并同步既有远程 `https://github.com/Heyprion/trd.git`，继续排除模型权重、数据集、虚拟环境、缓存、checkpoint、原始日志和本地 Git 备份。
+- 本轮保存既有 `HISTORY.md` 的基线评测/比较记录、`preparation/readiness.json` 的现有状态变动、`recipe/opd/dataset/data_utils.py` 的教师独享 assistant prefill 支持，以及 `preparation/training/seeded_kl_training.py` 的试验用随机种子入口；按当前状态归档，不代表新的训练方案已验证。
+- 同步前已 fetch origin；此前共有29个本地未同步提交，涉及87条代码/文档/配置/小型结果路径，165个新增blob版本合计3,681,527字节、最大125,426字节；已检查历史文件清单、大小与禁止上传目录，未发现大文件或被排除产物。现有未提交文件最大约128KB；Python AST、JSON格式和 `git diff --check` 通过。
+- 普通 HTTPS push 的 dry-run 因没有终端凭据失败，尚未修改远程；沿用前次已连接的 GitHub Git对象接口逐提交同步所有本地工作分支。该接口不接受原始 author/committer 时间，远程提交SHA会改变，但每个提交的文件树必须与原始提交完全相同；原始提交、分支和SHA映射备份仅保留于 `.git/codex-sync-backups/` 与 `refs/codex-local-archive/`，不上传。
+- 本轮仅进行Git保存、同步及静态格式检查，没有启动数据处理、模型生成、训练、评测或数值实验，因此不新建SwanLab实验。同步完成情况另行追加。

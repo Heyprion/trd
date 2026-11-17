@@ -54,6 +54,5 @@
       "memory_gib": 94.97
     }
   ],
-  "cuda_matmul_and_flash_attention_backward": "passed",
   "status": "ready"
 }
