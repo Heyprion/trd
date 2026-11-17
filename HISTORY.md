@@ -613,3 +613,12 @@
 - 当前未提交的4个文件已保存为提交 `343af9e`（`chore: save pending teacher-prefill pilot code and experiment records`）；随后仅追加本条同步结果记录。Python AST、JSON格式与diff空白检查通过，未启动实验。
 - 远程仍为 `https://github.com/Heyprion/trd.git`。HTTPS推送dry-run报 `could not read Username ... terminal prompts disabled`；既有GitHub连接连续3次报 `Could not start MCP server codex_apps: timed out awaiting tools/list after 30s`，未获得仓库信息，未上传对象或修改远程分支。本机无已配置的Git凭据助手、gh认证、相关token环境变量或SSH密钥，当前无法完成远程同步；需要恢复GitHub连接或配置本机Git认证后继续，不能将本轮记作已推送。
 - 原始14个本地分支、原始提交及待同步文件树/变更清单已备份到 `.git/codex-sync-backups/20261117T034500Z-save-and-sync/`（实际目录由 `.git/codex-sync-backups/active-sync-path` 索引），归档引用位于 `refs/codex-local-archive/`。这些备份均在 `.git` 内，仅保留本地。代码、文档、配置和小型结果可同步；模型/数据/环境/缓存/checkpoint/原始日志继续由既有忽略规则排除。
+
+
+## 2026-11-17T05:36:22.003334+00:00：GitHub认证恢复，完成全部工作分支同步
+
+- 用户完成服务器GitHub CLI登录后要求继续推送；已确认当前账号为Heyprion、协议HTTPS，并通过 `gh auth setup-git --hostname github.com` 配置Git认证。
+- 重新fetch并审查全部待上传历史：31个提交、170个新增blob版本，共3,967,894字节，最大130,953字节；仅包含代码、文档、配置及小型结果摘要，禁止上传目录/扩展名及单文件大小检查通过。模型权重、数据集、虚拟环境、缓存、checkpoint、原始日志和Git备份继续保留本地。审查清单位于既有本地备份目录的 `authenticated-pre-push-audit.json`。
+- 已成功执行 `git push --atomic --set-upstream origin --all`，同步全部14个本地工作分支，其中远程新建11个分支、既有3个分支已对齐；31个原始提交均保留原SHA。本轮使用普通HTTPS推送，取代前条记录中尚未执行的GitHub对象接口重建计划，无需变更提交SHA。未强制推送、未合并或改动main。
+- 通过 `git ls-remote --heads origin` 逐分支核对14个远程提交号与本地完全一致，待同步提交数为0；当前分支为 `experiment/thinking-alignment-pilot-20261116`，上游跟踪已建立。本条同步结果另外提交并推送。
+- 本轮仅Git认证、文件清单/大小审查、提交、推送及核验，没有新增模型或数据实验，因此未新建SwanLab运行；原始提交及本地Git备份继续保留于 `.git/codex-sync-backups/` 与 `refs/codex-local-archive/`，未推送归档引用。
